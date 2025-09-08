@@ -8,6 +8,19 @@
 
 import Foundation
 
+// MARK: - Константы полей API
+enum APIFields {
+    static let basic = ["id", "title", "slug"]
+    static let category = ["id", "slug", "name"]
+    static let news = ["id", "publication_date", "title", "slug"]
+    static let place = ["id", "title", "slug", "address", "phone", "site_url", "subway", "is_closed", "location", "has_parking_lot"]
+    static let movie = ["id", "title", "poster"]
+    static let movieShowing = ["id", "movie", "place", "datetime", "three_d", "imax", "four_dx", "original_language", "price"]
+    static let eventOfTheDay = ["date", "location", "object", "title"]
+    static let agentRole = ["id", "name", "name_plural"]
+    static let event = ["id", "title", "dates"]
+}
+
 // MARK: - Ошибки сети
 enum NetworkError: Error {
     case invalidURL
@@ -86,37 +99,37 @@ enum APIRequest {
 
     // MARK: - Параметры запросов
     var query: [URLQueryItem] {
+        var items: [URLQueryItem] = []
+        
         switch self {
-        case let .eventCategories(fields):
-            var items: [URLQueryItem] = []
+        // Простые запросы с полями
+        case let .eventCategories(fields),
+             let .placeCategories(fields):
             if let fields, !fields.isEmpty {
                 items.append(.init(name: "fields", value: fields.joined(separator: ",")))
             }
-            return items
             
-        case let .placeCategories(fields):
-            var items: [URLQueryItem] = []
-            if let fields, !fields.isEmpty {
-                items.append(.init(name: "fields", value: fields.joined(separator: ",")))
-            }
-            return items
-            
-        case let .agents(page, fields):
-            var items: [URLQueryItem] = []
+        // Пагинированные запросы
+        case let .agents(page, fields),
+             let .news(page, fields),
+             let .lists(page, fields),
+             let .places(page, fields),
+             let .movieShowings(page, fields),
+             let .movies(page, fields):
             if let page { items.append(.init(name: "page", value: String(page))) }
             if let fields, !fields.isEmpty {
                 items.append(.init(name: "fields", value: fields.joined(separator: ",")))
             }
-            return items
             
+        // Специальные случаи
         case let .agentRoles(lang, fields):
-            return [
+            items = [
                 .init(name: "lang", value: lang),
                 .init(name: "fields", value: fields.joined(separator: ","))
             ]
             
         case let .events(location, since, until, pageSize, fields):
-            return [
+            items = [
                 .init(name: "location", value: location),
                 .init(name: "actual_since", value: String(since)),
                 .init(name: "actual_until", value: String(until)),
@@ -125,57 +138,17 @@ enum APIRequest {
             ]
             
         case let .eventsOfTheDay(location, date, fields):
-            var items: [URLQueryItem] = []
             if let location { items.append(.init(name: "location", value: location)) }
-            if let date { items.append(.init(name: "date", value: date)) } // формат YYYY-MM-DD
+            if let date { items.append(.init(name: "date", value: date)) }
             if let fields, !fields.isEmpty {
                 items.append(.init(name: "fields", value: fields.joined(separator: ",")))
             }
-            return items
-            
-        case let .news(page, fields):
-            var items: [URLQueryItem] = []
-            if let page { items.append(.init(name: "page", value: String(page))) }
-            if let fields, !fields.isEmpty {
-                items.append(.init(name: "fields", value: fields.joined(separator: ",")))
-            }
-            return items
-            
-        case let .lists(page, fields):
-            var items: [URLQueryItem] = []
-            if let page { items.append(.init(name: "page", value: String(page))) }
-            if let fields, !fields.isEmpty {
-                items.append(.init(name: "fields", value: fields.joined(separator: ",")))
-            }
-            return items
-            
-        case let .places(page, fields):
-            var items: [URLQueryItem] = []
-            if let page { items.append(.init(name: "page", value: String(page))) }
-            if let fields, !fields.isEmpty {
-                items.append(.init(name: "fields", value: fields.joined(separator: ",")))
-            }
-            return items
             
         case .locations:
-            return []
-            
-        case let .movieShowings(page, fields):
-            var items: [URLQueryItem] = []
-            if let page { items.append(.init(name: "page", value: String(page))) }
-            if let fields, !fields.isEmpty {
-                items.append(.init(name: "fields", value: fields.joined(separator: ",")))
-            }
-            return items
-            
-        case let .movies(page, fields):
-            var items: [URLQueryItem] = []
-            if let page { items.append(.init(name: "page", value: String(page))) }
-            if let fields, !fields.isEmpty {
-                items.append(.init(name: "fields", value: fields.joined(separator: ",")))
-            }
-            return items
+            break
         }
+        
+        return items
     }
 
     // MARK: - Создание URLRequest

@@ -16,83 +16,70 @@ final class DataManager {
     // MARK: - Инициализация
     private init() {}
     
+    // MARK: - Универсальные методы
+    private func fetchPaged<T: Decodable>(_ request: APIRequest) async throws -> [T] {
+        let response: PagedResponse<T> = try await client.fetch(request)
+        return response.results
+    }
+    
+    private func fetchSimple<T: Decodable>(_ request: APIRequest) async throws -> T {
+        return try await client.fetch(request)
+    }
+    
     // MARK: - Категории
     func fetchEventCategories() async throws -> [EventCategory] {
-        return try await client.fetch(.eventCategories(fields: ["id", "slug", "name"]))
+        try await fetchSimple(.eventCategories(fields: APIFields.category))
     }
     
     func fetchPlaceCategories() async throws -> [PlaceCategory] {
-        try await client.fetch(.placeCategories(fields: ["id", "slug", "name"]))
+        try await fetchSimple(.placeCategories(fields: APIFields.category))
     }
     
     // MARK: - Агенты и роли
     func fetchAgents(page: Int? = nil) async throws -> [Agent] {
-        let response: PagedResponse<Agent> = try await client.fetch(
-            .agents(page: page, fields: ["id", "title", "slug"])
-        )
-        return response.results
+        try await fetchPaged(.agents(page: page, fields: APIFields.basic))
     }
 
     func fetchAgentRoles() async throws -> [AgentRole] {
-        let page: PagedResponse<AgentRole> = try await client.fetch(.agentRoles())
-        return page.results
+        try await fetchPaged(.agentRoles())
     }
 
     // MARK: - События
     func fetchEvents(location: String, actualSince: Int, actualUntil: Int) async throws -> [EventItem] {
-        let page: PagedResponse<EventItem> = try await client.fetch(.events(location: location, since: actualSince, until: actualUntil))
-        return page.results
+        try await fetchPaged(.events(location: location, since: actualSince, until: actualUntil))
     }
     
     func fetchEventsOfTheDay(location: String? = nil, date: String? = nil) async throws -> [EventOfTheDay] {
-        let response: PagedResponse<EventOfTheDay> = try await client.fetch(
-            .eventsOfTheDay(location: location, date: date, fields: ["date", "location", "object", "title"])
-        )
-        return response.results
+        try await fetchPaged(.eventsOfTheDay(location: location, date: date, fields: APIFields.eventOfTheDay))
     }
     
     // MARK: - Новости
     func fetchNews(page: Int? = nil) async throws -> [NewsItem] {
-        let response: PagedResponse<NewsItem> = try await client.fetch(
-            .news(page: page, fields: ["id", "publication_date", "title", "slug"])
-        )
-        return response.results
+        try await fetchPaged(.news(page: page, fields: APIFields.news))
     }
     
     // MARK: - Подборки
     func fetchLists(page: Int? = nil) async throws -> [ListItem] {
-        let response: PagedResponse<ListItem> = try await client.fetch(
-            .lists(page: page, fields: ["id", "publication_date", "title", "slug", "site_url"])
-        )
-        return response.results
+        try await fetchPaged(.lists(page: page, fields: APIFields.news))
     }
     
     // MARK: - Места
     func fetchPlaces(page: Int? = nil) async throws -> [Place] {
-        let response: PagedResponse<Place> = try await client.fetch(
-            .places(page: page, fields: ["id", "title", "slug", "address", "phone", "site_url", "subway", "is_closed", "location", "has_parking_lot"])
-        )
-        return response.results
+        try await fetchPaged(.places(page: page, fields: APIFields.place))
     }
     
     // MARK: - Локации
     func fetchLocations() async throws -> [Location] {
-        return try await client.fetch(.locations)
+        try await fetchSimple(.locations)
     }
     
     // MARK: - Показы фильмов
     func fetchMovieShowings(page: Int? = nil) async throws -> [MovieShowing] {
-        let response: PagedResponse<MovieShowing> = try await client.fetch(
-            .movieShowings(page: page, fields: ["id", "movie", "place", "datetime", "three_d", "imax", "four_dx", "original_language", "price"])
-        )
-        return response.results
+        try await fetchPaged(.movieShowings(page: page, fields: APIFields.movieShowing))
     }
     
     // MARK: - Фильмы
     func fetchMovies(page: Int? = nil) async throws -> [Movie] {
-        let response: PagedResponse<Movie> = try await client.fetch(
-            .movies(page: page, fields: ["id", "title", "poster"])
-        )
-        return response.results
+        try await fetchPaged(.movies(page: page, fields: APIFields.movie))
     }
 }
