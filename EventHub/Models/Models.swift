@@ -15,39 +15,28 @@ struct PagedResponse<T: Decodable>: Decodable {
     let results: [T]
 }
 
-// MARK: - Категории
-struct EventCategory: Decodable, Sendable {
-    let id: Int
-    let slug: String
-    let name: String
-}
-
-struct PlaceCategory: Decodable, Sendable {
-    let id: Int
-    let slug: String
-    let name: String
-}
-
-// MARK: - Агенты и роли
+// MARK: - Агент
 struct Agent: Decodable, Sendable {
     let id: Int
     let title: String
     let slug: String
 }
 
+// MARK: - Роль агента
 struct AgentRole: Decodable, Sendable {
     let id: Int
     let name: String?
     let namePlural: String?
 }
 
-// MARK: - События
+// MARK: - Элемент события
 struct EventItem: Decodable, Sendable {
     let id: Int
     let title: String
     let dates: [EventDate]?
 }
 
+// MARK: - Дата события
 struct EventDate: Decodable, Sendable {
     let start: Int?
     let end: Int?
@@ -57,12 +46,14 @@ struct EventDate: Decodable, Sendable {
     let endTime: String?
 }
 
+// MARK: - Событие дня
 struct EventOfTheDay: Decodable, Sendable {
     let date: String
     let location: String
     let object: EventOfTheDayObject
     let title: String
 
+    // MARK: - Объект события дня
     struct EventOfTheDayObject: Decodable, Sendable {
         let id: Int
         let ctype: String
@@ -100,13 +91,7 @@ struct Place: Decodable, Sendable {
     let hasParkingLot: Bool
 }
 
-// MARK: - Локации
-struct Location: Decodable, Sendable {
-    let slug: String
-    let name: String
-}
-
-// MARK: - Показы фильмов
+// MARK: - Показ фильма
 struct MovieShowing: Decodable, Sendable {
     let id: Int
     let movie: MovieReference
@@ -118,28 +103,53 @@ struct MovieShowing: Decodable, Sendable {
     let originalLanguage: Bool
     let price: String
 
+    // MARK: - Ссылка на фильм
     struct MovieReference: Decodable, Sendable {
         let id: Int
     }
 
+    // MARK: - Ссылка на место
     struct PlaceReference: Decodable, Sendable {
         let id: Int
     }
 }
 
-// MARK: - Фильмы
+// MARK: - Фильм
 struct Movie: Decodable, Sendable {
     let id: Int
     let title: String
     let poster: MoviePoster?
 
+    // MARK: - Постер фильма
     struct MoviePoster: Decodable, Sendable {
         let image: String
         let source: PosterSource?
 
+        // MARK: - Источник постера
         struct PosterSource: Decodable, Sendable {
             let name: String
             let link: String
         }
     }
+}
+
+// MARK: - Категория события
+struct EventCategory: Decodable, Sendable {
+    let id: Int
+    let slug: String
+    let name: String
+}
+
+// MARK: - Категория места
+struct PlaceCategory: Decodable, Sendable {
+    let id: Int
+    let slug: String
+    let name: String
+}
+
+// MARK: - Локации
+// MARK: - Локация
+struct Location: Decodable, Sendable {
+    let slug: String
+    let name: String
 }
