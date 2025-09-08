@@ -52,7 +52,7 @@ final class DataManager {
     func fetchEventsOfTheDay(location: String? = nil, date: String? = nil) async throws -> [EventOfTheDay] {
         try await fetchPaged(.eventsOfTheDay(location: location, date: date, fields: APIFields.eventOfTheDay))
     }
-    
+
     // MARK: - Получение новостей
     func fetchNews(page: Int? = nil) async throws -> [NewsItem] {
         try await fetchPaged(.news(page: page, fields: APIFields.news))
@@ -67,7 +67,7 @@ final class DataManager {
     func fetchPlaces(page: Int? = nil) async throws -> [Place] {
         try await fetchPaged(.places(page: page, fields: APIFields.place))
     }
-
+    
     // MARK: - Получение локаций
     func fetchLocations() async throws -> [Location] {
         try await fetchSimple(.locations)

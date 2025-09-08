@@ -7,14 +7,6 @@
 
 import Foundation
 
-// MARK: - Модель страницы
-struct PagedResponse<T: Decodable>: Decodable {
-    let count: Int
-    let next: String?
-    let previous: String?
-    let results: [T]
-}
-
 // MARK: - Категория события
 struct EventCategory: Decodable, Sendable {
     let id: Int
@@ -33,6 +25,14 @@ struct PlaceCategory: Decodable, Sendable {
 struct Location: Decodable, Sendable {
     let slug: String
     let name: String
+}
+
+// MARK: - Модель страницы
+struct PagedResponse<T: Decodable>: Decodable {
+    let count: Int
+    let next: String?
+    let previous: String?
+    let results: [T]
 }
 
 // MARK: - Агент
