@@ -15,6 +15,26 @@ struct PagedResponse<T: Decodable>: Decodable {
     let results: [T]
 }
 
+// MARK: - Категория события
+struct EventCategory: Decodable, Sendable {
+    let id: Int
+    let slug: String
+    let name: String
+}
+
+// MARK: - Категория места
+struct PlaceCategory: Decodable, Sendable {
+    let id: Int
+    let slug: String
+    let name: String
+}
+
+// MARK: - Локация
+struct Location: Decodable, Sendable {
+    let slug: String
+    let name: String
+}
+
 // MARK: - Агент
 struct Agent: Decodable, Sendable {
     let id: Int
@@ -29,7 +49,7 @@ struct AgentRole: Decodable, Sendable {
     let namePlural: String?
 }
 
-// MARK: - Элемент события
+// MARK: - Событие
 struct EventItem: Decodable, Sendable {
     let id: Int
     let title: String
@@ -77,7 +97,7 @@ struct ListItem: Decodable, Sendable {
     let siteUrl: String
 }
 
-// MARK: - Места
+// MARK: - Место
 struct Place: Decodable, Sendable {
     let id: Int
     let title: String
@@ -131,25 +151,4 @@ struct Movie: Decodable, Sendable {
             let link: String
         }
     }
-}
-
-// MARK: - Категория события
-struct EventCategory: Decodable, Sendable {
-    let id: Int
-    let slug: String
-    let name: String
-}
-
-// MARK: - Категория места
-struct PlaceCategory: Decodable, Sendable {
-    let id: Int
-    let slug: String
-    let name: String
-}
-
-// MARK: - Локации
-// MARK: - Локация
-struct Location: Decodable, Sendable {
-    let slug: String
-    let name: String
 }
