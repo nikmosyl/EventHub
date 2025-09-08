@@ -58,4 +58,12 @@ final class DataManager {
         )
         return response.results
     }
+    
+    // MARK: - Подборки
+    func fetchLists(page: Int? = nil) async throws -> [ListItem] {
+        let response: PagedResponse<ListItem> = try await client.fetch(
+            .lists(page: page, fields: ["id", "publication_date", "title", "slug", "site_url"])
+        )
+        return response.results
+    }
 }

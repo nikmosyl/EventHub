@@ -76,3 +76,12 @@ struct NewsItem: Decodable, Sendable {
     let title: String
     let slug: String
 }
+
+// MARK: - Подборки
+struct ListItem: Decodable, Sendable {
+    let id: Int
+    let publicationDate: Int // Unix timestamp
+    let title: String
+    let slug: String
+    let siteUrl: String
+}
