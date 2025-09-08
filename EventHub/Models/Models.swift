@@ -15,7 +15,7 @@ struct PagedResponse<T: Decodable>: Decodable {
     let results: [T]
 }
 
-// MARK: - Модели
+// MARK: - Категории
 struct EventCategory: Decodable, Sendable {
     let id: Int
     let slug: String
@@ -28,6 +28,7 @@ struct PlaceCategory: Decodable, Sendable {
     let name: String
 }
 
+// MARK: - Агенты и роли
 struct Agent: Decodable, Sendable {
     let id: Int
     let title: String
@@ -40,6 +41,7 @@ struct AgentRole: Decodable, Sendable {
     let namePlural: String?
 }
 
+// MARK: - События
 struct EventItem: Decodable, Sendable {
     let id: Int
     let title: String
@@ -55,7 +57,6 @@ struct EventDate: Decodable, Sendable {
     let endTime: String?
 }
 
-// MARK: - Событие дня
 struct EventOfTheDay: Decodable, Sendable {
     let date: String
     let location: String
@@ -66,4 +67,12 @@ struct EventOfTheDay: Decodable, Sendable {
         let id: Int
         let ctype: String
     }
+}
+
+// MARK: - Новости
+struct NewsItem: Decodable, Sendable {
+    let id: Int
+    let publicationDate: Int
+    let title: String
+    let slug: String
 }

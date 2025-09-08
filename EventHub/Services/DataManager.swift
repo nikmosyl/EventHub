@@ -9,11 +9,14 @@ import Foundation
 
 // MARK: - DataManager
 final class DataManager {
+    // MARK: - Свойства
     static let shared = DataManager()
     private let client = SimpleClient()
     
+    // MARK: - Инициализация
     private init() {}
     
+    // MARK: - Категории
     func fetchEventCategories() async throws -> [EventCategory] {
         return try await client.fetch(.eventCategories(fields: ["id", "slug", "name"]))
     }
@@ -22,6 +25,7 @@ final class DataManager {
         try await client.fetch(.placeCategories(fields: ["id", "slug", "name"]))
     }
     
+    // MARK: - Агенты и роли
     func fetchAgents(page: Int? = nil) async throws -> [Agent] {
         let response: PagedResponse<Agent> = try await client.fetch(
             .agents(page: page, fields: ["id", "title", "slug"])
@@ -34,6 +38,7 @@ final class DataManager {
         return page.results
     }
 
+    // MARK: - События
     func fetchEvents(location: String, actualSince: Int, actualUntil: Int) async throws -> [EventItem] {
         let page: PagedResponse<EventItem> = try await client.fetch(.events(location: location, since: actualSince, until: actualUntil))
         return page.results
@@ -42,6 +47,14 @@ final class DataManager {
     func fetchEventsOfTheDay(location: String? = nil, date: String? = nil) async throws -> [EventOfTheDay] {
         let response: PagedResponse<EventOfTheDay> = try await client.fetch(
             .eventsOfTheDay(location: location, date: date, fields: ["date", "location", "object", "title"])
+        )
+        return response.results
+    }
+    
+    // MARK: - Новости
+    func fetchNews(page: Int? = nil) async throws -> [NewsItem] {
+        let response: PagedResponse<NewsItem> = try await client.fetch(
+            .news(page: page, fields: ["id", "publication_date", "title", "slug"])
         )
         return response.results
     }

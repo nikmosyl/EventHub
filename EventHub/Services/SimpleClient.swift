@@ -44,7 +44,12 @@ enum APIRequest {
         date: String? = nil,
         fields: [String]? = nil
     )
+    case news(
+        page: Int? = nil,
+        fields: [String]? = nil
+    )
 
+    // MARK: - Пути эндпоинтов
     var path: String {
         switch self {
         case .eventCategories: return "event-categories/"
@@ -53,9 +58,11 @@ enum APIRequest {
         case .agentRoles: return "agent-roles/"
         case .events: return "events/"
         case .eventsOfTheDay: return "events-of-the-day/"
+        case .news: return "news/"
         }
     }
 
+    // MARK: - Параметры запросов
     var query: [URLQueryItem] {
         switch self {
         case let .eventCategories(fields):
@@ -103,9 +110,18 @@ enum APIRequest {
                 items.append(.init(name: "fields", value: fields.joined(separator: ",")))
             }
             return items
+            
+        case let .news(page, fields):
+            var items: [URLQueryItem] = []
+            if let page { items.append(.init(name: "page", value: String(page))) }
+            if let fields, !fields.isEmpty {
+                items.append(.init(name: "fields", value: fields.joined(separator: ",")))
+            }
+            return items
         }
     }
 
+    // MARK: - Создание URLRequest
     func urlRequest(baseURL: URL) throws -> URLRequest {
         var components = URLComponents(
             url: baseURL.appendingPathComponent(path),
@@ -122,12 +138,15 @@ enum APIRequest {
 }
 
 
+// MARK: - Сетевой клиент
 final class SimpleClient {
+    // MARK: - Свойства
     private let baseURL = URL(string: "https://kudago.com/public-api/v1.4")!
     private let session: URLSession
     private let decoder: JSONDecoder
     private let maxRetries: Int = 1
 
+    // MARK: - Инициализация
     init(session: URLSession = .shared) {
         self.session = session
         let decoder = JSONDecoder()
@@ -136,6 +155,7 @@ final class SimpleClient {
         self.decoder = decoder
     }
 
+    // MARK: - Публичные методы
     func fetch<T: Decodable>(_ request: APIRequest) async throws -> T {
         let urlRequest = try request.urlRequest(baseURL: baseURL)
         var lastError: Error?
