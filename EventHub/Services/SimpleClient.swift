@@ -52,6 +52,10 @@ enum APIRequest {
         page: Int? = nil,
         fields: [String]? = nil
     )
+    case places(
+        page: Int? = nil,
+        fields: [String]? = nil
+    )
 
     // MARK: - Пути эндпоинтов
     var path: String {
@@ -64,6 +68,7 @@ enum APIRequest {
         case .eventsOfTheDay: return "events-of-the-day/"
         case .news: return "news/"
         case .lists: return "lists/"
+        case .places: return "places/"
         }
     }
 
@@ -125,6 +130,14 @@ enum APIRequest {
             return items
             
         case let .lists(page, fields):
+            var items: [URLQueryItem] = []
+            if let page { items.append(.init(name: "page", value: String(page))) }
+            if let fields, !fields.isEmpty {
+                items.append(.init(name: "fields", value: fields.joined(separator: ",")))
+            }
+            return items
+            
+        case let .places(page, fields):
             var items: [URLQueryItem] = []
             if let page { items.append(.init(name: "page", value: String(page))) }
             if let fields, !fields.isEmpty {

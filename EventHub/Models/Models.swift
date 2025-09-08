@@ -85,3 +85,17 @@ struct ListItem: Decodable, Sendable {
     let slug: String
     let siteUrl: String
 }
+
+// MARK: - Места
+struct Place: Decodable, Sendable {
+    let id: Int
+    let title: String
+    let slug: String
+    let address: String
+    let phone: String
+    let siteUrl: String
+    let subway: String
+    let isClosed: Bool
+    let location: String
+    let hasParkingLot: Bool
+}

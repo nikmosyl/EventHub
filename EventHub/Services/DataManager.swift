@@ -66,4 +66,12 @@ final class DataManager {
         )
         return response.results
     }
+    
+    // MARK: - Места
+    func fetchPlaces(page: Int? = nil) async throws -> [Place] {
+        let response: PagedResponse<Place> = try await client.fetch(
+            .places(page: page, fields: ["id", "title", "slug", "address", "phone", "site_url", "subway", "is_closed", "location", "has_parking_lot"])
+        )
+        return response.results
+    }
 }
