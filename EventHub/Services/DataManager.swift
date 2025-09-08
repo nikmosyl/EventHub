@@ -79,4 +79,12 @@ final class DataManager {
     func fetchLocations() async throws -> [Location] {
         return try await client.fetch(.locations)
     }
+    
+    // MARK: - Показы фильмов
+    func fetchMovieShowings(page: Int? = nil) async throws -> [MovieShowing] {
+        let response: PagedResponse<MovieShowing> = try await client.fetch(
+            .movieShowings(page: page, fields: ["id", "movie", "place", "datetime", "three_d", "imax", "four_dx", "original_language", "price"])
+        )
+        return response.results
+    }
 }

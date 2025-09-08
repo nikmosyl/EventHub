@@ -105,3 +105,24 @@ struct Location: Decodable, Sendable {
     let slug: String
     let name: String
 }
+
+// MARK: - Показы фильмов
+struct MovieShowing: Decodable, Sendable {
+    let id: Int
+    let movie: MovieReference
+    let place: PlaceReference
+    let datetime: Int // Unix timestamp
+    let threeD: Bool
+    let imax: Bool
+    let fourDx: Bool
+    let originalLanguage: Bool
+    let price: String
+
+    struct MovieReference: Decodable, Sendable {
+        let id: Int
+    }
+
+    struct PlaceReference: Decodable, Sendable {
+        let id: Int
+    }
+}
