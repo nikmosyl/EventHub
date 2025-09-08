@@ -91,10 +91,10 @@ struct NewsItem: Decodable, Sendable {
 // MARK: - Подборки
 struct ListItem: Decodable, Sendable {
     let id: Int
-    let publicationDate: Int // Unix timestamp
+    let publicationDate: Int
     let title: String
     let slug: String
-    let siteUrl: String
+    let siteUrl: String?
 }
 
 // MARK: - Место
@@ -116,7 +116,7 @@ struct MovieShowing: Decodable, Sendable {
     let id: Int
     let movie: MovieReference
     let place: PlaceReference
-    let datetime: Int // Unix timestamp
+    let datetime: Int
     let threeD: Bool
     let imax: Bool
     let fourDx: Bool

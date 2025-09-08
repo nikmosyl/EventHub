@@ -15,13 +15,24 @@ final class DataManager {
     // MARK: - Универсальный запрос
     private func fetch<T: Decodable>(_ request: APIRequest) async throws -> T {
         let (data, response) = try await URLSession.shared.data(for: try request.urlRequest())
-        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+        
+        guard let http = response as? HTTPURLResponse else {
             throw NetworkError.invalidResponse
         }
+        
+        guard (200...299).contains(http.statusCode) else {
+            throw NetworkError.badStatus(http.statusCode)
+        }
+        
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         decoder.dateDecodingStrategy = .secondsSince1970
-        return try decoder.decode(T.self, from: data)
+        
+        do {
+            return try decoder.decode(T.self, from: data)
+        } catch {
+            throw NetworkError.decoding(error)
+        }
     }
     
     // MARK: - Универсальные методы
