@@ -7,6 +7,12 @@
 
 import Foundation
 
+// MARK: - Конфигурация API
+enum APIConfig {
+    static let baseURL = URL(string: "https://kudago.com/public-api/v1.4")!
+}
+
+// MARK: - Поля API
 enum APIFields {
     static let basic = ["id", "title", "slug"]
     static let category = ["id", "slug", "name"]
@@ -19,10 +25,12 @@ enum APIFields {
     static let event = ["id", "title", "dates"]
 }
 
+// MARK: - Ошибки сети
 enum NetworkError: Error {
     case invalidURL, invalidResponse, badStatus(Int), decoding(Error)
 }
 
+// MARK: - Запросы API
 enum APIRequest {
     case eventCategories(fields: [String]? = nil)
     case placeCategories(fields: [String]? = nil)
@@ -37,6 +45,7 @@ enum APIRequest {
     case movieShowings(page: Int? = nil, fields: [String]? = nil)
     case movies(page: Int? = nil, fields: [String]? = nil)
 
+    // MARK: - Путь запроса
     var path: String {
         switch self {
         case .eventCategories: return "event-categories/"
@@ -54,6 +63,7 @@ enum APIRequest {
         }
     }
 
+    // MARK: - Параметры запроса
     var query: [URLQueryItem] {
         switch self {
         case let .eventCategories(fields), let .placeCategories(fields):
@@ -84,8 +94,9 @@ enum APIRequest {
         }
     }
 
-    func urlRequest(baseURL: URL) throws -> URLRequest {
-        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
+    // MARK: - Создание URL запроса
+    func urlRequest() throws -> URLRequest {
+        var components = URLComponents(url: APIConfig.baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)
         components?.queryItems = query
         guard let url = components?.url else { throw NetworkError.invalidURL }
         var request = URLRequest(url: url)

@@ -10,17 +10,28 @@ import Foundation
 // MARK: - DataManager
 final class DataManager {
     static let shared = DataManager()
-    private let client = SimpleClient()
     private init() {}
+    
+    // MARK: - Универсальный запрос
+    private func fetch<T: Decodable>(_ request: APIRequest) async throws -> T {
+        let (data, response) = try await URLSession.shared.data(for: try request.urlRequest())
+        guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
+            throw NetworkError.invalidResponse
+        }
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        decoder.dateDecodingStrategy = .secondsSince1970
+        return try decoder.decode(T.self, from: data)
+    }
     
     // MARK: - Универсальные методы
     private func fetchPaged<T: Decodable>(_ request: APIRequest) async throws -> [T] {
-        let response: PagedResponse<T> = try await client.fetch(request)
+        let response: PagedResponse<T> = try await fetch(request)
         return response.results
     }
     
     private func fetchSimple<T: Decodable>(_ request: APIRequest) async throws -> T {
-        return try await client.fetch(request)
+        return try await fetch(request)
     }
     
     // MARK: - Получение категорий событий
@@ -37,12 +48,12 @@ final class DataManager {
     func fetchAgents(page: Int? = nil) async throws -> [Agent] {
         try await fetchPaged(.agents(page: page, fields: APIFields.basic))
     }
-
+    
     // MARK: - Получение ролей агентов
     func fetchAgentRoles() async throws -> [AgentRole] {
         try await fetchPaged(.agentRoles())
     }
-
+    
     // MARK: - Получение событий
     func fetchEvents(location: String, actualSince: Int, actualUntil: Int) async throws -> [EventItem] {
         try await fetchPaged(.events(location: location, since: actualSince, until: actualUntil))
@@ -52,7 +63,7 @@ final class DataManager {
     func fetchEventsOfTheDay(location: String? = nil, date: String? = nil) async throws -> [EventOfTheDay] {
         try await fetchPaged(.eventsOfTheDay(location: location, date: date, fields: APIFields.eventOfTheDay))
     }
-
+    
     // MARK: - Получение новостей
     func fetchNews(page: Int? = nil) async throws -> [NewsItem] {
         try await fetchPaged(.news(page: page, fields: APIFields.news))
