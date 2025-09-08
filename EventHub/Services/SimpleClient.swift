@@ -61,6 +61,10 @@ enum APIRequest {
         page: Int? = nil,
         fields: [String]? = nil
     )
+    case movies(
+        page: Int? = nil,
+        fields: [String]? = nil
+    )
 
     // MARK: - Пути эндпоинтов
     var path: String {
@@ -76,7 +80,7 @@ enum APIRequest {
         case .places: return "places/"
         case .locations: return "locations/"
         case .movieShowings: return "movie-showings/"
-
+        case .movies: return "movies/"
         }
     }
 
@@ -157,6 +161,14 @@ enum APIRequest {
             return []
             
         case let .movieShowings(page, fields):
+            var items: [URLQueryItem] = []
+            if let page { items.append(.init(name: "page", value: String(page))) }
+            if let fields, !fields.isEmpty {
+                items.append(.init(name: "fields", value: fields.joined(separator: ",")))
+            }
+            return items
+            
+        case let .movies(page, fields):
             var items: [URLQueryItem] = []
             if let page { items.append(.init(name: "page", value: String(page))) }
             if let fields, !fields.isEmpty {

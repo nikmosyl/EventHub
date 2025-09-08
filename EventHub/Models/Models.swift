@@ -126,3 +126,20 @@ struct MovieShowing: Decodable, Sendable {
         let id: Int
     }
 }
+
+// MARK: - Фильмы
+struct Movie: Decodable, Sendable {
+    let id: Int
+    let title: String
+    let poster: MoviePoster?
+
+    struct MoviePoster: Decodable, Sendable {
+        let image: String
+        let source: PosterSource?
+
+        struct PosterSource: Decodable, Sendable {
+            let name: String
+            let link: String
+        }
+    }
+}
