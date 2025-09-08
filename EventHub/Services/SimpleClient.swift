@@ -56,6 +56,7 @@ enum APIRequest {
         page: Int? = nil,
         fields: [String]? = nil
     )
+    case locations
 
     // MARK: - Пути эндпоинтов
     var path: String {
@@ -69,6 +70,8 @@ enum APIRequest {
         case .news: return "news/"
         case .lists: return "lists/"
         case .places: return "places/"
+        case .locations: return "locations/"
+
         }
     }
 
@@ -144,6 +147,9 @@ enum APIRequest {
                 items.append(.init(name: "fields", value: fields.joined(separator: ",")))
             }
             return items
+            
+        case .locations:
+            return []
         }
     }
 

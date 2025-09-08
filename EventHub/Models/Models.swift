@@ -99,3 +99,9 @@ struct Place: Decodable, Sendable {
     let location: String
     let hasParkingLot: Bool
 }
+
+// MARK: - Локации
+struct Location: Decodable, Sendable {
+    let slug: String
+    let name: String
+}

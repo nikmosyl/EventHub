@@ -74,4 +74,9 @@ final class DataManager {
         )
         return response.results
     }
+    
+    // MARK: - Локации
+    func fetchLocations() async throws -> [Location] {
+        return try await client.fetch(.locations)
+    }
 }
