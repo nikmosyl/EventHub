@@ -7,6 +7,47 @@
 
 import Foundation
 
+// MARK: - Фильтры для событий
+struct EventFilters {
+    let location: String?
+    let actualSince: Int?
+    let actualUntil: Int?
+    let categories: [String]?
+    let isFree: Bool?
+    let price: String?
+    let ageRestriction: String?
+    let tags: [String]?
+    let search: String?
+    let page: Int?
+    let pageSize: Int?
+    
+    init(
+        location: String? = nil,
+        actualSince: Int? = nil,
+        actualUntil: Int? = nil,
+        categories: [String]? = nil,
+        isFree: Bool? = nil,
+        price: String? = nil,
+        ageRestriction: String? = nil,
+        tags: [String]? = nil,
+        search: String? = nil,
+        page: Int? = nil,
+        pageSize: Int? = nil
+    ) {
+        self.location = location
+        self.actualSince = actualSince
+        self.actualUntil = actualUntil
+        self.categories = categories
+        self.isFree = isFree
+        self.price = price
+        self.ageRestriction = ageRestriction
+        self.tags = tags
+        self.search = search
+        self.page = page
+        self.pageSize = pageSize
+    }
+}
+
 // MARK: - Категория события
 struct EventCategory: Decodable, Sendable {
     let id: Int

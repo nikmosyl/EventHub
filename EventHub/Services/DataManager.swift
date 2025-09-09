@@ -65,9 +65,20 @@ final class DataManager {
         try await fetchPaged(.agentRoles())
     }
     
-    // MARK: - Получение событий
+    // MARK: - Получение событий с фильтрами
+    func fetchEvents(filters: EventFilters) async throws -> [EventItem] {
+        try await fetchPaged(.events(filters: filters))
+    }
+    
+    // MARK: - Получение событий (обратная совместимость)
     func fetchEvents(location: String, actualSince: Int, actualUntil: Int, page: Int? = nil) async throws -> [EventItem] {
-        try await fetchPaged(.events(location: location, since: actualSince, until: actualUntil, page: page))
+        let filters = EventFilters(
+            location: location,
+            actualSince: actualSince,
+            actualUntil: actualUntil,
+            page: page
+        )
+        return try await fetchEvents(filters: filters)
     }
     
     // MARK: - Получение событий дня
@@ -75,15 +86,28 @@ final class DataManager {
         try await fetchPaged(.eventsOfTheDay(location: location, date: date, fields: APIFields.eventOfTheDay))
     }
     
-    // MARK: - Получение всех событий
-    func fetchAllEvents(location: String, actualSince: Int, actualUntil: Int) async throws -> [EventItem] {
+    // MARK: - Получение всех событий с фильтрами
+    func fetchAllEvents(filters: EventFilters) async throws -> [EventItem] {
         var all: [EventItem] = []
         var page: Int? = 1
         
         while let currentPage = page {
-            let response: PagedResponse<EventItem> = try await fetch(
-                .events(location: location, since: actualSince, until: actualUntil, page: currentPage, pageSize: 100, fields: APIFields.event)
+            var updatedFilters = filters
+            updatedFilters = EventFilters(
+                location: filters.location,
+                actualSince: filters.actualSince,
+                actualUntil: filters.actualUntil,
+                categories: filters.categories,
+                isFree: filters.isFree,
+                price: filters.price,
+                ageRestriction: filters.ageRestriction,
+                tags: filters.tags,
+                search: filters.search,
+                page: currentPage,
+                pageSize: filters.pageSize ?? 100
             )
+            
+            let response: PagedResponse<EventItem> = try await fetch(.events(filters: updatedFilters))
             all.append(contentsOf: response.results)
             page = URLComponents(string: response.next ?? "")?
                 .queryItems?.first(where: { $0.name == "page" })?.value
@@ -91,6 +115,16 @@ final class DataManager {
         }
         
         return all
+    }
+    
+    // MARK: - Получение всех событий (обратная совместимость)
+    func fetchAllEvents(location: String, actualSince: Int, actualUntil: Int) async throws -> [EventItem] {
+        let filters = EventFilters(
+            location: location,
+            actualSince: actualSince,
+            actualUntil: actualUntil
+        )
+        return try await fetchAllEvents(filters: filters)
     }
     
     // MARK: - Получение новостей
@@ -126,5 +160,63 @@ final class DataManager {
     // MARK: - Получение детальной информации о событии
     func fetchEventDetails(eventId: Int) async throws -> EventDetails {
         try await fetchSimple(.eventDetails(id: eventId, fields: APIFields.eventDetails))
+    }
+    
+    // MARK: - Методы для создания фильтров
+    
+    /// Поиск событий по тексту
+    func searchEvents(query: String, location: String? = nil, page: Int? = nil) async throws -> [EventItem] {
+        let filters = EventFilters(
+            location: location,
+            search: query,
+            page: page
+        )
+        return try await fetchEvents(filters: filters)
+    }
+    
+    /// События по категории
+    func fetchEventsByCategory(category: String, location: String? = nil, page: Int? = nil) async throws -> [EventItem] {
+        let filters = EventFilters(
+            location: location,
+            categories: [category],
+            page: page
+        )
+        return try await fetchEvents(filters: filters)
+    }
+    
+    /// Бесплатные события
+    func fetchFreeEvents(location: String? = nil, page: Int? = nil) async throws -> [EventItem] {
+        let filters = EventFilters(
+            location: location,
+            isFree: true,
+            page: page
+        )
+        return try await fetchEvents(filters: filters)
+    }
+    
+    /// События по датам
+    func fetchEventsByDateRange(
+        location: String,
+        from: Date,
+        to: Date,
+        page: Int? = nil
+    ) async throws -> [EventItem] {
+        let filters = EventFilters(
+            location: location,
+            actualSince: Int(from.timeIntervalSince1970),
+            actualUntil: Int(to.timeIntervalSince1970),
+            page: page
+        )
+        return try await fetchEvents(filters: filters)
+    }
+    
+    /// События по тегам
+    func fetchEventsByTags(tags: [String], location: String? = nil, page: Int? = nil) async throws -> [EventItem] {
+        let filters = EventFilters(
+            location: location,
+            tags: tags,
+            page: page
+        )
+        return try await fetchEvents(filters: filters)
     }
 }

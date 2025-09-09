@@ -41,7 +41,7 @@ enum APIRequest {
     case placeCategories(fields: [String]? = nil)
     case agents(page: Int? = nil, fields: [String]? = nil)
     case agentRoles(lang: String = "ru", fields: [String] = ["id", "name", "name_plural"])
-    case events(location: String, since: Int, until: Int, page: Int? = nil, pageSize: Int = 20, fields: [String] = ["id","title","dates"])
+    case events(filters: EventFilters, fields: [String] = ["id","title","dates"])
     case eventsOfTheDay(location: String? = nil, date: String? = nil, fields: [String]? = nil)
     case news(page: Int? = nil, fields: [String]? = nil)
     case lists(page: Int? = nil, fields: [String]? = nil)
@@ -82,15 +82,53 @@ enum APIRequest {
                 .init(name: "fields", value: fields.joined(separator: ","))
             ]
         
-        case let .events(location, since, until, page, pageSize, fields):
-            var items: [URLQueryItem] = [
-                .init(name: "location", value: location),
-                .init(name: "actual_since", value: String(since)),
-                .init(name: "actual_until", value: String(until)),
-                .init(name: "page_size", value: String(pageSize)),
-                .init(name: "fields", value: fields.joined(separator: ","))
-            ]
-            if let page = page { items.append(.init(name: "page", value: String(page))) }
+        case let .events(filters, fields):
+            var items: [URLQueryItem] = []
+            
+            // Обязательные параметры
+            if let location = filters.location {
+                items.append(.init(name: "location", value: location))
+            }
+            if let actualSince = filters.actualSince {
+                items.append(.init(name: "actual_since", value: String(actualSince)))
+            }
+            if let actualUntil = filters.actualUntil {
+                items.append(.init(name: "actual_until", value: String(actualUntil)))
+            }
+            
+            // Опциональные фильтры
+            if let categories = filters.categories, !categories.isEmpty {
+                items.append(.init(name: "categories", value: categories.joined(separator: ",")))
+            }
+            if let isFree = filters.isFree {
+                items.append(.init(name: "is_free", value: String(isFree)))
+            }
+            if let price = filters.price {
+                items.append(.init(name: "price", value: price))
+            }
+            if let ageRestriction = filters.ageRestriction {
+                items.append(.init(name: "age_restriction", value: ageRestriction))
+            }
+            if let tags = filters.tags, !tags.isEmpty {
+                items.append(.init(name: "tags", value: tags.joined(separator: ",")))
+            }
+            if let search = filters.search {
+                items.append(.init(name: "search", value: search))
+            }
+            
+            // Пагинация
+            if let page = filters.page {
+                items.append(.init(name: "page", value: String(page)))
+            }
+            if let pageSize = filters.pageSize {
+                items.append(.init(name: "page_size", value: String(pageSize)))
+            } else {
+                items.append(.init(name: "page_size", value: "20")) // По умолчанию
+            }
+            
+            // Поля
+            items.append(.init(name: "fields", value: fields.joined(separator: ",")))
+            
             return items
         
         case let .eventsOfTheDay(location, date, fields):
