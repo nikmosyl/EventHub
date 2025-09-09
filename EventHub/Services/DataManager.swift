@@ -122,4 +122,9 @@ final class DataManager {
     func fetchMovies(page: Int? = nil) async throws -> [Movie] {
         try await fetchPaged(.movies(page: page, fields: APIFields.movie))
     }
+    
+    // MARK: - Получение детальной информации о событии
+    func fetchEventDetails(eventId: Int) async throws -> EventDetails {
+        try await fetchSimple(.eventDetails(id: eventId, fields: APIFields.eventDetails))
+    }
 }

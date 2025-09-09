@@ -23,6 +23,11 @@ enum APIFields {
     static let eventOfTheDay = ["date", "location", "object", "title"]
     static let agentRole = ["id", "name", "name_plural"]
     static let event = ["id", "title", "dates"]
+    static let eventDetails = [
+        "id", "title", "description", "body_text", "short_title", "slug", 
+        "dates", "location", "place", "price", "is_free", "images", 
+        "site_url", "tags", "categories", "age_restriction", "participants"
+    ]
 }
 
 // MARK: - Ошибки сети
@@ -44,6 +49,7 @@ enum APIRequest {
     case locations
     case movieShowings(page: Int? = nil, fields: [String]? = nil)
     case movies(page: Int? = nil, fields: [String]? = nil)
+    case eventDetails(id: Int, fields: [String]? = nil)
 
     // MARK: - Путь запроса
     var path: String {
@@ -60,6 +66,7 @@ enum APIRequest {
         case .locations: return "locations/"
         case .movieShowings: return "movie-showings/"
         case .movies: return "movies/"
+        case .eventDetails(let id, _): return "events/\(id)/"
         }
     }
 
@@ -98,6 +105,13 @@ enum APIRequest {
             var items: [URLQueryItem] = []
             if let page = page { items.append(.init(name: "page", value: String(page))) }
             if let fields = fields { items.append(.init(name: "fields", value: fields.joined(separator: ","))) }
+            return items
+            
+        case let .eventDetails(_, fields):
+            var items: [URLQueryItem] = []
+            if let fields = fields { 
+                items.append(.init(name: "fields", value: fields.joined(separator: ","))) 
+            }
             return items
         
         case .locations:
