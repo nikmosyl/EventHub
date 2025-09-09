@@ -19,7 +19,7 @@ struct CustomTF: View {
     
     var body: some View {
         HStack(alignment: .top, spacing: 8, content: {
-            Image(systemName: sfIcon)
+            Image(sfIcon)
                 .foregroundStyle(iconTint)
                 .frame(width: 30)
                 .offset(y: 2)
