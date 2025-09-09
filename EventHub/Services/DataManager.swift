@@ -47,17 +47,17 @@ final class DataManager {
     
     // MARK: - Получение категорий событий
     func fetchEventCategories() async throws -> [EventCategory] {
-        try await fetchSimple(.eventCategories(fields: APIFields.category))
+        try await fetchSimple(.eventCategories)
     }
     
     // MARK: - Получение категорий мест
     func fetchPlaceCategories() async throws -> [PlaceCategory] {
-        try await fetchSimple(.placeCategories(fields: APIFields.category))
+        try await fetchSimple(.placeCategories)
     }
     
     // MARK: - Получение агентов
     func fetchAgents(page: Int? = nil) async throws -> [Agent] {
-        try await fetchPaged(.agents(page: page, fields: APIFields.basic))
+        try await fetchPaged(.agents(page: page))
     }
     
     // MARK: - Получение ролей агентов
@@ -83,7 +83,7 @@ final class DataManager {
     
     // MARK: - Получение событий дня
     func fetchEventsOfTheDay(location: String? = nil, date: String? = nil) async throws -> [EventOfTheDay] {
-        try await fetchPaged(.eventsOfTheDay(location: location, date: date, fields: APIFields.eventOfTheDay))
+        try await fetchPaged(.eventsOfTheDay(location: location, date: date))
     }
     
     // MARK: - Получение всех событий с фильтрами
@@ -92,8 +92,7 @@ final class DataManager {
         var page: Int? = 1
         
         while let currentPage = page {
-            var updatedFilters = filters
-            updatedFilters = EventFilters(
+            let updatedFilters = EventFilters(
                 location: filters.location,
                 actualSince: filters.actualSince,
                 actualUntil: filters.actualUntil,
@@ -129,17 +128,17 @@ final class DataManager {
     
     // MARK: - Получение новостей
     func fetchNews(page: Int? = nil) async throws -> [NewsItem] {
-        try await fetchPaged(.news(page: page, fields: APIFields.news))
+        try await fetchPaged(.news(page: page))
     }
     
     // MARK: - Получение подборок
     func fetchLists(page: Int? = nil) async throws -> [ListItem] {
-        try await fetchPaged(.lists(page: page, fields: APIFields.news))
+        try await fetchPaged(.lists(page: page))
     }
     
     // MARK: - Получение мест
     func fetchPlaces(page: Int? = nil) async throws -> [Place] {
-        try await fetchPaged(.places(page: page, fields: APIFields.place))
+        try await fetchPaged(.places(page: page))
     }
     
     // MARK: - Получение локаций
@@ -149,17 +148,17 @@ final class DataManager {
     
     // MARK: - Получение показов фильмов
     func fetchMovieShowings(page: Int? = nil) async throws -> [MovieShowing] {
-        try await fetchPaged(.movieShowings(page: page, fields: APIFields.movieShowing))
+        try await fetchPaged(.movieShowings(page: page))
     }
     
     // MARK: - Получение фильмов
     func fetchMovies(page: Int? = nil) async throws -> [Movie] {
-        try await fetchPaged(.movies(page: page, fields: APIFields.movie))
+        try await fetchPaged(.movies(page: page))
     }
     
     // MARK: - Получение детальной информации о событии
     func fetchEventDetails(eventId: Int) async throws -> EventDetails {
-        try await fetchSimple(.eventDetails(id: eventId, fields: APIFields.eventDetails))
+        try await fetchSimple(.eventDetails(id: eventId))
     }
     
     // MARK: - Методы для создания фильтров
