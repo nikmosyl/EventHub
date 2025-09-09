@@ -55,7 +55,7 @@ enum APIRequest {
     // MARK: - Параметры запроса
     var query: [URLQueryItem] {
         switch self {
-        case .eventCategories, .placeCategories, .locations:
+        case .eventCategories, .placeCategories, .locations, .eventDetails:
             return []
         
         case let .agentRoles(lang):
@@ -124,9 +124,6 @@ enum APIRequest {
                 items.append(.init(name: "page", value: String(page)))
             }
             return items
-            
-        case .eventDetails:
-            return []
         }
     }
 

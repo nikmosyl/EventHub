@@ -65,7 +65,7 @@ struct PlaceCategory: Decodable, Sendable {
 // MARK: - Локация
 struct Location: Decodable, Sendable {
     let slug: String
-    let name: String
+    let name: String?
 }
 
 // MARK: - Модель страницы
@@ -198,10 +198,11 @@ struct Movie: Decodable, Sendable {
 struct EventDetails: Decodable, Sendable {
     let id: Int
     let title: String
+    let slug: String
     let description: String?
     let bodyText: String?
     let shortTitle: String?
-    let slug: String
+    let tagline: String?
     let dates: [EventDate]?
     let location: Location?
     let place: PlaceReference?
@@ -213,6 +214,9 @@ struct EventDetails: Decodable, Sendable {
     let categories: [String]?
     let ageRestriction: String?
     let participants: [String]?
+    let favoritesCount: Int?
+    let commentsCount: Int?
+    let disableComments: Bool?
     
     // MARK: - Изображение события
     struct EventImage: Decodable, Sendable {
