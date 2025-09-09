@@ -66,13 +66,31 @@ final class DataManager {
     }
     
     // MARK: - Получение событий
-    func fetchEvents(location: String, actualSince: Int, actualUntil: Int) async throws -> [EventItem] {
-        try await fetchPaged(.events(location: location, since: actualSince, until: actualUntil))
+    func fetchEvents(location: String, actualSince: Int, actualUntil: Int, page: Int? = nil) async throws -> [EventItem] {
+        try await fetchPaged(.events(location: location, since: actualSince, until: actualUntil, page: page))
     }
     
     // MARK: - Получение событий дня
     func fetchEventsOfTheDay(location: String? = nil, date: String? = nil) async throws -> [EventOfTheDay] {
         try await fetchPaged(.eventsOfTheDay(location: location, date: date, fields: APIFields.eventOfTheDay))
+    }
+    
+    // MARK: - Получение всех событий
+    func fetchAllEvents(location: String, actualSince: Int, actualUntil: Int) async throws -> [EventItem] {
+        var all: [EventItem] = []
+        var page: Int? = 1
+        
+        while let currentPage = page {
+            let response: PagedResponse<EventItem> = try await fetch(
+                .events(location: location, since: actualSince, until: actualUntil, page: currentPage, pageSize: 100, fields: APIFields.event)
+            )
+            all.append(contentsOf: response.results)
+            page = URLComponents(string: response.next ?? "")?
+                .queryItems?.first(where: { $0.name == "page" })?.value
+                .flatMap(Int.init)
+        }
+        
+        return all
     }
     
     // MARK: - Получение новостей

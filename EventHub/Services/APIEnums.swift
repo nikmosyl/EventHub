@@ -36,7 +36,7 @@ enum APIRequest {
     case placeCategories(fields: [String]? = nil)
     case agents(page: Int? = nil, fields: [String]? = nil)
     case agentRoles(lang: String = "ru", fields: [String] = ["id", "name", "name_plural"])
-    case events(location: String, since: Int, until: Int, pageSize: Int = 20, fields: [String] = ["id","title","dates"])
+    case events(location: String, since: Int, until: Int, page: Int? = nil, pageSize: Int = 20, fields: [String] = ["id","title","dates"])
     case eventsOfTheDay(location: String? = nil, date: String? = nil, fields: [String]? = nil)
     case news(page: Int? = nil, fields: [String]? = nil)
     case lists(page: Int? = nil, fields: [String]? = nil)
@@ -67,30 +67,41 @@ enum APIRequest {
     var query: [URLQueryItem] {
         switch self {
         case let .eventCategories(fields), let .placeCategories(fields):
-            return fields.map { [URLQueryItem(name: "fields", value: $0.joined(separator: ","))] } ?? []
-        case let .agents(page, fields), let .news(page, fields), let .lists(page, fields),
-             let .places(page, fields), let .movieShowings(page, fields), let .movies(page, fields):
-            var items: [URLQueryItem] = []
-            if let page { items.append(.init(name: "page", value: String(page))) }
-            if let fields { items.append(.init(name: "fields", value: fields.joined(separator: ","))) }
-            return items
+            return fields.map { [.init(name: "fields", value: $0.joined(separator: ","))] } ?? []
+        
         case let .agentRoles(lang, fields):
-            return [.init(name: "lang", value: lang), .init(name: "fields", value: fields.joined(separator: ","))]
-        case let .events(location, since, until, pageSize, fields):
             return [
+                .init(name: "lang", value: lang),
+                .init(name: "fields", value: fields.joined(separator: ","))
+            ]
+        
+        case let .events(location, since, until, page, pageSize, fields):
+            var items: [URLQueryItem] = [
                 .init(name: "location", value: location),
                 .init(name: "actual_since", value: String(since)),
                 .init(name: "actual_until", value: String(until)),
                 .init(name: "page_size", value: String(pageSize)),
                 .init(name: "fields", value: fields.joined(separator: ","))
             ]
+            if let page = page { items.append(.init(name: "page", value: String(page))) }
+            return items
+        
         case let .eventsOfTheDay(location, date, fields):
             var items: [URLQueryItem] = []
-            if let location { items.append(.init(name: "location", value: location)) }
-            if let date { items.append(.init(name: "date", value: date)) }
-            if let fields { items.append(.init(name: "fields", value: fields.joined(separator: ","))) }
+            if let location = location { items.append(.init(name: "location", value: location)) }
+            if let date = date { items.append(.init(name: "date", value: date)) }
+            if let fields = fields { items.append(.init(name: "fields", value: fields.joined(separator: ","))) }
             return items
-        case .locations: return []
+        
+        case let .agents(page, fields), let .news(page, fields), let .lists(page, fields),
+             let .places(page, fields), let .movieShowings(page, fields), let .movies(page, fields):
+            var items: [URLQueryItem] = []
+            if let page = page { items.append(.init(name: "page", value: String(page))) }
+            if let fields = fields { items.append(.init(name: "fields", value: fields.joined(separator: ","))) }
+            return items
+        
+        case .locations:
+            return []
         }
     }
 
