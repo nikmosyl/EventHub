@@ -42,16 +42,6 @@ enum TabItem: CaseIterable {
 }
 
 // MARK: - Примеры экранов
-struct ExploreView: View {
-    var body: some View {
-        ZStack {
-            Color
-                .red
-                .ignoresSafeArea()
-            Text("ExploreView")
-        }
-    }
-}
 
 struct EventsView: View {
     var body: some View {
