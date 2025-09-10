@@ -84,6 +84,7 @@ struct SignUpView: View {
             }
             .navigationTitle("Sign up")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden()
         }
     }
     
