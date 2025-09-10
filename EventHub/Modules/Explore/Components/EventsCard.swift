@@ -14,7 +14,7 @@ struct EventsCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ZStack(alignment: .top) {
-                Image("imageCard")
+                Image(systemName: "photo")
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: 217, height: 140)
@@ -38,7 +38,10 @@ struct EventsCard: View {
                     
                     Spacer()
                     
-                    BookmarkButton()
+                    BookmarkButton(action: {
+                        //Сохранение мероприятия
+                        isLiked.toggle()
+                    }, isLiked: $isLiked)
                         .padding(.trailing, 15)
                         .padding(.top, 2)
                 }
