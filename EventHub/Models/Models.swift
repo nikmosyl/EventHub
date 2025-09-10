@@ -197,8 +197,8 @@ struct Movie: Decodable, Sendable {
 // MARK: - Детальная информация о событии
 struct EventDetails: Decodable, Sendable {
     let id: Int
-    let title: String
-    let slug: String
+    let title: String?
+    let slug: String?
     let description: String?
     let bodyText: String?
     let shortTitle: String?
@@ -207,12 +207,12 @@ struct EventDetails: Decodable, Sendable {
     let location: Location?
     let place: PlaceReference?
     let price: String?
-    let isFree: Bool
+    let isFree: Bool?
     let images: [EventImage]?
     let siteUrl: String?
     let tags: [String]?
     let categories: [String]?
-    let ageRestriction: String?
+    //let ageRestriction: String?
     let participants: [String]?
     let favoritesCount: Int?
     let commentsCount: Int?
@@ -220,13 +220,13 @@ struct EventDetails: Decodable, Sendable {
     
     // MARK: - Изображение события
     struct EventImage: Decodable, Sendable {
-        let image: String
+        let image: String?
         let source: ImageSource?
         
         // MARK: - Источник изображения
         struct ImageSource: Decodable, Sendable {
-            let name: String
-            let link: String
+            let name: String?
+            let link: String?
         }
     }
 }
