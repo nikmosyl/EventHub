@@ -10,7 +10,7 @@ import SwiftUI
 struct ExploreView: View {
     var body: some View {
         NavigationStack {
-            ScrollView(.vertical, showsIndicators: false) {
+            ScrollView(showsIndicators: false) {
                 VStack(spacing: 0) {
                     ZStack(alignment: .top) {
                         Rectangle()
@@ -45,7 +45,7 @@ struct ExploreView: View {
                             VStack(spacing: 20) {
                                 HStack {
                                     Text("Upcoming Events")
-                                        .font(.system(size: 18, weight: .bold))
+                                        .font(.system(size: 18))
                                         .foregroundColor(.black)
                                     
                                     Spacer()
@@ -67,7 +67,7 @@ struct ExploreView: View {
                                 
                                 HStack {
                                     Text("Nearby You")
-                                        .font(.system(size: 18, weight: .bold))
+                                        .font(.system(size: 18))
                                         .foregroundColor(.black)
                                     
                                     Spacer()

@@ -18,7 +18,7 @@ struct CityLocationView: View {
                         .resizable()
                         .frame(width: 10, height: 5)
                 }
-                .foregroundStyle(.blue)
+                .foregroundStyle(Color.textLightSecondary)
                 .fontWeight(.regular)
                 
                 Text("New York, USA")

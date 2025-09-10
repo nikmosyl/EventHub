@@ -65,7 +65,7 @@ struct EventsCard: View {
                     Text("+20 Going")
                         .font(.system(size: 14))
                 }
-                .foregroundColor(.green)
+                .foregroundColor(.pillColor3)
                 .padding(.horizontal, 16)
                 
                 // Адрес
@@ -86,7 +86,7 @@ struct EventsCard: View {
         .background(
             RoundedRectangle(cornerRadius: 15)
                 .fill(Color.white)
-                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 4)
+                .shadow(radius: 10)
         )
     }
 }
