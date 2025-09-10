@@ -16,7 +16,7 @@ struct SignInButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 16, weight: .semibold))
+                .font(.system(size: 16, weight: .regular))
                 .multilineTextAlignment(.center)
                 .lineLimit(2)
                 .minimumScaleFactor(0.85)

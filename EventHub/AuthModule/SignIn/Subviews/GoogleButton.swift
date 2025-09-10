@@ -20,6 +20,7 @@ struct GoogleButton: View {
                     .scaledToFit()
                     .frame(width: 20, height: 20)
                 Text(title)
+                    .font(.system(size: 16, weight: .regular))
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal)
