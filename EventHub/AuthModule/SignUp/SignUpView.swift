@@ -7,12 +7,6 @@
 
 import SwiftUI
 
-enum AuthRoute: Hashable {
-    case signIn
-    case signUp
-}
-
-
 struct SignUpView: View {
     
     /// View Properties
@@ -21,8 +15,8 @@ struct SignUpView: View {
     @State private var password: String = ""
     @State private var confirmPassword: String = ""
     
-    /// Navigation
-    @State private var path = NavigationPath()
+    ///Navigation
+    @Binding var isPresented: Bool
     
     var body: some View {
         NavigationStack {
@@ -79,6 +73,7 @@ struct SignUpView: View {
                         
                         Button(action: {
                             //handle sign in action
+                            isPresented = false
                         }) {
                             Text("Sign in")
                                 .foregroundColor(Color.buttonPrimary)
@@ -95,5 +90,5 @@ struct SignUpView: View {
 }
 
 #Preview {
-    SignUpView()
+    SignUpView(isPresented: .constant(true))
 }

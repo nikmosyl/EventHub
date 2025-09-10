@@ -13,6 +13,9 @@ struct SignInView: View {
     @State private var password: String = ""
     @State private var rememberUser = true
     
+    ///Navigation
+    @State private var showSignUp: Bool = false
+    
     var body: some View {
         NavigationStack{
             ZStack {
@@ -90,7 +93,7 @@ struct SignInView: View {
                             Text("Don't have an account?")
                             
                             Button(action: {
-                                handleSignUpButton()
+                                showSignUp = true
                             }) {
                                 Text("Sign Up")
                                     .foregroundColor(Color.buttonPrimary)
@@ -102,6 +105,10 @@ struct SignInView: View {
                     Spacer()
                 }
             }
+            .navigationDestination(
+                isPresented: $showSignUp) {
+                    SignUpView(isPresented: $showSignUp)
+                }
         }
     }
     
@@ -112,10 +119,6 @@ struct SignInView: View {
     
     private func handleAuthButton() {
         print("--> Sign In With Email and Password")
-    }
-    
-    private func handleSignUpButton() {
-        print("--> Sign Up tapped ")
     }
 }
 
