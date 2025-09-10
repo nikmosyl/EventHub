@@ -8,10 +8,83 @@
 import SwiftUI
 
 struct EventsCard: View {
+    
+    @State private var isLiked: Bool = false
+    
     var body: some View {
-        ZStack {
+        VStack(alignment: .leading, spacing: 0) {
+            ZStack(alignment: .top) {
+                Image("imageCard")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 217, height: 140)
+                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                    .padding(.horizontal, 10)
+                
+                HStack {
+                    
+                    Text("10\nJUNE")
+                        .font(.system(size: 16, weight: .semibold))
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.textCalored)
+                        .frame(width: 60, height: 60)
+                        .background(
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color.textLightSecondary)
+                                .frame(width: 60, height: 60)
+                        )
+                        .padding(.leading, 15)
+                        .padding(.top, 5)
+                    
+                    Spacer()
+                    
+                    BookmarkButton()
+                        .padding(.trailing, 15)
+                        .padding(.top, 2)
+                }
+            }
+            .frame(height: 140)
+            .padding(.top, 20)
             
+            // Нижняя часть с контентом
+            VStack(alignment: .leading, spacing: 8) {
+                // Название события
+                Text("International Band Music Festival")
+                    .font(.system(size: 16, weight: .semibold))
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+                
+                // Количество участников
+                HStack {
+                    Image(systemName: "person.2.fill")
+                    Text("+20 Going")
+                        .font(.system(size: 14))
+                }
+                .foregroundColor(.green)
+                .padding(.horizontal, 16)
+                
+                // Адрес
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("36 Guild Street")
+                        .font(.system(size: 14))
+                    Text("London, UK")
+                        .font(.system(size: 14))
+                        .foregroundColor(.gray)
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 16)
+            }
+            .frame(height: 115)
+            .background(Color.white)
         }
+        .frame(width: 237, height: 255)
+        .background(
+            RoundedRectangle(cornerRadius: 15)
+                .fill(Color.white)
+                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 4)
+        )
     }
 }
 
