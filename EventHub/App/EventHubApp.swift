@@ -25,7 +25,11 @@ struct EventHubApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationView {
+<<<<<<< HEAD
                 SignInView()
+=======
+                TabBarView()
+>>>>>>> develop
             }
         }
     }
