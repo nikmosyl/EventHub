@@ -16,8 +16,3 @@ struct FilledButtonBackground: ViewModifier {
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
     }
 }
-extension View {
-    func filledButtonBackground(_ color: Color, cornerRadius: CGFloat = 16) -> some View {
-        modifier(FilledButtonBackground(color: color, cornerRadius: cornerRadius))
-    }
-}

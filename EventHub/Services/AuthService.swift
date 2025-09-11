@@ -15,10 +15,8 @@ import UIKit
 
 struct UserModel: Codable {
     var uid: String
-    var firstName: String
-    var lastName: String
-    var gender: String
-    var description: String
+    var displayName: String
+    var email: String
     var photoURL: String?
 }
 

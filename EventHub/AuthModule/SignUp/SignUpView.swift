@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct SignUpView: View {
     
@@ -14,6 +15,10 @@ struct SignUpView: View {
     @State private var emailID: String = ""
     @State private var password: String = ""
     @State private var confirmPassword: String = ""
+    
+    @State private var isSigningByEmail: Bool = false
+    @State private var isSigningByGoogle: Bool = false
+    @State private var alertMessage: String?
     
     ///Navigation
     @Binding var isPresented: Bool
@@ -31,17 +36,24 @@ struct SignUpView: View {
                     CustomTF(sfIcon: "envelope", hint: "abc@email.com", value: $emailID)
                     
                     CustomTF(sfIcon: "lock", hint: "Your password", isPassword: true, value: $password)
+                        .textContentType(.none)
+                        .autocorrectionDisabled(true)
+                        .textInputAutocapitalization(.never)
                     
                     CustomTF(sfIcon: "lock", hint: "Confirm password", isPassword: true, value: $confirmPassword)
+                        .textContentType(.none)
+                        .autocorrectionDisabled(true)
+                        .textInputAutocapitalization(.never)
                     
                     VStack(alignment: .center, spacing: 40) {
                         SignInButton(
                             backgroundColor: .buttonPrimary,
                             circleColor: .buttonSecondary,
-                            title: "SIGN UP") {
+                            title: isSigningByEmail ? "PLEASE WAIT…" : "SIGN UP") {
                                 //handle sign up action
-                                
+                                handleEmailSignUp()
                             }
+                            .disabled(isSigningByEmail)
                             .frame(width: 300)
                             .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
                                 .filledButtonBackground(.buttonPrimary)
@@ -51,13 +63,14 @@ struct SignUpView: View {
                             .foregroundStyle(.secondary)
                         
                         GoogleButton(
-                            title: "Login with Google",
+                            title: isSigningByGoogle ? "Signing in…" : "Login with Google",
                             image: "googleIcon",
                             action: {
                                 //Login with Google Auth Service
-                                
+                                handleGoogleSignIn()
                             }
                         )
+                            .disabled(isSigningByGoogle)
                             .frame(width: 300)
                             .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
                             .filledButtonBackground(Color.white)
@@ -81,13 +94,97 @@ struct SignUpView: View {
                     }
                 }
                 .padding(.horizontal, 25)
+                
             }
             .navigationTitle("Sign up")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
+            .alert("Oops", isPresented: Binding(
+                get: { alertMessage != nil },
+                set: { _ in alertMessage = nil }
+            )) {
+                Button("OK", role: .cancel) { alertMessage = nil }
+            } message: {
+                Text(alertMessage ?? "")
+            }
         }
     }
     
+    // MARK: - Actions
+        
+        private func handleEmailSignUp() {
+            
+            guard !fullName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+                alertMessage = "Please enter your full name."
+                return
+            }
+            guard isValidEmail(emailID) else {
+                alertMessage = "Please enter a valid email."
+                return
+            }
+            guard password.count >= 6 else {
+                alertMessage = "Password must be at least 6 characters."
+                return
+            }
+            guard password == confirmPassword else {
+                alertMessage = "Passwords do not match."
+                return
+            }
+            
+            isSigningByEmail = true
+            Task {
+                do {
+                    let result = try await AuthService.shared.register(email: emailID, password: password)
+                    let uid = result.user.uid
+                    
+                    let user = UserModel(
+                        uid: uid,
+                        displayName: fullName,
+                        email: emailID
+                    )
+                    try await AuthService.shared.saveUser(user)
+                    
+                    isSigningByEmail = false
+                    isPresented = false
+                } catch {
+                    isSigningByEmail = false
+                    alertMessage = error.localizedDescription
+                }
+            }
+        }
+        
+        private func handleGoogleSignIn() {
+            guard let vc = UIApplication.shared.topViewController else {
+                alertMessage = "Unable to find a presenting controller."
+                return
+            }
+            isSigningByGoogle = true
+            Task {
+                do {
+                    let result = try await AuthService.shared.signInWithGoogle(presenting: vc)
+                    let user = result.user
+                    
+                    let profile = UserModel(
+                        uid: user.uid,
+                        displayName: fullName,
+                        email: emailID
+                    )
+                    try await AuthService.shared.saveUser(profile)
+                    
+                    isSigningByGoogle = false
+                    isPresented = false
+                } catch {
+                    isSigningByGoogle = false
+                    alertMessage = error.localizedDescription
+                }
+            }
+        }
+        
+        // MARK: - Utils
+        private func isValidEmail(_ email: String) -> Bool {
+            let pattern = #"^\S+@\S+\.\S+$"#
+            return email.range(of: pattern, options: .regularExpression) != nil
+        }
 }
 
 #Preview {

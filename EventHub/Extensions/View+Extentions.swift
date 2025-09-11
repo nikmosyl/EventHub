@@ -30,4 +30,8 @@ extension View {
             .disabled(condition)
             .opacity(condition ? 0.5 : 1)
     }
+    
+    func filledButtonBackground(_ color: Color, cornerRadius: CGFloat = 16) -> some View {
+        modifier(FilledButtonBackground(color: color, cornerRadius: cornerRadius))
+    }
 }
