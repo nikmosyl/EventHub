@@ -14,6 +14,10 @@ final class DataManager {
     
     // MARK: - Универсальный запрос
     private func fetch<T: Decodable>(_ request: APIRequest) async throws -> T {
+        
+        #warning("убрать Debug")
+        print("request.urlRequest():", try request.urlRequest())
+        
         let (data, response) = try await URLSession.shared.data(for: try request.urlRequest())
         
         guard let http = response as? HTTPURLResponse else {
