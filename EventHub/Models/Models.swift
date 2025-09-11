@@ -209,13 +209,13 @@ struct EventDetails: Decodable, Sendable {
     let price: String?
     let isFree: Bool
     let images: [EventImage]?
+    let favoritesCount: Int?
+    let commentsCount: Int?
     let siteUrl: String?
     let tags: [String]?
     let categories: [String]?
-    let ageRestriction: String?
-    let participants: [String]?
-    let favoritesCount: Int?
-    let commentsCount: Int?
+//    let ageRestriction: String?
+    let participants: [Participant]?
     let disableComments: Bool?
     
     // MARK: - Изображение события
@@ -227,6 +227,27 @@ struct EventDetails: Decodable, Sendable {
         struct ImageSource: Decodable, Sendable {
             let name: String
             let link: String
+        }
+    }
+    // MARK: - Участник события
+    struct Participant: Decodable, Sendable {
+        let role: ParticipantRole
+        let agent: ParticipantAgent
+        
+        // MARK: - Роль участника
+        struct ParticipantRole: Decodable, Sendable {
+            let slug: String
+        }
+        
+        // MARK: - Агент (актер, режиссер и т.д.)
+        struct ParticipantAgent: Decodable, Sendable {
+            let id: Int
+            let title: String
+            let slug: String
+            let agentType: String
+            let images: [String]
+            let siteUrl: String
+            let isStub: Bool
         }
     }
 }
