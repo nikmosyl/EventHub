@@ -93,7 +93,7 @@ struct ProfileView: View {
     
     var body: some View {
         ScrollView {
-            LazyVStack {
+            VStack {
                 ForEach(viewModel.events, id: \.id) { event in
                     EventRow(event: event, viewModel: viewModel)
                 }
@@ -105,7 +105,7 @@ struct ProfileView: View {
 struct EventRow: View {
     let event: Event
     @ObservedObject var viewModel: ProfileViewModel
-    @State private var details: Event?
+    //@State private var details: Event?
     @State private var isLoading = true
     
     var body: some View {
@@ -114,7 +114,7 @@ struct EventRow: View {
             
             if isLoading {
                 ProgressView()
-            } else if let imageUrl = details?.images?.first?.image {
+            } else if let imageUrl = event.images?.first?.image {
                 
                 HStack {
                     AsyncImage(url: URL(string: imageUrl)) { image in
@@ -132,7 +132,7 @@ struct EventRow: View {
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     
-                    Text(details?.shortTitle ?? "Пустой title")
+                    Text(event.shortTitle ?? "Пустой title")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -145,11 +145,6 @@ struct EventRow: View {
         }
         .background(Color.gray)
         .padding()
-        .task {
-            isLoading = true
-            details = await viewModel.fetchEvent(id: event.id ?? 123456)
-            isLoading = false
-        }
     }
 }
 
@@ -162,38 +157,30 @@ final class ProfileViewModel: ObservableObject {
     }
     
     func loadEvents() {
-//        let now = Int(Date().timeIntervalSince1970)
-//        let sevenDaysLater = now + (7 * 24 * 60 * 60)
-        
         Task {
             do {
                 let events = try await DataManager.shared.fetchEvents()
                 self.events = events
             } catch {
-                print("ProfileViewModel Ошибка при загрузке событий")
+                print("ProfileViewModel Ошибка при загрузке событий, ошибка: \(error)")
+                if let netError = error as? NetworkError {
+                    switch netError {
+                    case .invalidResponse:
+                        print("⚠️ Некорректный ответ сервера")
+                    case .badStatus(let code):
+                        print("⚠️ Сервер вернул статус: \(code)")
+                    case .decoding(let decodeError):
+                        print("⚠️ Ошибка декодирования:", decodeError)
+                    case .invalidURL:
+                        print("⚠️ Ошибка url:")
+                    }
+                }
                 self.events = []
             }
         }
     }
-    
-    func fetchEvent(id: Int) async -> Event? {
-        do {
-            return try await DataManager.shared.fetchEvent(id: id)
-        } catch {
-            print("не удалось загрузить event \(id) Ошибка: \(error)")
-            if let netError = error as? NetworkError {
-                switch netError {
-                case .invalidResponse:
-                    print("⚠️ Некорректный ответ сервера")
-                case .badStatus(let code):
-                    print("⚠️ Сервер вернул статус: \(code)")
-                case .decoding(let decodeError):
-                    print("⚠️ Ошибка декодирования:", decodeError)
-                case .invalidURL:
-                    print("⚠️ Ошибка url:")
-                }
-            }
-            return nil
-        }
-    }
+}
+
+#Preview {
+    TabBarView()
 }
