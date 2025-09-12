@@ -105,17 +105,12 @@ struct ProfileView: View {
 struct EventRow: View {
     let event: Event
     @ObservedObject var viewModel: ProfileViewModel
-    //@State private var details: Event?
-    @State private var isLoading = true
     
     var body: some View {
         VStack() {
             Text(event.title)
             
-            if isLoading {
-                ProgressView()
-            } else if let imageUrl = event.images?.first?.image {
-                
+            if let imageUrl = event.images?.first?.image {
                 HStack {
                     AsyncImage(url: URL(string: imageUrl)) { image in
                         image
