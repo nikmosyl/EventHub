@@ -36,7 +36,7 @@ enum TabItem: CaseIterable {
         case .map:
             MapView()
         case .profile:
-            ProfileView()
+            TestView()
         }
     }
 }
@@ -88,8 +88,8 @@ struct MapView: View {
 
 
 //MARK: пример использования DataManager
-struct ProfileView: View {
-    @StateObject private var viewModel = ProfileViewModel()
+struct TestView: View {
+    @StateObject private var viewModel = TestViewModel()
     
     var body: some View {
         ScrollView {
@@ -104,7 +104,7 @@ struct ProfileView: View {
 
 struct EventRow: View {
     let event: Event
-    @ObservedObject var viewModel: ProfileViewModel
+    @ObservedObject var viewModel: TestViewModel
     
     var body: some View {
         VStack() {
@@ -141,7 +141,7 @@ struct EventRow: View {
 }
 
 @MainActor
-final class ProfileViewModel: ObservableObject {
+final class TestViewModel: ObservableObject {
     @Published var events: [Event] = []
     
     init() {
