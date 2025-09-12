@@ -7,73 +7,6 @@
 
 import Foundation
 
-// MARK: - Фильтры для событий
-struct EventFilters {
-    let location: String?
-    let actualSince: Int?
-    let actualUntil: Int?
-    let categories: [String]?
-//    let isFree: Bool?
-//    let price: String?
-//    let ageRestriction: String?
-//    let tags: [String]?
-    let search: String?
-    let page: Int?
-//    let pageSize: Int?
-    let fields: [String]?
-    
-    init(
-        location: String? = nil,
-        actualSince: Int? = nil,
-        actualUntil: Int? = nil,
-        categories: [String]? = nil,
-//        isFree: Bool? = nil,
-  //      price: String? = nil,
-    //    ageRestriction: String? = nil,
-//        tags: [String]? = nil,
-        search: String? = nil,
-        page: Int? = nil,
-  //      pageSize: Int? = nil
-        fields: [String]? = nil
-    ) {
-        self.location = location
-        self.actualSince = actualSince
-        self.actualUntil = actualUntil
-        self.categories = categories
-//        self.isFree = isFree
-//        self.price = price
-//        self.ageRestriction = ageRestriction
-//        self.tags = tags
-        self.search = search
-        self.page = page
-//        self.pageSize = pageSize
-        self.fields = fields
-    }
-}
-
-
-// MARK: - Категория события
-struct EventCategory: Decodable, Sendable {
-    let id: Int
-    let slug: String
-    let name: String
-}
-
-/*
-// MARK: - Категория места
-struct PlaceCategory: Decodable, Sendable {
-    let id: Int
-    let slug: String
-    let name: String
-}
-*/
-
-// MARK: - Локация
-struct Location: Decodable, Sendable {
-    let slug: String
-    let name: String?
-}
-
 // MARK: - Модель страницы
 struct PagedResponse<T: Decodable>: Decodable {
     let count: Int
@@ -82,61 +15,68 @@ struct PagedResponse<T: Decodable>: Decodable {
     let results: [T]
 }
 
-/*
-// MARK: - Агент
-struct Agent: Decodable, Sendable {
-    let id: Int
-    let title: String
-    let slug: String
-}
-
-// MARK: - Роль агента
-struct AgentRole: Decodable, Sendable {
-    let id: Int
-    let name: String?
-    let namePlural: String?
-}
-
-// MARK: - Событие
-struct EventItem: Decodable, Sendable {
-    let id: Int
-    let title: String
-    let dates: [EventDate]?
-}
-*/
-// MARK: - Дата события
-struct EventDate: Decodable, Sendable {
-    let start: Int?
-    let end: Int?
-    let startDate: String?
-    let endDate: String?
-    let startTime: String?
-    let endTime: String?
-}
-
-/*
-// MARK: - Событие дня
-struct EventOfTheDay: Decodable, Sendable {
-    let date: String
-    let location: String
-    let object: EventOfTheDayObject
-    let title: String
-
-    // MARK: - Объект события дня
-    struct EventOfTheDayObject: Decodable, Sendable {
-        let id: Int
-        let ctype: String
+// MARK: - Фильтры для событий
+struct EventFilters {
+    let location: String?
+    let actualSince: Int?
+    let actualUntil: Int?
+    let categories: [String]?
+    let price: String?
+    let search: String?
+    let page: Int?
+    let fields: [String]?
+    let expand: [String]?
+    
+    init(
+        location: String? = nil,
+        actualSince: Int? = nil,
+        actualUntil: Int? = nil,
+        categories: [String]? = nil,
+        search: String? = nil,
+        page: Int? = nil,
+        price: String? = nil,
+        fields: [String]? = nil,
+        expand: [String]? = nil
+    ) {
+        self.location = location
+        self.actualSince = actualSince
+        self.actualUntil = actualUntil
+        self.categories = categories
+        self.search = search
+        self.page = page
+        self.price = price
+        self.fields = fields
+        self.expand = expand
     }
 }
 
-// MARK: - Новости
-struct NewsItem: Decodable, Sendable {
+// MARK: - Категория события
+struct EventCategory: Decodable, Sendable {
     let id: Int
-    let publicationDate: Int
-    let title: String
-    let slug: String
+    let name: String
 }
-*/
+
+
+// MARK: - Локация
+struct Location: Decodable, Sendable {
+    let slug: String
+    let name: String?
+}
+
+// MARK: - Дата события
+struct EventDate: Decodable, Sendable, Hashable {
+    let start: Int?
+    let end: Int?
+    
+    func formatter(date: Int, format: String) -> String {
+        let date = Date(timeIntervalSince1970: TimeInterval(date))
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.dateFormat = format
+        return formatter.string(from: date)
+    }
+}
+
 // MARK: - Подборки
 struct ListItem: Decodable, Sendable {
     let id: Int
@@ -146,55 +86,34 @@ struct ListItem: Decodable, Sendable {
     let siteUrl: String?
 }
 
-/*
+
 // MARK: - Место
 struct Place: Decodable, Sendable {
     let id: Int
-    let title: String
-    let slug: String
-    let address: String
-    let phone: String
-    let siteUrl: String
-    let subway: String
-    let isClosed: Bool
-    let location: String
-    let hasParkingLot: Bool
+    let title: String?
+    let address: String?
+    let subway: String?
+    let location: String?
+    let coords: Сoords?
 }
 
-// MARK: - Показ фильма
-struct MovieShowing: Decodable, Sendable {
-    let id: Int
-    let movie: MovieReference
-    let place: PlaceReference
-    let datetime: Int
-    let threeD: Bool
-    let imax: Bool
-    let fourDx: Bool
-    let originalLanguage: Bool
-    let price: String
-
-    // MARK: - Ссылка на фильм
-    struct MovieReference: Decodable, Sendable {
-        let id: Int
-    }
+// MARK: - Координаты
+struct Сoords: Decodable, Sendable {
+    let lat: Double?
+    let lon: Double?
 }
 
-// MARK: - Ссылка на место
-struct PlaceReference: Decodable, Sendable {
-    let id: Int
-}
-*/
 // MARK: - Фильм
 struct Movie: Decodable, Sendable {
     let id: Int
     let title: String
     let poster: MoviePoster?
-
+    
     // MARK: - Постер фильма
     struct MoviePoster: Decodable, Sendable {
         let image: String
         let source: PosterSource?
-
+        
         // MARK: - Источник постера
         struct PosterSource: Decodable, Sendable {
             let name: String
@@ -209,23 +128,32 @@ struct Event: Decodable, Sendable {
     let title: String
     let slug: String
     let description: String?
-//    let bodyText: String?
     let shortTitle: String?
-//    let tagline: String?
     let dates: [EventDate]?
     let location: Location?
-//    let place: PlaceReference?
-//    let price: String?
-//    let isFree: Bool
+    let place: Place?
+    let price: String?
     let images: [EventImage]?
     let favoritesCount: Int?
-//    let commentsCount: Int?
-//    let siteUrl: String?
-//    let tags: [String]?
+    let siteUrl: String?
     let categories: [String]?
-//    let ageRestriction: String?
     let participants: [Participant]?
-//    let disableComments: Bool?
+    
+    var nextDate: EventDate? {
+        guard let dates = dates else { return nil }
+        let now = Int(Date().timeIntervalSince1970)
+        return dates
+            .filter { ($0.start ?? 0) >= now }
+            .min { ($0.start ?? 0) < ($1.start ?? 0) }
+    }
+    
+    var previousDate: EventDate? {
+        guard let dates = dates else { return nil }
+        let now = Int(Date().timeIntervalSince1970)
+        return dates
+            .filter { ($0.end ?? 0) < now }
+            .max { ($0.end ?? 0) < ($1.end ?? 0) }
+    }
     
     // MARK: - Изображение события
     struct EventImage: Decodable, Sendable {

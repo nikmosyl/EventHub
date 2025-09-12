@@ -112,20 +112,9 @@ struct EventRow: View {
             
             if let imageUrl = event.images?.first?.image {
                 HStack {
-                    AsyncImage(url: URL(string: imageUrl)) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 50, height: 50)
-                            .clipped()
-                    } placeholder: {
-                        ZStack {
-                            Color.clear
-                            ProgressView()
-                                .frame(width: 50, height: 50)
-                        }
-                    }
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    NetworkImage(imageUrl: imageUrl)
+                        .frame(width: 50, height: 50)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                     
                     Text(event.shortTitle ?? "Пустой title")
                         .font(.subheadline)
@@ -136,6 +125,14 @@ struct EventRow: View {
                 Text("Не удалось загрузить детали")
                     .foregroundColor(.red)
                     .font(.footnote)
+            }
+            
+            if let next = event.nextDate, let start = next.start{
+                Text("next: \(next.formatter(date: start, format: "EEE, MMM d • h:mm a"))")
+            }
+            
+            if let prev = event.previousDate, let start = prev.start {
+                Text("prev: \(prev.formatter(date: start, format: "EEE, MMM d • h:mm a"))")
             }
         }
         .background(Color.gray)
@@ -154,7 +151,7 @@ final class ProfileViewModel: ObservableObject {
     func loadEvents() {
         Task {
             do {
-                let events = try await DataManager.shared.fetchEvents()
+                let events = try await DataManager.shared.getUpcamingEvents()
                 self.events = events
             } catch {
                 print("ProfileViewModel Ошибка при загрузке событий, ошибка: \(error)")

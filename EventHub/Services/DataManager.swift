@@ -15,7 +15,7 @@ final class DataManager {
     // MARK: - Универсальный запрос
     private func fetch<T: Decodable>(_ request: APIRequest) async throws -> T {
         
-        #warning("убрать Debug")
+#warning("убрать Debug")
         print("request.urlRequest():", try request.urlRequest())
         
         let (data, response) = try await URLSession.shared.data(for: try request.urlRequest())
@@ -50,70 +50,42 @@ final class DataManager {
     }
     
     // MARK: - Получение категорий событий
-    func fetchEventCategories() async throws -> [EventCategory] {
+    private func fetchEventCategories() async throws -> [EventCategory] {
         try await fetchSimple(.eventCategories)
     }
     
-    /*
-    // MARK: - Получение категорий мест
-    func fetchPlaceCategories() async throws -> [PlaceCategory] {
-        try await fetchSimple(.placeCategories)
-    }
-    
-    // MARK: - Получение агентов
-    func fetchAgents(page: Int? = nil) async throws -> [Agent] {
-        try await fetchPaged(.agents(page: page))
-    }
-    
-    // MARK: - Получение ролей агентов
-    func fetchAgentRoles() async throws -> [AgentRole] {
-        try await fetchPaged(.agentRoles())
-    }
-     
-     // MARK: - Получение новостей
-     func fetchNews(page: Int? = nil) async throws -> [NewsItem] {
-         try await fetchPaged(.news(page: page))
-     }
-     
-     // MARK: - Получение показов фильмов
-     func fetchMovieShowings(page: Int? = nil) async throws -> [MovieShowing] {
-         try await fetchPaged(.movieShowings(page: page))
-     }
-     
-     // MARK: - Получение мест
-     func fetchPlaces(page: Int? = nil) async throws -> [Place] {
-         try await fetchPaged(.places(page: page))
-     }
-     
-     // MARK: - Получение событий дня
-     func fetchEventsOfTheDay(location: String? = nil, date: String? = nil) async throws -> [EventOfTheDay] {
-         try await fetchPaged(.eventsOfTheDay(location: location, date: date))
-     }
-    */
     // MARK: - Получение событий с фильтрами
-    func fetchEvents(filters: EventFilters = EventFilters(), id: Int? = nil) async throws -> [Event] {
+    private func fetchEvents(filters: EventFilters = EventFilters(), id: Int? = nil) async throws -> [Event] {
         let updatedFilters = EventFilters(
-                    location: filters.location,
-                    actualSince: filters.actualSince,
-                    actualUntil: filters.actualUntil,
-                    categories: filters.categories,
-//                    isFree: filters.isFree,
- //                   price: filters.price,
- //                   ageRestriction: filters.ageRestriction,
-  //                  tags: filters.tags,
-                    search: filters.search,
-                    page: filters.page,
-//                    pageSize: filters.pageSize,
-                    fields: filters.fields ?? [
-                        "id", "title", "slug", "description", "short_title",
-                        "dates", "location", "images", "categories", "favorites_count"
-                    ]
-                )
+            location: filters.location,
+            actualSince: filters.actualSince,
+            actualUntil: filters.actualUntil,
+            categories: filters.categories,
+            search: filters.search,
+            page: filters.page,
+            price: filters.price,
+            fields: filters.fields ?? [
+                "id",
+                "title",
+                "slug",
+                "description",
+                "short_title",
+                "dates",
+                "location",
+                "images",
+                "categories",
+                "favorites_count",
+                "place"
+            ],
+            expand: filters.expand ?? [
+                "place"
+            ]
+        )
         return try await fetchPaged(.events(filters: updatedFilters, id: id))
     }
     
     // MARK: - Получение одного события по ID
-    func fetchEvent(id: Int) async throws -> Event {
+    private func fetchEvent(id: Int) async throws -> Event {
         let events = try await fetchEvents(id: id)
         guard let event = events.first else {
             throw NetworkError.invalidResponse
@@ -121,90 +93,23 @@ final class DataManager {
         return event
     }
     
-    /*
-    // MARK: - Получение событий (обратная совместимость)
-    func fetchEvents(location: String, actualSince: Int, actualUntil: Int, page: Int? = nil) async throws -> [Event] {
-        let filters = EventFilters(
-            location: location,
-            actualSince: actualSince,
-            actualUntil: actualUntil,
-            page: page
-        )
-        return try await fetchEvents(filters: filters)
-    }
-    */
-    /*
-    // MARK: - Получение всех событий с фильтрами
-    func fetchAllEvents(filters: EventFilters = EventFilters()) async throws -> [Event] {
-        var all: [Event] = []
-        var page: Int? = 1
-        
-        while let currentPage = page {
-            let updatedFilters = EventFilters(
-                location: filters.location,
-                actualSince: filters.actualSince,
-                actualUntil: filters.actualUntil,
-                categories: filters.categories,
-//                isFree: filters.isFree,
-//                price: filters.price,
-//                ageRestriction: filters.ageRestriction,
-//                tags: filters.tags,
-                search: filters.search,
-                page: currentPage,
-//                pageSize: filters.pageSize ?? 100
-                fields: filters.fields ?? [
-                    "id", "title", "slug", "description", "short_title",
-                    "dates", "location", "images", "categories", "favorites_count"
-                ]
-                
-            )
-            
-            let response: PagedResponse<Event> = try await fetch(.events(filters: updatedFilters))
-            all.append(contentsOf: response.results)
-            page = URLComponents(string: response.next ?? "")?
-                .queryItems?.first(where: { $0.name == "page" })?.value
-                .flatMap(Int.init)
-        }
-        
-        return all
-    }
-   */
-    /*
-    // MARK: - Получение всех событий (обратная совместимость)
-    func fetchAllEvents(location: String, actualSince: Int, actualUntil: Int) async throws -> [Event] {
-        let filters = EventFilters(
-            location: location,
-            actualSince: actualSince,
-            actualUntil: actualUntil
-        )
-        return try await fetchAllEvents(filters: filters)
-    }
-    */
-    
     // MARK: - Получение подборок
-    func fetchLists(page: Int? = nil) async throws -> [ListItem] {
+    private func fetchLists(page: Int? = nil) async throws -> [ListItem] {
         try await fetchPaged(.lists(page: page))
     }
     
     // MARK: - Получение локаций
-    func fetchLocations() async throws -> [Location] {
+    private func fetchLocations() async throws -> [Location] {
         try await fetchSimple(.locations)
     }
     
     // MARK: - Получение фильмов
-    func fetchMovies(page: Int? = nil) async throws -> [Movie] {
+    private func fetchMovies(page: Int? = nil) async throws -> [Movie] {
         try await fetchPaged(.movies(page: page))
     }
-
-    /*
-    // MARK: - Получение детальной информации о событии
-    func fetchEventDetails(eventId: Int) async throws -> Event {
-        try await fetchSimple(.eventDetails(id: eventId))
-    }
-    */
-    // MARK: - Методы для создания фильтров
-    /*
-    /// Поиск событий по тексту
+    
+    
+    // MARK: - Поиск событий по тексту
     func searchEvents(query: String, location: String? = nil, page: Int? = nil) async throws -> [Event] {
         let filters = EventFilters(
             location: location,
@@ -214,50 +119,31 @@ final class DataManager {
         return try await fetchEvents(filters: filters)
     }
     
-    /// События по категории
-    func fetchEventsByCategory(category: String, location: String? = nil, page: Int? = nil) async throws -> [Event] {
+    func getUpcamingEvents(categories: [String]? = nil) async throws -> [Event] {
+        let actualSince = Int(Date().timeIntervalSince1970)
+        let actualUntil = actualSince + (7 * 24 * 60 * 60)
+        
         let filters = EventFilters(
-            location: location,
-            categories: [category],
-            page: page
+            actualSince: actualSince,
+            actualUntil: actualUntil,
+            categories: categories
         )
         return try await fetchEvents(filters: filters)
     }
     
-    /// Бесплатные события
-    func fetchFreeEvents(location: String? = nil, page: Int? = nil) async throws -> [Event] {
+    func getNearByEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
         let filters = EventFilters(
             location: location,
-            isFree: true,
-            page: page
+            categories: categories
         )
         return try await fetchEvents(filters: filters)
     }
     
-    /// События по датам
-    func fetchEventsByDateRange(
-        location: String,
-        from: Date,
-        to: Date,
-        page: Int? = nil
-    ) async throws -> [Event] {
-        let filters = EventFilters(
-            location: location,
-            actualSince: Int(from.timeIntervalSince1970),
-            actualUntil: Int(to.timeIntervalSince1970),
-            page: page
-        )
-        return try await fetchEvents(filters: filters)
+    func getCategories() async throws -> [EventCategory] {
+        try await fetchEventCategories()
     }
     
-    /// События по тегам
-    func fetchEventsByTags(tags: [String], location: String? = nil, page: Int? = nil) async throws -> [Event] {
-        let filters = EventFilters(
-            location: location,
-            tags: tags,
-            page: page
-        )
-        return try await fetchEvents(filters: filters)
+    func getLocations() async throws -> [Location] {
+        try await fetchLocations()
     }
-     */
 }

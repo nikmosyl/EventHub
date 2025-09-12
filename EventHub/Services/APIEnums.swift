@@ -20,35 +20,19 @@ enum NetworkError: Error {
 // MARK: - Запросы API
 enum APIRequest {
     case eventCategories
-//    case placeCategories
-//    case agents(page: Int? = nil)
-//    case agentRoles(lang: String = "ru")
     case events(filters: EventFilters, id: Int? = nil)
-//    case eventsOfTheDay(location: String? = nil, date: String? = nil)
-//    case news(page: Int? = nil)
     case lists(page: Int? = nil)
-//    case places(page: Int? = nil)
     case locations
-//    case movieShowings(page: Int? = nil)
     case movies(page: Int? = nil)
-//    case eventDetails(id: Int)
 
     // MARK: - Путь запроса
     var path: String {
         switch self {
         case .eventCategories: return "event-categories/"
-//        case .placeCategories: return "place-categories/"
-//        case .agents: return "agents/"
-//        case .agentRoles: return "agent-roles/"
         case .events: return "events/"
-//        case .eventsOfTheDay: return "events-of-the-day/"
-//        case .news: return "news/"
         case .lists: return "lists/"
-//        case .places: return "places/"
         case .locations: return "locations/"
-//        case .movieShowings: return "movie-showings/"
         case .movies: return "movies/"
-//        case .eventDetails(let id): return "events/\(id)/"
         }
     }
 
@@ -98,35 +82,18 @@ extension EventFilters {
         if let categories = categories, !categories.isEmpty {
             items.append(.init(name: "categories", value: categories.joined(separator: ",")))
         }
-        /*
-        if let isFree = isFree {
-            items.append(.init(name: "is_free", value: String(isFree)))
-        }
-        if let price = price {
-            items.append(.init(name: "price", value: price))
-        }
-        if let ageRestriction = ageRestriction {
-            items.append(.init(name: "age_restriction", value: ageRestriction))
-        }
-        if let tags = tags, !tags.isEmpty {
-            items.append(.init(name: "tags", value: tags.joined(separator: ",")))
-        }
-         */
         if let search = search {
             items.append(.init(name: "search", value: search))
         }
         if let page = page {
             items.append(.init(name: "page", value: String(page)))
         }
-        /*
-        if let pageSize = pageSize {
-            items.append(.init(name: "page_size", value: String(pageSize)))
-        } else {
-            items.append(.init(name: "page_size", value: "20"))
-        }
-         */
         if let fields = fields, !fields.isEmpty {
             items.append(.init(name: "fields", value: fields.joined(separator: ",")))
+        }
+        
+        if let expand = expand, !expand.isEmpty {
+            items.append(.init(name: "expand", value: expand.joined(separator: ",")))
         }
         
         return items
