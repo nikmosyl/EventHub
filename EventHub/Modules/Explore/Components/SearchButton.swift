@@ -13,13 +13,13 @@ struct SearchButton: View {
             Image(systemName: "magnifyingglass")
                 .resizable()
                 .frame(width: 20, height: 20)
-                .foregroundStyle(.textLightSecondary) // Color (textLightSecondary)
+                .foregroundStyle(.textLightSecondary)
             RoundedRectangle(cornerRadius: 5)
-                .fill(Color.textLightSecondary) // Color (textLightSecondary)
+                .fill(Color.textLightSecondary)
                 .frame(width: 1, height: 20)
             Text("Search...")
                 .font(.system(size: 20))
-                .foregroundStyle(.textLightSecondary) // Color (textLightSecond
+                .foregroundStyle(.textLightSecondary)
             
             Spacer()
             
