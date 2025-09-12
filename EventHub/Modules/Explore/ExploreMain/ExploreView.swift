@@ -9,90 +9,49 @@ import SwiftUI
 
 struct ExploreView: View {
     var body: some View {
-        NavigationStack {
+        ZStack(alignment: .top) {
+            
+            ExploreNavBar()
+            
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 0) {
-                    ZStack(alignment: .top) {
-                        Rectangle()
-                            .fill(Color.navBarPrimary)
-                            .frame(height: 200)
-                            .clipShape(
-                                RoundedRectangleShape(radius: 33,
-                                                      corners: [.bottomLeft, .bottomRight])
-                            )
-                            .ignoresSafeArea(.all)
-                            .offset(y: -65)
-                        
-                        VStack(spacing: 20) {
-                            CityLocationView()
-                                .padding(.horizontal, 20)
+                VStack(spacing: 30) {
+                    Spacer()
+                        .frame(height: 90)
+                    
+                    VariableSectionView()
+                        .offset(y: 5)
+                    
+                    VariableSectionView()
+                        .offset(y: 5)
+                    
+                    VStack(spacing: 5) {
+                        HStack {
+                            Text("Upcoming Events")
+                                .font(.system(size: 18))
+                                .foregroundStyle(Color.textDarkPrimary)
+                            Spacer()
                             
                             Button {
-                                // Go to Search
+                                
                             } label: {
-                                SearchButton()
+                                Text("See All")
+                                    .foregroundStyle(Color.textDarkSecondary)
+                                    .font(.system(size: 14))
                             }
-                            .padding(.horizontal, 20)
-                            
-                            VariableSectionView()
-                                .padding(.leading, 20)
-                                .offset(y: 10)
-                            
-                            VariableSectionView()
-                                .padding(.leading, 20)
-                                .offset(y: 10)
-                            
-                            VStack(spacing: 20) {
-                                HStack {
-                                    Text("Upcoming Events")
-                                        .font(.system(size: 18))
-                                        .foregroundColor(.black)
-                                    
-                                    Spacer()
-                                    
-                                    Text("See All")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.gray)
-                                }
-                                .padding(.horizontal, 20)
-                                
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 15) {
-                                        EventsCard()
-                                        EventsCard()
-                                        EventsCard()
-                                    }
-                                    .padding(.horizontal, 20)
-                                }
-                                
-                                HStack {
-                                    Text("Nearby You")
-                                        .font(.system(size: 18))
-                                        .foregroundColor(.black)
-                                    
-                                    Spacer()
-                                    
-                                    Text("See All")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.gray)
-                                }
-                                .padding(.horizontal, 20)
-                                
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 15) {
-                                        EventsCard()
-                                        EventsCard()
-                                    }
-                                    .padding(.horizontal, 20)
+                        }
+                        .padding(.horizontal, 20)
+                        
+                        // Upcoming Events ForEach
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 15) {
+                                ForEach(0..<3) { _ in
+                                    EventsCard()
                                 }
                             }
-                            .padding(.top, 20)
-                            .background(Color.white)
                         }
                     }
                 }
             }
-            .toolbar(.hidden, for: .navigationBar)
         }
     }
 }

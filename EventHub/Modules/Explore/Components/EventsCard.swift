@@ -49,9 +49,9 @@ struct EventsCard: View {
             .frame(height: 140)
             .padding(.top, 20)
             
-            // Нижняя часть с контентом
+            
             VStack(alignment: .leading, spacing: 8) {
-                // Название события
+                
                 Text("International Band Music Festival")
                     .font(.system(size: 16, weight: .semibold))
                     .lineLimit(2)
@@ -59,7 +59,7 @@ struct EventsCard: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 12)
                 
-                // Количество участников
+                
                 HStack {
                     Image(systemName: "person.2.fill")
                     Text("+20 Going")
@@ -68,7 +68,7 @@ struct EventsCard: View {
                 .foregroundColor(.pillColor3)
                 .padding(.horizontal, 16)
                 
-                // Адрес
+                
                 VStack(alignment: .leading, spacing: 2) {
                     Text("36 Guild Street")
                         .font(.system(size: 14))
@@ -83,10 +83,11 @@ struct EventsCard: View {
             .background(Color.white)
         }
         .frame(width: 237, height: 255)
-        .background(
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 15))
+        .overlay(
             RoundedRectangle(cornerRadius: 15)
-                .fill(Color.white)
-                .shadow(radius: 10)
+                .stroke(Color.black.opacity(0.1), lineWidth: 1)
         )
     }
 }
