@@ -93,7 +93,7 @@ struct ProfileView: View {
     
     var body: some View {
         ScrollView {
-            VStack {
+            LazyVStack {
                 ForEach(viewModel.events, id: \.id) { event in
                     EventRow(event: event, viewModel: viewModel)
                 }
@@ -103,9 +103,9 @@ struct ProfileView: View {
 }
 
 struct EventRow: View {
-    let event: EventItem
+    let event: Event
     @ObservedObject var viewModel: ProfileViewModel
-    @State private var details: EventDetails?
+    @State private var details: Event?
     @State private var isLoading = true
     
     var body: some View {
@@ -147,7 +147,7 @@ struct EventRow: View {
         .padding()
         .task {
             isLoading = true
-            details = await viewModel.fetchEvent(id: event.id)
+            details = await viewModel.fetchEvent(id: event.id ?? 123456)
             isLoading = false
         }
     }
@@ -155,23 +155,19 @@ struct EventRow: View {
 
 @MainActor
 final class ProfileViewModel: ObservableObject {
-    @Published var events: [EventItem] = []
+    @Published var events: [Event] = []
     
     init() {
         loadEvents()
     }
     
     func loadEvents() {
-        let now = Int(Date().timeIntervalSince1970)
-        let sevenDaysLater = now + (7 * 24 * 60 * 60)
+//        let now = Int(Date().timeIntervalSince1970)
+//        let sevenDaysLater = now + (7 * 24 * 60 * 60)
         
         Task {
             do {
-                let events = try await DataManager.shared.fetchEvents(
-                    location: "msk",
-                    actualSince: now,
-                    actualUntil: sevenDaysLater
-                )
+                let events = try await DataManager.shared.fetchEvents()
                 self.events = events
             } catch {
                 print("ProfileViewModel Ошибка при загрузке событий")
@@ -180,9 +176,9 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
-    func fetchEvent(id: Int) async -> EventDetails? {
+    func fetchEvent(id: Int) async -> Event? {
         do {
-            return try await DataManager.shared.fetchEventDetails(eventId: id)
+            return try await DataManager.shared.fetchEvent(id: id)
         } catch {
             print("не удалось загрузить event \(id) Ошибка: \(error)")
             if let netError = error as? NetworkError {

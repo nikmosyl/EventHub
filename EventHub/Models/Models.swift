@@ -13,40 +13,41 @@ struct EventFilters {
     let actualSince: Int?
     let actualUntil: Int?
     let categories: [String]?
-    let isFree: Bool?
-    let price: String?
-    let ageRestriction: String?
-    let tags: [String]?
+//    let isFree: Bool?
+//    let price: String?
+//    let ageRestriction: String?
+//    let tags: [String]?
     let search: String?
     let page: Int?
-    let pageSize: Int?
+//    let pageSize: Int?
     
     init(
         location: String? = nil,
         actualSince: Int? = nil,
         actualUntil: Int? = nil,
         categories: [String]? = nil,
-        isFree: Bool? = nil,
-        price: String? = nil,
-        ageRestriction: String? = nil,
-        tags: [String]? = nil,
+//        isFree: Bool? = nil,
+  //      price: String? = nil,
+    //    ageRestriction: String? = nil,
+//        tags: [String]? = nil,
         search: String? = nil,
         page: Int? = nil,
-        pageSize: Int? = nil
+  //      pageSize: Int? = nil
     ) {
         self.location = location
         self.actualSince = actualSince
         self.actualUntil = actualUntil
         self.categories = categories
-        self.isFree = isFree
-        self.price = price
-        self.ageRestriction = ageRestriction
-        self.tags = tags
+//        self.isFree = isFree
+//        self.price = price
+//        self.ageRestriction = ageRestriction
+//        self.tags = tags
         self.search = search
         self.page = page
-        self.pageSize = pageSize
+//        self.pageSize = pageSize
     }
 }
+
 
 // MARK: - Категория события
 struct EventCategory: Decodable, Sendable {
@@ -55,12 +56,14 @@ struct EventCategory: Decodable, Sendable {
     let name: String
 }
 
+/*
 // MARK: - Категория места
 struct PlaceCategory: Decodable, Sendable {
     let id: Int
     let slug: String
     let name: String
 }
+*/
 
 // MARK: - Локация
 struct Location: Decodable, Sendable {
@@ -76,6 +79,7 @@ struct PagedResponse<T: Decodable>: Decodable {
     let results: [T]
 }
 
+/*
 // MARK: - Агент
 struct Agent: Decodable, Sendable {
     let id: Int
@@ -96,7 +100,7 @@ struct EventItem: Decodable, Sendable {
     let title: String
     let dates: [EventDate]?
 }
-
+*/
 // MARK: - Дата события
 struct EventDate: Decodable, Sendable {
     let start: Int?
@@ -107,6 +111,7 @@ struct EventDate: Decodable, Sendable {
     let endTime: String?
 }
 
+/*
 // MARK: - Событие дня
 struct EventOfTheDay: Decodable, Sendable {
     let date: String
@@ -128,7 +133,7 @@ struct NewsItem: Decodable, Sendable {
     let title: String
     let slug: String
 }
-
+*/
 // MARK: - Подборки
 struct ListItem: Decodable, Sendable {
     let id: Int
@@ -138,6 +143,7 @@ struct ListItem: Decodable, Sendable {
     let siteUrl: String?
 }
 
+/*
 // MARK: - Место
 struct Place: Decodable, Sendable {
     let id: Int
@@ -174,7 +180,7 @@ struct MovieShowing: Decodable, Sendable {
 struct PlaceReference: Decodable, Sendable {
     let id: Int
 }
-
+*/
 // MARK: - Фильм
 struct Movie: Decodable, Sendable {
     let id: Int
@@ -195,28 +201,28 @@ struct Movie: Decodable, Sendable {
 }
 
 // MARK: - Детальная информация о событии
-struct EventDetails: Decodable, Sendable {
-    let id: Int
+struct Event: Decodable, Sendable {
+    let id: Int?
     let title: String
-    let slug: String
+//    let slug: String
     let description: String?
-    let bodyText: String?
+//    let bodyText: String?
     let shortTitle: String?
-    let tagline: String?
+//    let tagline: String?
     let dates: [EventDate]?
     let location: Location?
-    let place: PlaceReference?
-    let price: String?
-    let isFree: Bool
+//    let place: PlaceReference?
+//    let price: String?
+//    let isFree: Bool
     let images: [EventImage]?
     let favoritesCount: Int?
-    let commentsCount: Int?
-    let siteUrl: String?
-    let tags: [String]?
+//    let commentsCount: Int?
+//    let siteUrl: String?
+//    let tags: [String]?
     let categories: [String]?
 //    let ageRestriction: String?
-    let participants: [Participant]?
-    let disableComments: Bool?
+//    let participants: [Participant]?
+//    let disableComments: Bool?
     
     // MARK: - Изображение события
     struct EventImage: Decodable, Sendable {
