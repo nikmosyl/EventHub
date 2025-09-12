@@ -6,23 +6,19 @@
 //
 
 import UIKit
+import SwiftUI
 
 final class EventDetailsViewModel: ObservableObject {
     @Published var eventDetails: EventDetailsModel
-    @Published var isBookmarked: Bool = false
-    let isModal: Bool
+    @Published var isBookmarked: Bool
     
     var shareURL: URL? {
         URL(string: "https://google.com")
     }
     
-    init(eventDetails: EventDetailsModel, isModal: Bool = false) {
+    init(eventDetails: EventDetailsModel, isBookmarked: Bool = false) {
         self.eventDetails = eventDetails
-        self.isModal = isModal
-    }
-    
-    func onBackTapped() {
-        print("Back button tapped")
+        self.isBookmarked = isBookmarked
     }
     
     func onBookmarkTapped() {

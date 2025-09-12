@@ -13,7 +13,6 @@ struct HeaderSection: View {
     let onBookmarkTapped: () -> Void
     let isBookmarked: Bool
     let shareURL: URL?
-    let isModal: Bool
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -44,15 +43,16 @@ struct HeaderSection: View {
                             .foregroundColor(.white)
                     }
                     Spacer()
-                    ActionButton(
-                        icon: .bookmark,
-                        isSelected: isBookmarked,
-                        selectedColor: .red,
-                        action: onBookmarkTapped
-                    )
+                    Button(action: onBookmarkTapped) {
+                        Image(isBookmarked ? .bookmarkFill : .bookmark)
+                            .font(.system(size: 18, weight: .medium))
+                            .frame(width: 36, height: 36)
+                            .background(.ultraThinMaterial.opacity(0.3))
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, isModal ? 20 : 60)
+                .padding(.top, 20)
                 
                 Spacer()
                 
@@ -84,7 +84,6 @@ struct HeaderSection: View {
         onBackTapped: { print("Back tapped") },
         onBookmarkTapped: { print("Bookmark tapped") },
         isBookmarked: false,
-        shareURL: URL(string: "https://google.com"),
-        isModal: false
+        shareURL: URL(string: "https://google.com")
     )
 }
