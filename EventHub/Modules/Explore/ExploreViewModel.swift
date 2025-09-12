@@ -8,7 +8,15 @@
 import Foundation
 
 final class ExploreViewModel: ObservableObject{
+    //MARK: - Variables
+    
+    //MARK: - Methods API
     
     
+    
+    
+    //MARK: - Methods for UI
+    
+    //For VariableSectionView
     
 }

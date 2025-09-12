@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ExploreView: View {
+    
+    @ObservedObject var vm = ExploreViewModel()
+    
     var body: some View {
         ZStack(alignment: .top) {
             
