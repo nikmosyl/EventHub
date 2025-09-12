@@ -36,7 +36,7 @@ enum TabItem: CaseIterable {
         case .map:
             MapView()
         case .profile:
-            ProfileView()
+            ProfileView(profile: .example)
         }
     }
 }
@@ -82,17 +82,6 @@ struct MapView: View {
                 .cyan
                 .ignoresSafeArea()
             Text("MapView")
-        }
-    }
-}
-
-struct ProfileView: View {
-    var body: some View {
-        ZStack {
-            Color
-                .yellow
-                .ignoresSafeArea()
-            Text("ProfileView")
         }
     }
 }
