@@ -125,6 +125,9 @@ extension EventFilters {
             items.append(.init(name: "page_size", value: "20"))
         }
          */
+        if let fields = fields, !fields.isEmpty {
+            items.append(.init(name: "fields", value: fields.joined(separator: ",")))
+        }
         
         return items
     }

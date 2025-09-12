@@ -20,6 +20,7 @@ struct EventFilters {
     let search: String?
     let page: Int?
 //    let pageSize: Int?
+    let fields: [String]?
     
     init(
         location: String? = nil,
@@ -33,6 +34,7 @@ struct EventFilters {
         search: String? = nil,
         page: Int? = nil,
   //      pageSize: Int? = nil
+        fields: [String]? = nil
     ) {
         self.location = location
         self.actualSince = actualSince
@@ -45,6 +47,7 @@ struct EventFilters {
         self.search = search
         self.page = page
 //        self.pageSize = pageSize
+        self.fields = fields
     }
 }
 
@@ -204,7 +207,7 @@ struct Movie: Decodable, Sendable {
 struct Event: Decodable, Sendable {
     let id: Int?
     let title: String
-//    let slug: String
+    let slug: String
     let description: String?
 //    let bodyText: String?
     let shortTitle: String?
