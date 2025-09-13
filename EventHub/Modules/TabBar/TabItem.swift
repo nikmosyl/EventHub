@@ -92,10 +92,21 @@ struct TestView: View {
     @StateObject private var viewModel = TestViewModel()
     
     var body: some View {
-        ScrollView {
-            VStack {
-                ForEach(viewModel.events, id: \.id) { event in
-                    EventRow(event: event, viewModel: viewModel)
+        VStack {
+            Button {
+                Task {
+                    try AuthService.shared.logout()
+                }
+            } label: {
+                Text("Log Out")
+            }
+            
+            
+            ScrollView {
+                VStack {
+                    ForEach(viewModel.events, id: \.id) { event in
+                        EventRow(event: event, viewModel: viewModel)
+                    }
                 }
             }
         }

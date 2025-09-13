@@ -6,11 +6,10 @@
 //
 
 import SwiftUI
-import FirebaseAuth
 
 struct SignUpView: View {
+    @StateObject var rootViewModel: RootViewModel
     
-    /// View Properties
     @State private var fullName: String = ""
     @State private var emailID: String = ""
     @State private var password: String = ""
@@ -20,7 +19,6 @@ struct SignUpView: View {
     @State private var isSigningByGoogle: Bool = false
     @State private var alertMessage: String?
     
-    ///Navigation
     @Binding var isPresented: Bool
     
     var body: some View {
@@ -140,12 +138,13 @@ struct SignUpView: View {
                     let user = UserModel(
                         uid: uid,
                         displayName: fullName,
-                        email: emailID
+                        email: emailID,
+                        photoURL: "empty"
                     )
                     try await AuthService.shared.saveUser(user)
                     
                     isSigningByEmail = false
-                    isPresented = false
+                    rootViewModel.login()
                 } catch {
                     isSigningByEmail = false
                     alertMessage = error.localizedDescription
@@ -153,32 +152,8 @@ struct SignUpView: View {
             }
         }
         
-        private func handleGoogleSignIn() {
-            guard let vc = UIApplication.shared.topViewController else {
-                alertMessage = "Unable to find a presenting controller."
-                return
-            }
-            isSigningByGoogle = true
-            Task {
-                do {
-                    let result = try await AuthService.shared.signInWithGoogle(presenting: vc)
-                    let user = result.user
-                    
-                    let profile = UserModel(
-                        uid: user.uid,
-                        displayName: fullName,
-                        email: emailID
-                    )
-                    try await AuthService.shared.saveUser(profile)
-                    
-                    isSigningByGoogle = false
-                    isPresented = false
-                } catch {
-                    isSigningByGoogle = false
-                    alertMessage = error.localizedDescription
-                }
-            }
-        }
+    private func handleGoogleSignIn() {
+    }
         
         // MARK: - Utils
         private func isValidEmail(_ email: String) -> Bool {
@@ -188,5 +163,5 @@ struct SignUpView: View {
 }
 
 #Preview {
-    SignUpView(isPresented: .constant(true))
+    SignUpView(rootViewModel: RootViewModel(), isPresented: .constant(true))
 }

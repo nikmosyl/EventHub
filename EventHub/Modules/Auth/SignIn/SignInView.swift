@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct SignInView: View {
-    /// View Properties
+    @StateObject var rootViewModel: RootViewModel
+    
     @State private var emailID: String = ""
     @State private var password: String = ""
     @State private var rememberUser = true
     
-    ///Navigation
     @State private var showSignUp: Bool = false
     
     var body: some View {
@@ -65,8 +65,8 @@ struct SignInView: View {
                                 }
                                 .frame(width: 300)
                                 .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
-                                    .filledButtonBackground(.buttonPrimary)
-                                    .foregroundStyle(.white)
+                                .filledButtonBackground(.buttonPrimary)
+                                .foregroundStyle(.white)
                             
                             Text("OR")
                                 .foregroundStyle(.secondary)
@@ -79,14 +79,14 @@ struct SignInView: View {
                                     handleGoogleSignInButton()
                                 }
                             )
-                                .frame(width: 300)
-                                .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
-                                .filledButtonBackground(Color.white)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                                )
-                                .foregroundStyle(.black)
+                            .frame(width: 300)
+                            .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
+                            .filledButtonBackground(Color.white)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                            )
+                            .foregroundStyle(.black)
                         }
                         
                         HStack {
@@ -101,27 +101,62 @@ struct SignInView: View {
                         }
                     }
                     .padding(.horizontal, 25)
-
+                    
                     Spacer()
                 }
             }
             .navigationDestination(
                 isPresented: $showSignUp) {
-                    SignUpView(isPresented: $showSignUp)
+                    SignUpView(rootViewModel: rootViewModel, isPresented: $showSignUp)
                 }
         }
     }
     
     
     private func handleGoogleSignInButton() {
-        print("--> Sign In With Google")
+        Task {
+            do {
+                guard let rootVC = UIApplication.shared.connectedScenes
+                    .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController })
+                    .first else { return }
+                
+                let result = try await AuthService.shared.signInWithGoogle(presenting: rootVC)
+                
+                if rememberUser {
+                    UserDefaults.standard.set(true, forKey: "rememberUser")
+                } else {
+                    UserDefaults.standard.removeObject(forKey: "rememberUser")
+                }
+                
+                print("--> Google Signed In: \(result.user.uid)")
+                rootViewModel.login()
+            } catch {
+                print("Ошибка Google входа: \(error)")
+            }
+        }
     }
     
     private func handleAuthButton() {
-        print("--> Sign In With Email and Password")
+        Task {
+            do {
+                print("emailID: ", emailID, " password:", password)
+                let result = try await AuthService.shared.login(email: emailID, password: password)
+                
+                if rememberUser {
+                    UserDefaults.standard.set(true, forKey: "rememberUser")
+                } else {
+                    UserDefaults.standard.removeObject(forKey: "rememberUser")
+                }
+                
+                print("--> Signed In: \(result.user.uid)")
+                rootViewModel.login()
+            } catch {
+                print("Ошибка входа: \(error)")
+            }
+        }
     }
 }
 
 #Preview {
-    SignInView()
+    SignInView(rootViewModel: RootViewModel())
 }

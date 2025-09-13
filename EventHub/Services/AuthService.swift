@@ -17,15 +17,19 @@ struct UserModel: Codable {
     var uid: String
     var displayName: String
     var email: String
-    var photoURL: String?
+    var photoURL: String
 }
 
 @MainActor
 final class AuthService {
     static let shared = AuthService()
     
-    private let db = Firestore.firestore()
+    private let database = Firestore.firestore()
     private let storage = Storage.storage()
+    
+    var currentUser: User? {
+        Auth.auth().currentUser
+    }
     
     private init() {}
     
@@ -46,21 +50,29 @@ final class AuthService {
         try await Auth.auth().sendPasswordReset(withEmail: email)
     }
     
-    func resetPassword(oldPassword: String, newPassword: String) {
-        #warning("TO DO resetPassword")
+    func changePassword(oldPassword: String, newPassword: String) async throws {
+        guard let user = Auth.auth().currentUser,
+              let email = user.email else {
+            throw NSError(
+                domain: "AuthService",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Пользователь не авторизован"]
+            )
+        }
+        
+        let credential = EmailAuthProvider.credential(withEmail: email, password: oldPassword)
+        try await user.reauthenticate(with: credential)
+        try await user.updatePassword(to: newPassword)
     }
-    
-    var currentUser: User? {
-        Auth.auth().currentUser
-    }
+
     
     // MARK: - Firestore
     func saveUser(_ user: UserModel) async throws {
-        try db.collection("users").document(user.uid).setData(from: user)
+        try database.collection("users").document(user.uid).setData(from: user)
     }
     
     func getUser(uid: String) async throws -> UserModel {
-        let snapshot = try await db.collection("users").document(uid).getDocument()
+        let snapshot = try await database.collection("users").document(uid).getDocument()
         return try snapshot.data(as: UserModel.self)
     }
     
