@@ -21,19 +21,11 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct EventHubApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @State private var finishedOnboarding: Bool = UserDefaults.standard.bool(forKey: "finishedOnboarding")
-
+    
     var body: some Scene {
         WindowGroup {
-            if finishedOnboarding {
-                NavigationView {
-                    TabBarView()
-                }
-            } else {
-                OnboardingView {
-                    UserDefaults.standard.set(true, forKey: "finishedOnboarding")
-                    finishedOnboarding = true
-                }
+            NavigationView {
+                TabBarView()
             }
         }
     }
