@@ -29,8 +29,12 @@ final class DataManager {
         }
         
         let decoder = JSONDecoder()
+        let formatter = DateFormatter()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
-        decoder.dateDecodingStrategy = .secondsSince1970
+        formatter.dateFormat = "y-MM-dd"
+        formatter.locale = Locale(identifier: "en_US")
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        decoder.dateDecodingStrategy = .formatted(formatter)
         
         do {
             return try decoder.decode(T.self, from: data)
@@ -145,5 +149,33 @@ final class DataManager {
     
     func getLocations() async throws -> [Location] {
         try await fetchLocations()
+    }
+}
+
+// MARK: - DataManager + Избранное
+extension DataManager {
+    
+    // Добавление в избранное
+    func addToFavorites(eventId: Int) async throws {
+        print("Добавляем событие \(eventId) в избранное")
+        
+        try await Task.sleep(nanoseconds: 500_000_000)
+    }
+    
+    // Удаление из избранного
+    func removeFromFavorites(eventId: Int) async throws {
+        print("Удаляем событие \(eventId) из избранного")
+        
+        try await Task.sleep(nanoseconds: 500_000_000)
+    }
+    
+    // Проверка статуса избранного
+    func isEventFavorite(eventId: Int) async -> Bool {
+        return false
+    }
+    
+    // Получение всех избранных событий
+    func getFavoriteEvents() async throws -> [Event] {
+        return []
     }
 }

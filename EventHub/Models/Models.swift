@@ -56,7 +56,6 @@ struct EventCategory: Decodable, Sendable {
     let name: String
 }
 
-
 // MARK: - Локация
 struct Location: Decodable, Sendable {
     let slug: String
@@ -67,6 +66,10 @@ struct Location: Decodable, Sendable {
 struct EventDate: Decodable, Sendable, Hashable {
     let start: Int?
     let end: Int?
+    let startDate: Date?
+    let endDate: Date?
+    let startTime: String?
+    let endTime: String?
     
     func formatter(date: Int, format: String) -> String {
         let date = Date(timeIntervalSince1970: TimeInterval(date))
@@ -140,7 +143,7 @@ struct Event: Decodable, Sendable {
     let participants: [Participant]?
     
     var nextDate: EventDate? {
-        guard let dates = dates else { return nil }
+        guard let dates else { return nil }
         let now = Int(Date().timeIntervalSince1970)
         return dates
             .filter { ($0.start ?? 0) >= now }
@@ -148,7 +151,7 @@ struct Event: Decodable, Sendable {
     }
     
     var previousDate: EventDate? {
-        guard let dates = dates else { return nil }
+        guard let dates else { return nil }
         let now = Int(Date().timeIntervalSince1970)
         return dates
             .filter { ($0.end ?? 0) < now }

@@ -8,18 +8,15 @@
 import SwiftUI
 
 struct EventCellView: View {
-    @Binding var isBookmarked: Bool
+    @StateObject private var viewModel: EventCellViewModel
     
-    let imageURL: URL?
-    let dataText: String
-    let timeText: String
-    let title: String
-    let venue: String
-    let city: String
+    init(viewModel: EventCellViewModel) {
+        self._viewModel = StateObject(wrappedValue: viewModel)
+    }
     
     var body: some View {
         HStack(alignment: .top) {
-            AsyncImage(url: imageURL) { phase in
+            AsyncImage(url: viewModel.imageURL) { phase in
                 switch phase {
                 case .empty:
                     placeholder
@@ -37,11 +34,11 @@ struct EventCellView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             
             VStack(alignment: .leading) {
-                Text("\(dataText) • \(timeText)")
+                Text(viewModel.dateTime)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.buttonPrimary)
                 
-                Text(title)
+                Text(viewModel.title)
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(.textDarkPrimary)
                     .multilineTextAlignment(.leading)
@@ -53,7 +50,7 @@ struct EventCellView: View {
                         .font(.subheadline)
                         .foregroundStyle(.textDarkSecondary)
                     
-                    Text("\(venue) • \(city)")
+                    Text(viewModel.location)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
@@ -63,11 +60,14 @@ struct EventCellView: View {
             
             Spacer()
             
-            Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
-                .resizable()
-                .frame(width: 17, height: 19)
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(.buttonCalored)
+            Button(action: viewModel.toggleBookmark) {
+                Image(systemName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
+                    .resizable()
+                    .frame(width: 17, height: 19)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.buttonCalored)
+            }
+            .disabled(viewModel.isLoading)
         }
         .padding(12)
         .background(
@@ -90,13 +90,30 @@ struct EventCellView: View {
 }
 
 #Preview {
-    EventCellView(
-        isBookmarked: .constant(true),
-        imageURL: nil,
-        dataText: "Wed, Apr 28",
-        timeText: "5:30 PM",
-        title: "Jo Malone London’s Mother’s Day Presents",
-        venue: "Radius Gallery",
-        city: "Santa Cruz"
-    )
+    PreviewWrapper()
+}
+
+struct PreviewWrapper: View {
+    @State private var viewModel: EventCellViewModel?
+    
+    var body: some View {
+        VStack {
+            if let viewModel = viewModel {
+                EventCellView(viewModel: viewModel)
+            } else {
+                ProgressView("Загрузка события...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
+        .task {
+            do {
+                let events = try await DataManager.shared.getUpcamingEvents()
+                if let firstEvent = events.first {
+                    viewModel = EventCellViewModel(event: firstEvent)
+                }
+            } catch {
+                print("Ошибка загрузки: \(error)")
+            }
+        }
+    }
 }
