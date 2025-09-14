@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ExploreView: View {
     
-    @ObservedObject var vm = ExploreViewModel()
+    @StateObject var vm = ExploreViewModel()
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -21,10 +21,10 @@ struct ExploreView: View {
                     Spacer()
                         .frame(height: 90)
                     
-                    VariableSectionView()
+                    VariableSectionView(categories: vm.getCategoryViewModel())
                         .offset(y: 5)
                     
-                    VariableSectionView()
+                    VariableSectionView(categories: vm.getCategoryViewModel())
                         .offset(y: 5)
                     
                     VStack(spacing: 5) {
@@ -58,9 +58,3 @@ struct ExploreView: View {
         }
     }
 }
-
-#if DEBUG
-#Preview {
-    ExploreView()
-}
-#endif
