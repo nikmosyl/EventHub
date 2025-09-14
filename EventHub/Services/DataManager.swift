@@ -174,6 +174,7 @@ final class DataManager {
         let email = user.email ?? "empty"
         let displayName = user.displayName ?? "User"
         let photoURL = user.photoURL?.absoluteString ?? "empty"
+        let bio = "empty"
         
         do {
             _ = try await AuthService.shared.getUser(uid: uid)
@@ -182,7 +183,8 @@ final class DataManager {
                 uid: uid,
                 displayName: displayName,
                 email: email,
-                photoURL: photoURL
+                photoURL: photoURL,
+                bio: bio
             )
             try await AuthService.shared.saveUser(newUser)
         }
@@ -221,7 +223,8 @@ final class DataManager {
             uid: uid,
             displayName: fullName,
             email: email,
-            photoURL: "empty"
+            photoURL: "empty",
+            bio: "empty"
         )
         try await AuthService.shared.saveUser(user)
         
@@ -257,9 +260,38 @@ final class DataManager {
             fileExtension: "jpg"
         )
         
-        var user = try await AuthService.shared.getUser(uid: uid)
-        user.photoURL = url
-        try await AuthService.shared.saveUser(user)
+        try await AuthService.shared.updateUser(uid: uid, photoURL: url)
+    }
+    
+    // MARK: - обновление данных пользователя
+    func updateUserData(
+        photoURL: String? = nil,
+        displayName: String? = nil,
+        bio: String? = nil,
+        userModel: UserModel? = nil
+    ) async throws {
+        guard let uid = await AuthService.shared.currentUser?.uid else {
+            throw NSError(
+                domain: "DataManager",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Пользователь не авторизован"]
+            )
+        }
+        
+        if let photoURL {
+            try await AuthService.shared.updateUser(uid: uid, photoURL: photoURL)
+        }
+        if let displayName {
+            try await AuthService.shared.updateUser(uid: uid, displayName: displayName)
+        }
+        if let bio {
+            try await AuthService.shared.updateUser(uid: uid, bio: bio)
+        }
+        if let userModel {
+            try await AuthService.shared.updateUser(uid: uid, photoURL: userModel.photoURL)
+            try await AuthService.shared.updateUser(uid: uid, displayName: userModel.displayName)
+            try await AuthService.shared.updateUser(uid: uid, bio: userModel.bio)
+        }
     }
     
     // MARK: - выход (разлогинивание) пользователя
