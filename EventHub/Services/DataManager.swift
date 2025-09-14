@@ -162,16 +162,42 @@ final class DataManager {
     func loginUserWithGoogle(rememberUser: Bool) async throws {
         try await AuthService.shared.loginWithGoogle()
         
+        guard let user = await AuthService.shared.currentUser else {
+            throw NSError(
+                domain: "DataManager",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Не удалось получить текущего пользователя"]
+            )
+        }
+        
+        let uid = user.uid
+        let email = user.email ?? "empty"
+        let displayName = user.displayName ?? "User"
+        let photoURL = user.photoURL?.absoluteString ?? "empty"
+        
+        do {
+            _ = try await AuthService.shared.getUser(uid: uid)
+        } catch {
+            let newUser = UserModel(
+                uid: uid,
+                displayName: displayName,
+                email: email,
+                photoURL: photoURL
+            )
+            try await AuthService.shared.saveUser(newUser)
+        }
+        
         if rememberUser {
             UserDefaults.standard.set(true, forKey: "rememberUser")
         } else {
             UserDefaults.standard.removeObject(forKey: "rememberUser")
         }
+        
         await rootViewModel?.login()
     }
+
     
     func loginUser(email: String, password: String, rememberUser: Bool) async throws {
-        print("пробуем войти с email: ", email, " password:", password)
         let result = try await AuthService.shared.login(email: email, password: password)
         
         if rememberUser {
@@ -180,7 +206,6 @@ final class DataManager {
             UserDefaults.standard.removeObject(forKey: "rememberUser")
         }
         
-        print("--> Signed In: \(result.user.uid)")
         await rootViewModel?.login()
     }
     
@@ -244,7 +269,7 @@ final class DataManager {
         rootViewModel?.logout()
     }
     
-    // MARK: - onboarding
+    // MARK: - Onboarding
     @MainActor
     func completeOnboarding() {
         UserDefaults.standard.set(true, forKey: UserSettingsLink.onboarding.rawValue)
