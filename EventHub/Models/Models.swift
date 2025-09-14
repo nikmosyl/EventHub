@@ -66,10 +66,6 @@ struct Location: Decodable, Sendable {
 struct EventDate: Decodable, Sendable, Hashable {
     let start: Int?
     let end: Int?
-    let startDate: Date?
-    let endDate: Date?
-    let startTime: String?
-    let endTime: String?
     
     func formatter(date: Int, format: String) -> String {
         let date = Date(timeIntervalSince1970: TimeInterval(date))

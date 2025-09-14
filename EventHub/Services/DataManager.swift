@@ -29,12 +29,7 @@ final class DataManager {
         }
         
         let decoder = JSONDecoder()
-        let formatter = DateFormatter()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
-        formatter.dateFormat = "y-MM-dd"
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.timeZone = TimeZone(identifier: "UTC")
-        decoder.dateDecodingStrategy = .formatted(formatter)
         
         do {
             return try decoder.decode(T.self, from: data)

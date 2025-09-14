@@ -28,15 +28,14 @@ final class EventCellViewModel: ObservableObject {
     }
     
     var dateTime: String {
-        guard let event,
-              let startDate = event.dates?.first?.startDate else {
-            return "Дата не указана"
+        if let startTimestamp = event?.dates?.first?.start {
+            let startDate = Date(timeIntervalSince1970: TimeInterval(startTimestamp))
+            let dateString = startDate.formatted(date: .abbreviated, time: .omitted)
+            let timeString = startDate.formatted(date: .omitted, time: .shortened)
+            return "\(dateString) • \(timeString)"
         }
         
-        let dateString = startDate.formatted(date: .abbreviated, time: .omitted)
-        let timeString = startDate.formatted(date: .omitted, time: .shortened)
-        
-        return "\(dateString) • \(timeString)"
+        return "Дата не указана"
     }
     
     var title: String {
