@@ -13,7 +13,7 @@ final class EventCellViewModel: ObservableObject {
     @Published var isLoading = false
     
     private let dataManager = DataManager.shared
-    private var event: Event?
+    private var event: Event
     
     init(event: Event) {
         self.event = event
@@ -22,15 +22,12 @@ final class EventCellViewModel: ObservableObject {
     
     // изображение
     var imageURL: URL? {
-        guard let firstImage = event?.images?.first?.image else {
-            return nil
-        }
-        return URL(string: firstImage)
+        event.images?.first?.image.flatMap(URL.init)
     }
     
     // дата и время
     var dateTime: String {
-        if let startTimestamp = event?.dates?.first?.start {
+        if let startTimestamp = event.dates?.first?.start {
             let startDate = Date(timeIntervalSince1970: TimeInterval(startTimestamp))
             
             let formatter = DateFormatter()
@@ -45,14 +42,14 @@ final class EventCellViewModel: ObservableObject {
     
     // название мероприятия
     var title: String {
-        event?.title ?? "Название неизвестно"
+        event.title
     }
     
     // место и город
     var location: String {
-        let venue = event?.place?.title ?? "Место не указано"
+        let venue = event.place?.title ?? "Место не указано"
         
-        if let citySlug = event?.location?.slug,
+        if let citySlug = event.location?.slug,
            let cityName = getCityName(for: citySlug) {
             return "\(venue) • \(cityName)"
         } else {
@@ -62,7 +59,7 @@ final class EventCellViewModel: ObservableObject {
     
     func loadBookmarkStatus() {
         Task {
-            isBookmarked = await dataManager.isEventFavorite(eventId: event?.id ?? 0)
+            isBookmarked = await dataManager.isEventFavorite(eventId: event.id ?? 0)
         }
     }
     
@@ -74,9 +71,9 @@ final class EventCellViewModel: ObservableObject {
         Task {
             do {
                 if isBookmarked {
-                    try await dataManager.removeFromFavorites(eventId: event?.id ?? 0)
+                    try await dataManager.removeFromFavorites(eventId: event.id ?? 0)
                 } else {
-                    try await dataManager.addToFavorites(eventId: event?.id ?? 0)
+                    try await dataManager.addToFavorites(eventId: event.id ?? 0)
                 }
                 
                 isBookmarked.toggle()

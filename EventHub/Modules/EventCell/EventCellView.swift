@@ -15,6 +15,7 @@ struct EventCellView: View {
     }
     
     var body: some View {
+        // изображение
         HStack(alignment: .top) {
             AsyncImage(url: viewModel.imageURL) { phase in
                 switch phase {
@@ -34,17 +35,19 @@ struct EventCellView: View {
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             
             VStack(alignment: .leading) {
+                // дата и время
                 Text(viewModel.dateTime)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.buttonPrimary)
                 
+                // название
                 Text(viewModel.title)
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(.textDarkPrimary)
                     .multilineTextAlignment(.leading)
                     .lineLimit(3)
                     
-                
+                // локация
                 HStack {
                     Image(systemName: "mappin")
                         .font(.subheadline)
@@ -60,12 +63,15 @@ struct EventCellView: View {
             
             Spacer()
             
+            // избранное
             Button(action: viewModel.toggleBookmark) {
                 Image(systemName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
                     .resizable()
                     .frame(width: 17, height: 19)
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(.buttonCalored)
+                    .scaleEffect(viewModel.isLoading ? 0.8 : 1)
+                    .animation(.easeInOut(duration: 0.2), value:  viewModel.isLoading)
             }
             .disabled(viewModel.isLoading)
         }
