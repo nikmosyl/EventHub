@@ -7,7 +7,9 @@
 
 import Foundation
 
-// MARK: - DataManager
+enum UserSettingsLink: String {
+    case onboarding
+}
 final class DataManager {
     static let shared = DataManager()
     
@@ -240,5 +242,16 @@ final class DataManager {
     func logoutUser() throws {
         try AuthService.shared.logout()
         rootViewModel?.logout()
+    }
+    
+    // MARK: - onboarding
+    @MainActor
+    func completeOnboarding() {
+        UserDefaults.standard.set(true, forKey: UserSettingsLink.onboarding.rawValue)
+        rootViewModel?.completeOnboarding()
+    }
+    
+    func isOnboardingComplete() -> Bool {
+        UserDefaults.standard.bool(forKey: UserSettingsLink.onboarding.rawValue)
     }
 }
