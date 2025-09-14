@@ -54,8 +54,8 @@ struct SignUpView: View {
                             .disabled(isSigningByEmail)
                             .frame(width: 300)
                             .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
-                                .filledButtonBackground(.buttonPrimary)
-                                .foregroundStyle(.white)
+                            .background(.buttonPrimary, in: RoundedRectangle(cornerRadius: 16))
+                            .foregroundStyle(.white)
                         
                         Text("OR")
                             .foregroundStyle(.secondary)
@@ -68,15 +68,15 @@ struct SignUpView: View {
                                 handleGoogleSignIn()
                             }
                         )
-                            .disabled(isSigningByGoogle)
-                            .frame(width: 300)
-                            .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
-                            .filledButtonBackground(Color.white)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                            )
-                            .foregroundStyle(.black)
+                        .disabled(isSigningByGoogle)
+                        .frame(width: 300)
+                        .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
+                        .background(Color.background, in: RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                        )
+                        .foregroundStyle(.black)
                     }
                     
                     HStack {
@@ -109,57 +109,57 @@ struct SignUpView: View {
     }
     
     // MARK: - Actions
+    
+    private func handleEmailSignUp() {
         
-        private func handleEmailSignUp() {
-            
-            guard !fullName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-                alertMessage = "Please enter your full name."
-                return
-            }
-            guard isValidEmail(emailID) else {
-                alertMessage = "Please enter a valid email."
-                return
-            }
-            guard password.count >= 6 else {
-                alertMessage = "Password must be at least 6 characters."
-                return
-            }
-            guard password == confirmPassword else {
-                alertMessage = "Passwords do not match."
-                return
-            }
-            
-            isSigningByEmail = true
-            Task {
-                do {
-                    let result = try await AuthService.shared.register(email: emailID, password: password)
-                    let uid = result.user.uid
-                    
-                    let user = UserModel(
-                        uid: uid,
-                        displayName: fullName,
-                        email: emailID,
-                        photoURL: "empty"
-                    )
-                    try await AuthService.shared.saveUser(user)
-                    
-                    isSigningByEmail = false
-                    rootViewModel.login()
-                } catch {
-                    isSigningByEmail = false
-                    alertMessage = error.localizedDescription
-                }
-            }
+        guard !fullName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            alertMessage = "Please enter your full name."
+            return
+        }
+        guard isValidEmail(emailID) else {
+            alertMessage = "Please enter a valid email."
+            return
+        }
+        guard password.count >= 6 else {
+            alertMessage = "Password must be at least 6 characters."
+            return
+        }
+        guard password == confirmPassword else {
+            alertMessage = "Passwords do not match."
+            return
         }
         
+        isSigningByEmail = true
+        Task {
+            do {
+                let result = try await AuthService.shared.register(email: emailID, password: password)
+                let uid = result.user.uid
+                
+                let user = UserModel(
+                    uid: uid,
+                    displayName: fullName,
+                    email: emailID,
+                    photoURL: "empty"
+                )
+                try await AuthService.shared.saveUser(user)
+                
+                isSigningByEmail = false
+                rootViewModel.login()
+            } catch {
+                isSigningByEmail = false
+                alertMessage = error.localizedDescription
+            }
+        }
+    }
+    
     private func handleGoogleSignIn() {
     }
-        
-        // MARK: - Utils
-        private func isValidEmail(_ email: String) -> Bool {
-            let pattern = #"^\S+@\S+\.\S+$"#
-            return email.range(of: pattern, options: .regularExpression) != nil
-        }
+    
+    // MARK: - Utils
+    private func isValidEmail(_ email: String) -> Bool {
+        let pattern = #"^\S+@\S+\.\S+$"#
+        return email.range(of: pattern, options: .regularExpression) != nil
+    }
 }
 
 #Preview {

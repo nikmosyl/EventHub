@@ -65,7 +65,7 @@ struct SignInView: View {
                                 }
                                 .frame(width: 300)
                                 .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
-                                .filledButtonBackground(.buttonPrimary)
+                                .background(.buttonPrimary, in: RoundedRectangle(cornerRadius: 16))
                                 .foregroundStyle(.white)
                             
                             Text("OR")
@@ -81,7 +81,7 @@ struct SignInView: View {
                             )
                             .frame(width: 300)
                             .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
-                            .filledButtonBackground(Color.white)
+                            .background(Color.background, in: RoundedRectangle(cornerRadius: 16))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16)
                                     .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
