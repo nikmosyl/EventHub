@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct SignInView: View {
-    @StateObject var rootViewModel: RootViewModel
-    
     @State private var emailID: String = ""
     @State private var password: String = ""
     @State private var rememberUser = true
@@ -107,7 +105,7 @@ struct SignInView: View {
             }
             .navigationDestination(
                 isPresented: $showSignUp) {
-                    SignUpView(rootViewModel: rootViewModel, isPresented: $showSignUp)
+                    SignUpView(isPresented: $showSignUp)
                 }
         }
     }
@@ -145,5 +143,5 @@ struct SignInView: View {
 }
 
 #Preview {
-    SignInView(rootViewModel: RootViewModel())
+    SignInView()
 }

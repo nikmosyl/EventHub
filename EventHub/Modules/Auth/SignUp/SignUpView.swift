@@ -8,8 +8,6 @@
 import SwiftUI
 
 struct SignUpView: View {
-    @StateObject var rootViewModel: RootViewModel
-    
     @State private var fullName: String = ""
     @State private var emailID: String = ""
     @State private var password: String = ""
@@ -166,5 +164,5 @@ struct SignUpView: View {
 }
 
 #Preview {
-    SignUpView(rootViewModel: RootViewModel(), isPresented: .constant(true))
+    SignUpView(isPresented: .constant(true))
 }

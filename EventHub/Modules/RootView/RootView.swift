@@ -24,7 +24,7 @@ struct RootView: View {
         } else if viewModel.isLoggedIn {
             TabBarView()
         } else {
-            SignInView(rootViewModel: viewModel)
+            SignInView()
         }
     }
 }
