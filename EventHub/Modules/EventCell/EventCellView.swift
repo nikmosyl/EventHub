@@ -49,13 +49,16 @@ struct EventCellView: View {
                     
                 // локация
                 HStack {
-                    Image(systemName: "mappin")
-                        .font(.subheadline)
+                    Image("Map")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 11, height: 13)
                         .foregroundStyle(.textDarkSecondary)
                     
                     Text(viewModel.location)
                         .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.textDarkSecondary)
                         .lineLimit(2)
                         .truncationMode(.tail)
                 }
@@ -67,7 +70,7 @@ struct EventCellView: View {
             Button(action: viewModel.toggleBookmark) {
                 Image(systemName: viewModel.isBookmarked ? "bookmark.fill" : "bookmark")
                     .resizable()
-                    .frame(width: 17, height: 19)
+                    .frame(width: 11, height: 13)
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(.buttonCalored)
                     .scaleEffect(viewModel.isLoading ? 0.8 : 1)
@@ -87,7 +90,7 @@ struct EventCellView: View {
     private var placeholder: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(.backgroundSecondary)
+                .fill(.textDarkSecondary)
             Image(systemName: "photo")
                 .font(.title2)
                 .foregroundStyle(.tertiary)
