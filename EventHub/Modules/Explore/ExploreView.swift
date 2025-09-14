@@ -21,40 +21,25 @@ struct ExploreView: View {
                     Spacer()
                         .frame(height: 90)
                     
-                    VariableSectionView(categories: vm.getCategoryViewModel())
-                        .offset(y: 5)
-                    
-                    VariableSectionView(categories: vm.getCategoryViewModel())
-                        .offset(y: 5)
-                    
-                    VStack(spacing: 5) {
-                        HStack {
-                            Text("Upcoming Events")
-                                .font(.system(size: 18))
-                                .foregroundStyle(Color.textDarkPrimary)
-                            Spacer()
-                            
-                            Button {
-                                
-                            } label: {
-                                Text("See All")
-                                    .foregroundStyle(Color.textDarkSecondary)
-                                    .font(.system(size: 14))
-                            }
-                        }
-                        .padding(.horizontal, 20)
-                        
-                        // Upcoming Events ForEach
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 15) {
-                                ForEach(0..<3) { _ in
-                                    EventsCard()
-                                }
+                    switch vm.state {
+                    case .idle, .loading:
+                        ProgressView()
+                            .frame(height: 200)
+                    case .loaded(let explorerContent):
+                        EventsCollectionView()
+                            .environmentObject(vm)
+                    case .error(let error):
+                        ErrorView(error: error) {
+                            Task {
+                                await vm.loadInitialData()
                             }
                         }
                     }
                 }
             }
+        }
+        .task {
+            await vm.loadInitialData()
         }
     }
 }

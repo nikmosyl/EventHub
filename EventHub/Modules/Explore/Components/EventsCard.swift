@@ -10,20 +10,28 @@ import SwiftUI
 struct EventsCard: View {
     
     @State private var isLiked: Bool = false
+    let events: EventCardViewModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ZStack(alignment: .top) {
-                Image(systemName: "photo")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 217, height: 140)
-                    .clipShape(RoundedRectangle(cornerRadius: 15))
-                    .padding(.horizontal, 10)
                 
+                if let imageURL = events.imageUrl {
+                    AsyncImage(url: URL(string: events.imageUrl ?? ""))
+                        .frame(width: 217, height: 140)
+                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                        .padding(.horizontal, 10)
+                }else {
+                    Image(systemName: "photo")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 217, height: 140)
+                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                        .padding(.horizontal, 10)
+                }
                 HStack {
                     
-                    Text("10\nJUNE")
+                    Text(events.date)
                         .font(.system(size: 16, weight: .semibold))
                         .multilineTextAlignment(.center)
                         .foregroundColor(.textCalored)
@@ -52,7 +60,7 @@ struct EventsCard: View {
             
             VStack(alignment: .leading, spacing: 8) {
                 
-                Text("International Band Music Festival")
+                Text(events.title)
                     .font(.system(size: 16, weight: .semibold))
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
@@ -62,7 +70,7 @@ struct EventsCard: View {
                 
                 HStack {
                     Image(systemName: "person.2.fill")
-                    Text("+20 Going")
+                    Text(events.peopleCount)
                         .font(.system(size: 14))
                 }
                 .foregroundColor(.pillColor3)
@@ -70,9 +78,9 @@ struct EventsCard: View {
                 
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("36 Guild Street")
+                    Text(events.location)
                         .font(.system(size: 14))
-                    Text("London, UK")
+                    Text(events.price)
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
                 }
@@ -91,9 +99,3 @@ struct EventsCard: View {
         )
     }
 }
-
-#if DEBUG
-#Preview {
-    EventsCard()
-}
-#endif
