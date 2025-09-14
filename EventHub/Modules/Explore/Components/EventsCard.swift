@@ -17,7 +17,8 @@ struct EventsCard: View {
             ZStack(alignment: .top) {
                 
                 if let imageURL = events.imageUrl {
-                    AsyncImage(url: URL(string: events.imageUrl ?? ""))
+                    AsyncImage(url: URL(string: imageURL))
+                        .scaledToFill()
                         .frame(width: 217, height: 140)
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .padding(.horizontal, 10)

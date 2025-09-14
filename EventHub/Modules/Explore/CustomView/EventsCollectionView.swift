@@ -9,62 +9,31 @@ import SwiftUI
 
 
 struct EventsCollectionView: View {
-    
-    @EnvironmentObject var viewModel : ExploreViewModel
+    let title: String
+    let events: [EventCardViewModel]
     
     var body: some View {
-        VStack(spacing: 5) {
+        VStack(spacing: 12) {
             HStack {
-                Text("Upcoming Events")
-                    .font(.system(size: 18))
+                Text(title)
+                    .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(Color.textDarkPrimary)
+                
                 Spacer()
                 
-                Button {
-                    // Navigation to all upcoming events
-                } label: {
-                    Text("See All")
-                        .foregroundStyle(Color.textDarkSecondary)
-                        .font(.system(size: 14))
+                Button("See All") {
+                    // Navigation to all events
                 }
+                .font(.system(size: 14))
+                .foregroundStyle(Color.textDarkSecondary)
             }
-            .padding(.horizontal, 20)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 15) {
-                    ForEach(viewModel.getUpcommnigViewModel()) { event in
+                    ForEach(events) { event in
                         EventsCard(events: event)
                     }
                 }
-                .padding(.horizontal, 16)
-            }
-        }
-        
-        // Nearby Events Section
-        VStack(spacing: 5) {
-            HStack {
-                Text("Nearby Events")
-                    .font(.system(size: 18))
-                    .foregroundStyle(Color.textDarkPrimary)
-                Spacer()
-                
-                Button {
-                    // Navigation to all nearby events
-                } label: {
-                    Text("See All")
-                        .foregroundStyle(Color.textDarkSecondary)
-                        .font(.system(size: 14))
-                }
-            }
-            .padding(.horizontal, 20)
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 15) {
-                    ForEach(viewModel.getNearbyViewModel()) { event in
-                        EventsCard(events: event)
-                    }
-                }
-                .padding(.horizontal, 16)
             }
         }
     }

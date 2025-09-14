@@ -51,6 +51,8 @@ final class ExploreViewModel: ObservableObject{
         return content.categories.map {CategoryCellViewModel(category: $0)}
     }
     
+    //For EventsCard
+    
     func getUpcommnigViewModel() -> [EventCardViewModel] {
         guard case .loaded(let content) = state else {return []}
         return content.upCommingEvents.prefix(5).map {EventCardViewModel(event: $0)}

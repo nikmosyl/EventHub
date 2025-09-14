@@ -9,37 +9,38 @@ import SwiftUI
 
 struct ExploreView: View {
     
-    @StateObject var vm = ExploreViewModel()
+    @StateObject var viewModel = ExploreViewModel()
     
     var body: some View {
         ZStack(alignment: .top) {
             
-            ExploreNavBar()
+            ExploreNavBar(categories: viewModel.getCategoryViewModel())
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 30) {
                     Spacer()
-                        .frame(height: 90)
+                        .frame(height: 140)
                     
-                    switch vm.state {
+                    switch viewModel.state {
                     case .idle, .loading:
                         ProgressView()
                             .frame(height: 200)
-                    case .loaded(let explorerContent):
-                        EventsCollectionView()
-                            .environmentObject(vm)
+                    case .loaded(_):
+                        EventsCollectionView(title: "Upcommning Events", events: viewModel.getUpcommnigViewModel())
+                        EventsCollectionView(title: "Nearby Events", events: viewModel.getNearbyViewModel())
                     case .error(let error):
                         ErrorView(error: error) {
                             Task {
-                                await vm.loadInitialData()
+                                await viewModel.loadInitialData()
                             }
                         }
                     }
                 }
+                .padding()
             }
         }
         .task {
-            await vm.loadInitialData()
+            await viewModel.loadInitialData()
         }
     }
 }
