@@ -10,12 +10,21 @@ import Foundation
 // MARK: - DataManager
 final class DataManager {
     static let shared = DataManager()
+    
+    private var rootViewModel: RootViewModel?
+    
     private init() {}
+    
+    func setRootViewModel(_ viewModel: RootViewModel) {
+        if rootViewModel == nil {
+            rootViewModel = viewModel
+        }
+    }
     
     // MARK: - Универсальный запрос
     private func fetch<T: Decodable>(_ request: APIRequest) async throws -> T {
         
-#warning("убрать Debug")
+        #warning("убрать Debug")
         print("request.urlRequest():", try request.urlRequest())
         
         let (data, response) = try await URLSession.shared.data(for: try request.urlRequest())
@@ -109,7 +118,7 @@ final class DataManager {
     }
     
     
-    // MARK: - Поиск событий по тексту
+    // MARK: - Простое получение данных
     func searchEvents(query: String, location: String? = nil, page: Int? = nil) async throws -> [Event] {
         let filters = EventFilters(
             location: location,
@@ -145,5 +154,91 @@ final class DataManager {
     
     func getLocations() async throws -> [Location] {
         try await fetchLocations()
+    }
+    
+    // MARK: - авторизация пользователя
+    func loginUserWithGoogle(rememberUser: Bool) async throws {
+        try await AuthService.shared.loginWithGoogle()
+        
+        if rememberUser {
+            UserDefaults.standard.set(true, forKey: "rememberUser")
+        } else {
+            UserDefaults.standard.removeObject(forKey: "rememberUser")
+        }
+        await rootViewModel?.login()
+    }
+    
+    func loginUser(email: String, password: String, rememberUser: Bool) async throws {
+        print("пробуем войти с email: ", email, " password:", password)
+        let result = try await AuthService.shared.login(email: email, password: password)
+        
+        if rememberUser {
+            UserDefaults.standard.set(true, forKey: "rememberUser")
+        } else {
+            UserDefaults.standard.removeObject(forKey: "rememberUser")
+        }
+        
+        print("--> Signed In: \(result.user.uid)")
+        await rootViewModel?.login()
+    }
+    
+    // MARK: - регистрация пользователя
+    func registerUser(email: String, password: String, fullName: String) async throws {
+        let result = try await AuthService.shared.register(
+            email: email,
+            password: password
+        )
+        let uid = result.user.uid
+        
+        let user = UserModel(
+            uid: uid,
+            displayName: fullName,
+            email: email,
+            photoURL: "empty"
+        )
+        try await AuthService.shared.saveUser(user)
+        
+        await rootViewModel?.login()
+    }
+    
+    // MARK: - восстановление пароля пользователя
+    func resetUserPassword(email: String) async throws {
+        try await AuthService.shared.forgotPassword(email: email)
+    }
+    
+    // MARK: - изменение пароля
+    func changeUserPassword(oldPassword: String, newPassword: String) async throws {
+        try await AuthService.shared.changePassword(
+            oldPassword: oldPassword,
+            newPassword: newPassword
+        )
+    }
+    
+    // MARK: - загрузка фотографии пользователя
+    func uploadUserPhoto(data: Data) async throws {
+        guard let uid = await AuthService.shared.currentUser?.uid else {
+            throw NSError(
+                domain: "DataManager",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Пользователь не авторизован"]
+            )
+        }
+        
+        let url = try await AuthService.shared.uploadPhoto(
+            uid: uid,
+            data: data,
+            fileExtension: "jpg"
+        )
+        
+        var user = try await AuthService.shared.getUser(uid: uid)
+        user.photoURL = url
+        try await AuthService.shared.saveUser(user)
+    }
+    
+    // MARK: - выход (разлогинивание) пользователя
+    @MainActor
+    func logoutUser() throws {
+        try AuthService.shared.logout()
+        rootViewModel?.logout()
     }
 }

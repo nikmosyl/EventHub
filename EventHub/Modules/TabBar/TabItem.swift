@@ -95,7 +95,7 @@ struct TestView: View {
         VStack {
             Button {
                 Task {
-                    try AuthService.shared.logout()
+                    try DataManager.shared.logoutUser()
                 }
             } label: {
                 Text("Log Out")

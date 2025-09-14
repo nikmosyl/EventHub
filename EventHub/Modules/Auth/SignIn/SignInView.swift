@@ -114,46 +114,33 @@ struct SignInView: View {
     
     
     private func handleGoogleSignInButton() {
+        #warning("TO DO: поднять какой-то флаг, чтобы отслеживать пока процесс идёт и крутить ромашку")
         Task {
             do {
-                guard let rootVC = UIApplication.shared.connectedScenes
-                    .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController })
-                    .first else { return }
-                
-                let result = try await AuthService.shared.signInWithGoogle(presenting: rootVC)
-                
-                if rememberUser {
-                    UserDefaults.standard.set(true, forKey: "rememberUser")
-                } else {
-                    UserDefaults.standard.removeObject(forKey: "rememberUser")
-                }
-                
-                print("--> Google Signed In: \(result.user.uid)")
-                rootViewModel.login()
+                try await DataManager.shared.loginUserWithGoogle(
+                    rememberUser: rememberUser
+                )
             } catch {
-                print("Ошибка Google входа: \(error)")
+                print("Ошибка в SignIn.handleGoogleSignInButton: ", error)
             }
         }
+        #warning("TO DO: снять флаг")
     }
     
     private func handleAuthButton() {
+        #warning("TO DO: поднять какой-то флаг, чтобы отслеживать пока процесс идёт и крутить ромашку")
         Task {
             do {
-                print("emailID: ", emailID, " password:", password)
-                let result = try await AuthService.shared.login(email: emailID, password: password)
-                
-                if rememberUser {
-                    UserDefaults.standard.set(true, forKey: "rememberUser")
-                } else {
-                    UserDefaults.standard.removeObject(forKey: "rememberUser")
-                }
-                
-                print("--> Signed In: \(result.user.uid)")
-                rootViewModel.login()
+                try await DataManager.shared.loginUser(
+                    email: emailID,
+                    password: password,
+                    rememberUser: rememberUser
+                )
             } catch {
-                print("Ошибка входа: \(error)")
+                print("Ошибка в SignIn.handleGoogleSignInButton: ", error)
             }
         }
+        #warning("TO DO: снять флаг")
     }
 }
 

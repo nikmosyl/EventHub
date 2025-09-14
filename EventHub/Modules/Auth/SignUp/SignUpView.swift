@@ -132,19 +132,11 @@ struct SignUpView: View {
         isSigningByEmail = true
         Task {
             do {
-                let result = try await AuthService.shared.register(email: emailID, password: password)
-                let uid = result.user.uid
-                
-                let user = UserModel(
-                    uid: uid,
-                    displayName: fullName,
+                try await DataManager.shared.registerUser(
                     email: emailID,
-                    photoURL: "empty"
+                    password: password,
+                    fullName: fullName
                 )
-                try await AuthService.shared.saveUser(user)
-                
-                isSigningByEmail = false
-                rootViewModel.login()
             } catch {
                 isSigningByEmail = false
                 alertMessage = error.localizedDescription
@@ -153,6 +145,17 @@ struct SignUpView: View {
     }
     
     private func handleGoogleSignIn() {
+        #warning("TO DO: поднять какой-то флаг, чтобы отслеживать пока процесс идёт и крутить ромашку")
+        Task {
+            do {
+                try await DataManager.shared.loginUserWithGoogle(
+                    rememberUser: true
+                )
+            } catch {
+                print("Ошибка в SignIn.handleGoogleSignInButton: ", error)
+            }
+        }
+        #warning("TO DO: снять флаг")
     }
     
     // MARK: - Utils

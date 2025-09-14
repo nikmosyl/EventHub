@@ -8,13 +8,19 @@
 import SwiftUI
 
 struct RootView: View {
-    @StateObject private var viewModel = RootViewModel()
+    @StateObject private var viewModel: RootViewModel
     
-    #warning("Уборать дебаг когда появится Onboarding")
+    init() {
+        let rootViewModel = RootViewModel()
+        _viewModel = StateObject(wrappedValue: rootViewModel)
+        DataManager.shared.setRootViewModel(rootViewModel)
+    }
+    
+#warning("Уборать дебаг когда появится Onboarding")
     var body: some View {
         if false {//!viewModel.isOnboardingComplete {
             //OnboardingView(rootViewModel: viewModel)
-        EmptyView()
+            EmptyView()
         } else if viewModel.isLoggedIn {
             TabBarView()
         } else {

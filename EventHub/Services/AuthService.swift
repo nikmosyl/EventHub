@@ -11,7 +11,6 @@ import FirebaseCore
 import FirebaseFirestore
 import FirebaseStorage
 import GoogleSignIn
-import UIKit
 
 struct UserModel: Codable {
     var uid: String
@@ -64,7 +63,7 @@ final class AuthService {
         try await user.reauthenticate(with: credential)
         try await user.updatePassword(to: newPassword)
     }
-
+    
     
     // MARK: - Firestore
     func saveUser(_ user: UserModel) async throws {
@@ -77,18 +76,15 @@ final class AuthService {
     }
     
     // MARK: - Storage
-    func uploadPhoto(uid: String, image: UIImage) async throws -> String {
-        let ref = storage.reference().child("profile_photos/\(uid).jpg")
-        guard let data = image.jpegData(compressionQuality: 0.8) else {
-            throw NSError(domain: "ImageError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Не удалось преобразовать UIImage"])
-        }
+    func uploadPhoto(uid: String, data: Data, fileExtension: String = "jpg") async throws -> String {
+        let ref = storage.reference().child("profile_photos/\(uid).\(fileExtension)")
         
         _ = try await ref.putDataAsync(data)
         return try await ref.downloadURL().absoluteString
     }
     
     // MARK: - Google Sign In
-    func signInWithGoogle(presenting: UIViewController) async throws -> AuthDataResult {
+    private func signInWithGoogle(presenting: UIViewController) async throws -> AuthDataResult {
         guard let clientID = FirebaseApp.app()?.options.clientID else {
             throw NSError(domain: "GoogleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "Отсутствует clientID"])
         }
@@ -106,5 +102,15 @@ final class AuthService {
         )
         
         return try await Auth.auth().signIn(with: credential)
+    }
+    
+    func loginWithGoogle() async throws {
+        guard let rootVC = UIApplication.shared.connectedScenes
+            .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController })
+            .first else { return }
+        
+        let result = try await AuthService.shared.signInWithGoogle(presenting: rootVC)
+        
+        print("--> Google Signed In: \(result.user.uid)")
     }
 }
