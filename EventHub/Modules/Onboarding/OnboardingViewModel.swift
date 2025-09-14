@@ -22,6 +22,7 @@ class OnboardingViewModel: ObservableObject {
             print("goToNext")
         }
     }
+    
     func skipOnboarding() {
         print("skipOnboarding")
     }

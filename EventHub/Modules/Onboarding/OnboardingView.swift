@@ -28,7 +28,6 @@ struct OnboardingView: View {
     }
 }
 
-
 private struct OnboardingImage: View {
     let imageName: String
     
@@ -41,11 +40,11 @@ private struct OnboardingImage: View {
                 .padding(.top, 15.5)
                 .padding(.horizontal, 52.5)
                 .offset(y: 38)
-                
+            
             LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.textLightSecondary.opacity(0.5),
-                                Color.white.opacity(0.6)
+                gradient: Gradient(colors: [
+                    Color.textLightSecondary.opacity(0.5),
+                    Color.white.opacity(0.6)
                 ]),
                 startPoint: .top,
                 endPoint: .bottom
@@ -56,7 +55,6 @@ private struct OnboardingImage: View {
         .padding(.bottom, -35)
     }
 }
-
 
 private struct OnboardingPanel: View {
     @ObservedObject var viewModel: OnboardingViewModel
@@ -79,11 +77,10 @@ private struct OnboardingPanel: View {
                     .lineSpacing(10)
                     .frame(width: 295, height: 50, alignment: .center)
                     .padding(.top, 16)
-                    
+                
                 
             }
             .padding(.top,40)
-            
             
             Spacer()
             HStack {
@@ -119,7 +116,6 @@ private struct OnboardingPanel: View {
                 .clipShape(RoundedRectangleShape(radius: 48, corners: [.topLeft, .topRight]))
                 .ignoresSafeArea(edges: .bottom)
         )
-        
     }
 }
 
