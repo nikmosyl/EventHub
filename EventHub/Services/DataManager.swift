@@ -168,9 +168,4 @@ extension DataManager {
     func isEventFavorite(eventId: Int) async -> Bool {
         return false
     }
-    
-    // Получение всех избранных событий
-    func getFavoriteEvents() async throws -> [Event] {
-        return []
-    }
 }

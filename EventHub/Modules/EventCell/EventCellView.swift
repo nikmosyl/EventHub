@@ -46,14 +46,14 @@ struct EventCellView: View {
                     
                 
                 HStack {
-                    Image(systemName: "location.circle")
+                    Image(systemName: "mappin")
                         .font(.subheadline)
                         .foregroundStyle(.textDarkSecondary)
                     
                     Text(viewModel.location)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        .lineLimit(1)
+                        .lineLimit(2)
                         .truncationMode(.tail)
                 }
             }
@@ -90,30 +90,9 @@ struct EventCellView: View {
 }
 
 #Preview {
-    PreviewWrapper()
-}
-
-struct PreviewWrapper: View {
-    @State private var viewModel: EventCellViewModel?
-    
-    var body: some View {
-        VStack {
-            if let viewModel = viewModel {
-                EventCellView(viewModel: viewModel)
-            } else {
-                ProgressView("Загрузка события...")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        }
-        .task {
-            do {
-                let events = try await DataManager.shared.getUpcamingEvents()
-                if let firstEvent = events.first {
-                    viewModel = EventCellViewModel(event: firstEvent)
-                }
-            } catch {
-                print("Ошибка загрузки: \(error)")
-            }
-        }
-    }
+    EventCellView(
+        viewModel: EventCellViewModel(
+            event: .preview
+        )
+    )
 }
