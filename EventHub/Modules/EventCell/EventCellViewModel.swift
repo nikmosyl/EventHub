@@ -30,9 +30,12 @@ final class EventCellViewModel: ObservableObject {
     var dateTime: String {
         if let startTimestamp = event?.dates?.first?.start {
             let startDate = Date(timeIntervalSince1970: TimeInterval(startTimestamp))
-            let dateString = startDate.formatted(date: .abbreviated, time: .omitted)
-            let timeString = startDate.formatted(date: .omitted, time: .shortened)
-            return "\(dateString) • \(timeString)"
+            
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "ru_RU")
+            formatter.dateFormat = "E, dd MMM • HH:mm"
+            
+            return formatter.string(from: startDate)
         }
         
         return "Дата не указана"
