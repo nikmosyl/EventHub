@@ -20,6 +20,7 @@ final class EventCellViewModel: ObservableObject {
         loadBookmarkStatus()
     }
     
+    // изображение
     var imageURL: URL? {
         guard let firstImage = event?.images?.first?.image else {
             return nil
@@ -27,6 +28,7 @@ final class EventCellViewModel: ObservableObject {
         return URL(string: firstImage)
     }
     
+    // дата и время
     var dateTime: String {
         if let startTimestamp = event?.dates?.first?.start {
             let startDate = Date(timeIntervalSince1970: TimeInterval(startTimestamp))
@@ -41,22 +43,21 @@ final class EventCellViewModel: ObservableObject {
         return "Дата не указана"
     }
     
+    // название мероприятия
     var title: String {
         event?.title ?? "Название неизвестно"
     }
     
+    // место и город
     var location: String {
-        var locationParts: [String] = []
+        let venue = event?.place?.title ?? "Место не указано"
         
-        if let venue = event?.place?.title {
-            locationParts.append(venue)
+        if let citySlug = event?.location?.slug,
+           let cityName = getCityName(for: citySlug) {
+            return "\(venue) • \(cityName)"
+        } else {
+            return venue
         }
-        
-        if let city = event?.location?.name {
-            locationParts.append(city)
-        }
-        
-        return locationParts.isEmpty ? "Место не указано" : locationParts.joined(separator: " • ")
     }
     
     func loadBookmarkStatus() {
@@ -84,6 +85,23 @@ final class EventCellViewModel: ObservableObject {
                 isLoading = false
                 print("Ошибка при изменении избранного: \(error)")
             }
+        }
+    }
+    
+    private func getCityName(for slug: String) -> String? {
+        switch slug {
+        case "msk":
+            return "Москва"
+        case "spb":
+            return "Санкт-Петербург"
+        case "ekb":
+            return "Екатеринбург"
+        case "kzn":
+            return "Казань"
+        case "nnv":
+            return "Нижний Новгород"
+        default:
+            return "Такого города нет"
         }
     }
 }
