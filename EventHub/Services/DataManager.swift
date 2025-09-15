@@ -289,7 +289,6 @@ final class DataManager {
             try await AuthService.shared.updateUser(uid: uid, bio: bio)
         }
         if let userModel {
-            try await AuthService.shared.updateUser(uid: uid, photoURL: userModel.photoURL)
             try await AuthService.shared.updateUser(uid: uid, displayName: userModel.displayName)
             try await AuthService.shared.updateUser(uid: uid, bio: userModel.bio)
         }
