@@ -52,7 +52,7 @@ struct HeaderSection: View {
                     }
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 20)
+                .padding(.top, 60)
                 
                 Spacer()
                 

@@ -31,18 +31,20 @@ struct ContentSection: View {
                         title: eventDetails.date,
                         subtitle: eventDetails.timeRange
                     )
-                    
+
                     InfoRow(
                         leftIcon: .icon(.location),
                         title: eventDetails.venue,
                         subtitle: eventDetails.address
                     )
-                    
-                    InfoRow(
-                        leftIcon: .asyncImage(url: eventDetails.imageURL ?? ""),
-                        title: eventDetails.organizer,
-                        subtitle: eventDetails.organizerTitle
-                    )
+
+                    if eventDetails.hasOrganizer {
+                        InfoRow(
+                            leftIcon: .asyncImage(url: eventDetails.organizerImageURL ?? ""),
+                            title: eventDetails.organizer,
+                            subtitle: eventDetails.organizerTitle
+                        )
+                    }
                 }
                 
                 Spacer()

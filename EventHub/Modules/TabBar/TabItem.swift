@@ -34,7 +34,7 @@ enum TabItem: CaseIterable {
         case .bookmark:
             BookmarkView()
         case .map:
-            MapView()
+            EventDetailsView(eventId: 123456)
         case .profile:
             TestView()
         }

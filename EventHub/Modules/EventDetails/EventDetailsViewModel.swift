@@ -8,28 +8,60 @@
 import UIKit
 import SwiftUI
 
+@MainActor
 final class EventDetailsViewModel: ObservableObject {
-    @Published var eventDetails: EventDetailsModel
-    @Published var isBookmarked: Bool
-    
+    @Published var eventDetails: EventDetailsModel?
+    @Published var isBookmarked: Bool = false
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
+
+    private let dataManager = DataManager.shared
+    private let eventId: Int
+    private var event: Event?
+
     var shareURL: URL? {
-        URL(string: "https://google.com")
+        event?.siteUrl.flatMap(URL.init) ?? URL(string: "https://google.com")
+    }
+
+    init(eventId: Int) {
+        self.eventId = eventId
+        loadEventDetails()
+    }
+
+    init(event: Event) {
+        self.eventId = event.id ?? 0
+        self.event = event
+        self.eventDetails = EventDetailsModel(from: event)
+        self.isBookmarked = false // TODO: Implement bookmark logic
     }
     
-    init(eventDetails: EventDetailsModel, isBookmarked: Bool = false) {
-        self.eventDetails = eventDetails
-        self.isBookmarked = isBookmarked
+    func loadEventDetails() {
+        guard eventId > 0 else { return }
+
+        isLoading = true
+        errorMessage = nil
+
+        Task {
+            do {
+                let foundEvent = try await dataManager.getEvent(id: eventId)
+                event = foundEvent
+                eventDetails = EventDetailsModel(from: foundEvent)
+            } catch {
+                errorMessage = "Failed to load event details: \(error.localizedDescription)"
+            }
+            isLoading = false
+        }
     }
-    
+
     func onBookmarkTapped() {
-        print("Bookmark button tapped")
+        // TODO: Implement bookmark functionality with DataManager
         isBookmarked.toggle()
     }
     
-    
     func onReadMoreTapped() {
-        print("Read more button tapped")
-        if let url = URL(string: "https://google.com") {
+        if let siteUrl = event?.siteUrl, let url = URL(string: siteUrl) {
+            UIApplication.shared.open(url)
+        } else if let url = URL(string: "https://google.com") {
             UIApplication.shared.open(url)
         }
     }

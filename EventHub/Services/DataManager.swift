@@ -173,6 +173,10 @@ final class DataManager {
     func getLocations() async throws -> [Location] {
         try await fetchLocations()
     }
+
+    func getEvent(id: Int) async throws -> Event {
+        try await fetchEvent(id: id)
+    }
     
     // MARK: - авторизация пользователя
     func loginUserWithGoogle(rememberUser: Bool) async throws {
