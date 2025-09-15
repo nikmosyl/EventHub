@@ -244,6 +244,19 @@ final class DataManager {
         )
     }
     
+    // MARK: - получение данных пользователя
+    func getUserData() async throws -> UserModel {
+        guard let uid = await AuthService.shared.currentUser?.uid else {
+            throw NSError(
+                domain: "DataManager",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Пользователь не авторизован"]
+            )
+        }
+        
+        return try await AuthService.shared.getUser(uid: uid)
+    }
+    
     // MARK: - загрузка фотографии пользователя
     func uploadUserPhoto(data: Data) async throws {
         guard let uid = await AuthService.shared.currentUser?.uid else {
