@@ -274,7 +274,6 @@ final class DataManager {
     
     // MARK: - обновление данных пользователя
     func updateUserData(
-        photoURL: String? = nil,
         displayName: String? = nil,
         bio: String? = nil,
         userModel: UserModel? = nil
@@ -283,9 +282,6 @@ final class DataManager {
             throw NSError.userNotAuthorized
         }
         
-        if let photoURL {
-            try await AuthService.shared.updateUser(uid: uid, photoURL: photoURL)
-        }
         if let displayName {
             try await AuthService.shared.updateUser(uid: uid, displayName: displayName)
         }
