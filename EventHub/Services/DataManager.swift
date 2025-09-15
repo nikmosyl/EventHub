@@ -10,6 +10,17 @@ import Foundation
 enum UserSettingsLink: String {
     case onboarding
 }
+
+extension NSError {
+    static var userNotAuthorized: NSError {
+        NSError(
+            domain: "DataManager",
+            code: -1,
+            userInfo: [NSLocalizedDescriptionKey: "Не удалось получить текущего пользователя"]
+        )
+    }
+}
+
 final class DataManager {
     static let shared = DataManager()
     
@@ -119,6 +130,11 @@ final class DataManager {
         try await fetchPaged(.movies(page: page))
     }
     
+    // MARK: - Сохранение авторизации
+    func remenberUser() {
+        UserDefaults.standard.set(true, forKey: "rememberUser")
+    }
+    
     
     // MARK: - Простое получение данных
     func searchEvents(query: String, location: String? = nil, page: Int? = nil) async throws -> [Event] {
@@ -163,17 +179,14 @@ final class DataManager {
         try await AuthService.shared.loginWithGoogle()
         
         guard let user = await AuthService.shared.currentUser else {
-            throw NSError(
-                domain: "DataManager",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Не удалось получить текущего пользователя"]
-            )
+            throw NSError.userNotAuthorized
         }
         
         let uid = user.uid
         let email = user.email ?? "empty"
         let displayName = user.displayName ?? "User"
         let photoURL = user.photoURL?.absoluteString ?? "empty"
+        let bio = "empty"
         
         do {
             _ = try await AuthService.shared.getUser(uid: uid)
@@ -182,29 +195,22 @@ final class DataManager {
                 uid: uid,
                 displayName: displayName,
                 email: email,
-                photoURL: photoURL
+                photoURL: photoURL,
+                bio: bio
             )
             try await AuthService.shared.saveUser(newUser)
         }
         
-        if rememberUser {
-            UserDefaults.standard.set(true, forKey: "rememberUser")
-        } else {
-            UserDefaults.standard.removeObject(forKey: "rememberUser")
-        }
+        if rememberUser { remenberUser() }
         
         await rootViewModel?.login()
     }
 
     
     func loginUser(email: String, password: String, rememberUser: Bool) async throws {
-        let result = try await AuthService.shared.login(email: email, password: password)
+        _ = try await AuthService.shared.login(email: email, password: password)
         
-        if rememberUser {
-            UserDefaults.standard.set(true, forKey: "rememberUser")
-        } else {
-            UserDefaults.standard.removeObject(forKey: "rememberUser")
-        }
+        if rememberUser { remenberUser() }
         
         await rootViewModel?.login()
     }
@@ -221,7 +227,8 @@ final class DataManager {
             uid: uid,
             displayName: fullName,
             email: email,
-            photoURL: "empty"
+            photoURL: "empty",
+            bio: "empty"
         )
         try await AuthService.shared.saveUser(user)
         
@@ -241,14 +248,19 @@ final class DataManager {
         )
     }
     
+    // MARK: - получение данных пользователя
+    func getUserData() async throws -> UserModel {
+        guard let uid = await AuthService.shared.currentUser?.uid else {
+            throw NSError.userNotAuthorized
+        }
+        
+        return try await AuthService.shared.getUser(uid: uid)
+    }
+    
     // MARK: - загрузка фотографии пользователя
     func uploadUserPhoto(data: Data) async throws {
         guard let uid = await AuthService.shared.currentUser?.uid else {
-            throw NSError(
-                domain: "DataManager",
-                code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Пользователь не авторизован"]
-            )
+            throw NSError.userNotAuthorized
         }
         
         let url = try await AuthService.shared.uploadPhoto(
@@ -257,9 +269,29 @@ final class DataManager {
             fileExtension: "jpg"
         )
         
-        var user = try await AuthService.shared.getUser(uid: uid)
-        user.photoURL = url
-        try await AuthService.shared.saveUser(user)
+        try await AuthService.shared.updateUser(uid: uid, photoURL: url)
+    }
+    
+    // MARK: - обновление данных пользователя
+    func updateUserData(
+        displayName: String? = nil,
+        bio: String? = nil,
+        userModel: UserModel? = nil
+    ) async throws {
+        guard let uid = await AuthService.shared.currentUser?.uid else {
+            throw NSError.userNotAuthorized
+        }
+        
+        if let displayName {
+            try await AuthService.shared.updateUser(uid: uid, displayName: displayName)
+        }
+        if let bio {
+            try await AuthService.shared.updateUser(uid: uid, bio: bio)
+        }
+        if let userModel {
+            try await AuthService.shared.updateUser(uid: uid, displayName: userModel.displayName)
+            try await AuthService.shared.updateUser(uid: uid, bio: userModel.bio)
+        }
     }
     
     // MARK: - выход (разлогинивание) пользователя

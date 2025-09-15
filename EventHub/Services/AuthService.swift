@@ -17,6 +17,7 @@ struct UserModel: Codable {
     var displayName: String
     var email: String
     var photoURL: String
+    var bio: String
 }
 
 @MainActor
@@ -73,6 +74,24 @@ final class AuthService {
     func getUser(uid: String) async throws -> UserModel {
         let snapshot = try await database.collection("users").document(uid).getDocument()
         return try snapshot.data(as: UserModel.self)
+    }
+
+    func updateUser(uid: String, photoURL: String) async throws {
+        try await database.collection("users").document(uid).updateData([
+            "photoURL": photoURL
+            ])
+    }
+    
+    func updateUser(uid: String, displayName: String) async throws {
+        try await database.collection("users").document(uid).updateData([
+            "displayName": displayName
+            ])
+    }
+    
+    func updateUser(uid: String, bio: String) async throws {
+        try await database.collection("users").document(uid).updateData([
+            "bio": bio
+            ])
     }
     
     // MARK: - Storage
