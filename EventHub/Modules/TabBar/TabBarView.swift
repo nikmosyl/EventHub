@@ -14,6 +14,9 @@ struct TabBarView: View {
         NavigationStack {
             ZStack(alignment: .bottom) {
                 viewModel.selectedTab.view
+                    .safeAreaInset(edge: .bottom) {
+                        Color.clear.frame(height: 100)
+                    }
                 
                 CustomTabBarView(viewModel: viewModel)
             }

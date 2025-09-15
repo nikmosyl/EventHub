@@ -36,7 +36,7 @@ enum TabItem: CaseIterable {
         case .map:
             MapView()
         case .profile:
-            ProfileView()
+            TestView()
         }
     }
 }
@@ -86,13 +86,104 @@ struct MapView: View {
     }
 }
 
-struct ProfileView: View {
+
+//MARK: пример использования DataManager
+struct TestView: View {
+    @StateObject private var viewModel = TestViewModel()
+    
     var body: some View {
-        ZStack {
-            Color
-                .yellow
-                .ignoresSafeArea()
-            Text("ProfileView")
+        VStack {
+            Button {
+                Task {
+                    try DataManager.shared.logoutUser()
+                }
+            } label: {
+                Text("Log Out")
+            }
+            
+            
+            ScrollView {
+                VStack {
+                    ForEach(viewModel.events, id: \.id) { event in
+                        EventRow(event: event, viewModel: viewModel)
+                    }
+                }
+            }
         }
     }
+}
+
+struct EventRow: View {
+    let event: Event
+    @ObservedObject var viewModel: TestViewModel
+    
+    var body: some View {
+        VStack() {
+            Text(event.title)
+            
+            if let imageUrl = event.images?.first?.image {
+                HStack {
+                    NetworkImage(imageUrl: imageUrl)
+                        .frame(width: 50, height: 50)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    
+                    Text(event.shortTitle ?? "Пустой title")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+            }
+            else {
+                Text("Не удалось загрузить детали")
+                    .foregroundColor(.red)
+                    .font(.footnote)
+            }
+            
+            if let next = event.nextDate, let start = next.start{
+                Text("next: \(next.formatter(date: start, format: "EEE, MMM d • h:mm a"))")
+            }
+            
+            if let prev = event.previousDate, let start = prev.start {
+                Text("prev: \(prev.formatter(date: start, format: "EEE, MMM d • h:mm a"))")
+            }
+        }
+        .background(Color.gray)
+        .padding()
+    }
+}
+
+@MainActor
+final class TestViewModel: ObservableObject {
+    @Published var events: [Event] = []
+    
+    init() {
+        loadEvents()
+    }
+    
+    func loadEvents() {
+        Task {
+            do {
+                let events = try await DataManager.shared.getUpcamingEvents()
+                self.events = events
+            } catch {
+                print("ProfileViewModel Ошибка при загрузке событий, ошибка: \(error)")
+                if let netError = error as? NetworkError {
+                    switch netError {
+                    case .invalidResponse:
+                        print("⚠️ Некорректный ответ сервера")
+                    case .badStatus(let code):
+                        print("⚠️ Сервер вернул статус: \(code)")
+                    case .decoding(let decodeError):
+                        print("⚠️ Ошибка декодирования:", decodeError)
+                    case .invalidURL:
+                        print("⚠️ Ошибка url:")
+                    }
+                }
+                self.events = []
+            }
+        }
+    }
+}
+
+#Preview {
+    TabBarView()
 }
