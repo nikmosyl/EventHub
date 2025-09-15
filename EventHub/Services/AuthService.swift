@@ -11,23 +11,25 @@ import FirebaseCore
 import FirebaseFirestore
 import FirebaseStorage
 import GoogleSignIn
-import UIKit
 
 struct UserModel: Codable {
     var uid: String
-    var firstName: String
-    var lastName: String
-    var gender: String
-    var description: String
-    var photoURL: String?
+    var displayName: String
+    var email: String
+    var photoURL: String
+    var bio: String
 }
 
 @MainActor
 final class AuthService {
     static let shared = AuthService()
     
-    private let db = Firestore.firestore()
+    private let database = Firestore.firestore()
     private let storage = Storage.storage()
+    
+    var currentUser: User? {
+        Auth.auth().currentUser
+    }
     
     private init() {}
     
@@ -48,37 +50,60 @@ final class AuthService {
         try await Auth.auth().sendPasswordReset(withEmail: email)
     }
     
-    func resetPassword(oldPassword: String, newPassword: String) {
-        #warning("TO DO resetPassword")
+    func changePassword(oldPassword: String, newPassword: String) async throws {
+        guard let user = Auth.auth().currentUser,
+              let email = user.email else {
+            throw NSError(
+                domain: "AuthService",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Пользователь не авторизован"]
+            )
+        }
+        
+        let credential = EmailAuthProvider.credential(withEmail: email, password: oldPassword)
+        try await user.reauthenticate(with: credential)
+        try await user.updatePassword(to: newPassword)
     }
     
-    var currentUser: User? {
-        Auth.auth().currentUser
-    }
     
     // MARK: - Firestore
     func saveUser(_ user: UserModel) async throws {
-        try db.collection("users").document(user.uid).setData(from: user)
+        try database.collection("users").document(user.uid).setData(from: user)
     }
     
     func getUser(uid: String) async throws -> UserModel {
-        let snapshot = try await db.collection("users").document(uid).getDocument()
+        let snapshot = try await database.collection("users").document(uid).getDocument()
         return try snapshot.data(as: UserModel.self)
+    }
+
+    func updateUser(uid: String, photoURL: String) async throws {
+        try await database.collection("users").document(uid).updateData([
+            "photoURL": photoURL
+            ])
+    }
+    
+    func updateUser(uid: String, displayName: String) async throws {
+        try await database.collection("users").document(uid).updateData([
+            "displayName": displayName
+            ])
+    }
+    
+    func updateUser(uid: String, bio: String) async throws {
+        try await database.collection("users").document(uid).updateData([
+            "bio": bio
+            ])
     }
     
     // MARK: - Storage
-    func uploadPhoto(uid: String, image: UIImage) async throws -> String {
-        let ref = storage.reference().child("profile_photos/\(uid).jpg")
-        guard let data = image.jpegData(compressionQuality: 0.8) else {
-            throw NSError(domain: "ImageError", code: -1, userInfo: [NSLocalizedDescriptionKey: "Не удалось преобразовать UIImage"])
-        }
+    func uploadPhoto(uid: String, data: Data, fileExtension: String = "jpg") async throws -> String {
+        let ref = storage.reference().child("profile_photos/\(uid).\(fileExtension)")
         
         _ = try await ref.putDataAsync(data)
         return try await ref.downloadURL().absoluteString
     }
     
     // MARK: - Google Sign In
-    func signInWithGoogle(presenting: UIViewController) async throws -> AuthDataResult {
+    private func signInWithGoogle(presenting: UIViewController) async throws -> AuthDataResult {
         guard let clientID = FirebaseApp.app()?.options.clientID else {
             throw NSError(domain: "GoogleSignIn", code: -1, userInfo: [NSLocalizedDescriptionKey: "Отсутствует clientID"])
         }
@@ -96,5 +121,15 @@ final class AuthService {
         )
         
         return try await Auth.auth().signIn(with: credential)
+    }
+    
+    func loginWithGoogle() async throws {
+        guard let rootVC = UIApplication.shared.connectedScenes
+            .compactMap({ ($0 as? UIWindowScene)?.keyWindow?.rootViewController })
+            .first else { return }
+        
+        let result = try await AuthService.shared.signInWithGoogle(presenting: rootVC)
+        
+        print("--> Google Signed In: \(result.user.uid)")
     }
 }
