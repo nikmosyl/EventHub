@@ -5,67 +5,152 @@
 //  Created by Николай Игнатов on 13.09.2025.
 //
 
-import Foundation
+import FirebaseStorage
+import UIKit
 
+@MainActor
 final class ProfileViewModel: ObservableObject {
-    @Published var profile: ProfileModel
-    @Published var isShowingFullAbout: Bool = false
+    @Published var profile: ProfileModel?
     @Published var isEditingMode: Bool = false
     @Published var showingNameAlert: Bool = false
     @Published var showingAboutAlert: Bool = false
     @Published var showingPhotoPicker: Bool = false
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
+    
     @Published var tempName: String = ""
     @Published var tempAboutMe: String = ""
+    @Published var profileImage: UIImage?
     
-    init(profile: ProfileModel) {
-        self.profile = profile
-        self.tempName = profile.name
-        self.tempAboutMe = profile.aboutMe
+    private let dataManager = DataManager.shared
+    
+    init() {
+        loadUserData()
+    }
+    
+    func loadUserData() {
+        isLoading = true
+        errorMessage = nil
+
+        Task {
+            do {
+                let userModel = try await dataManager.getUserData()
+                profile = ProfileModel(from: userModel)
+                tempName = profile?.name ?? ""
+                tempAboutMe = profile?.aboutMe ?? ""
+
+                if !userModel.photoURL.isEmpty {
+                    await loadProfileImage(from: userModel.photoURL)
+                }
+            } catch {
+                errorMessage = "Failed to load user data: \(error.localizedDescription)"
+            }
+            isLoading = false
+        }
+    }
+    
+    func uploadPhoto(data: Data) {
+        #warning("dataManager.uploadUserPhoto кидает 404")
+//        Task {
+//            try? await dataManager.uploadUserPhoto(data: data)
+//        }
+        if let image = UIImage(data: data) {
+            profileImage = image
+        }
     }
     
     func onEditProfileTapped() {
-        print("Edit Profile button tapped")
+        guard let profile = profile else { return }
+        tempName = profile.name
+        tempAboutMe = profile.aboutMe
         isEditingMode = true
     }
     
     func onSaveProfileTapped() {
         isEditingMode = false
-        print("Saving profile to data service...")
+
+        Task {
+            do {
+                try await dataManager.updateUserData(
+                    displayName: tempName,
+                    bio: tempAboutMe
+                )
+                refreshUserData()
+            } catch {
+                errorMessage = "Failed to save profile: \(error.localizedDescription)"
+            }
+        }
     }
     
     func onEditAvatarTapped() {
-        print("Edit Avatar button tapped")
         showingPhotoPicker = true
     }
     
     func onEditNameTapped() {
-        print("Edit Name button tapped")
-        tempName = profile.name
+        tempName = profile?.name ?? ""
         showingNameAlert = true
     }
     
     func onEditAboutTapped() {
-        print("Edit About button tapped")
-        tempAboutMe = profile.aboutMe
+        tempAboutMe = profile?.aboutMe ?? ""
         showingAboutAlert = true
     }
     
     func updateName() {
-        print("Updating name from '\(profile.name)' to '\(tempName)' in data service")
-        profile = ProfileModel(name: tempName, aboutMe: profile.aboutMe)
+        if let currentProfile = profile {
+            profile = ProfileModel(
+                name: tempName,
+                aboutMe: currentProfile.aboutMe
+            )
+        }
     }
-    
+
     func updateAbout() {
-        print("Updating about from '\(profile.aboutMe)' to '\(tempAboutMe)' in data service")
-        profile = ProfileModel(name: profile.name, aboutMe: tempAboutMe)
-    }
-    
-    func onReadMoreTapped() {
-        print("Read More button tapped")
-        isShowingFullAbout.toggle()
+        if let currentProfile = profile {
+            profile = ProfileModel(
+                name: currentProfile.name,
+                aboutMe: tempAboutMe
+            )
+        }
     }
     
     func onSignOutTapped() {
-        print("Sign Out button tapped")
+        do {
+            try dataManager.logoutUser()
+        } catch {
+            errorMessage = "Failed to sign out: \(error.localizedDescription)"
+        }
+    }
+}
+
+private extension ProfileViewModel {
+    func loadProfileImage(from urlString: String) async {
+        guard let url = URL(string: urlString) else { return }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            if let image = UIImage(data: data) {
+                await MainActor.run {
+                    profileImage = image
+                }
+            }
+        } catch {
+            errorMessage = "Failed to load profile image: \(error.localizedDescription)"
+        }
+    }
+    
+    func refreshUserData() {
+        Task {
+            do {
+                let userModel = try await dataManager.getUserData()
+                profile = ProfileModel(from: userModel)
+
+                if !userModel.photoURL.isEmpty {
+                    await loadProfileImage(from: userModel.photoURL)
+                }
+            } catch {
+                errorMessage = "Failed to refresh user data: \(error.localizedDescription)"
+            }
+        }
     }
 }

@@ -9,85 +9,96 @@ import SwiftUI
 import PhotosUI
 
 struct ProfileView: View {
-    @StateObject private var viewModel: ProfileViewModel
+    @StateObject private var viewModel = ProfileViewModel()
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var selectedImage: UIImage?
     
-    init(profile: ProfileModel) {
-        _viewModel = StateObject(wrappedValue: ProfileViewModel(profile: profile))
-    }
-    
     var body: some View {
         NavigationView {
-            VStack(spacing: 32) {
-                ProfileHeader(
-                    avatarImage: selectedImage,
-                    name: viewModel.profile.name,
-                    isEditingMode: viewModel.isEditingMode,
-                    onEditProfileTapped: viewModel.onEditProfileTapped,
-                    onEditAvatarTapped: viewModel.onEditAvatarTapped,
-                    onEditNameTapped: viewModel.onEditNameTapped
-                )
-                
-                AboutSection(
-                    aboutText: viewModel.profile.aboutMe,
-                    isShowingFullText: viewModel.isShowingFullAbout,
-                    isEditingMode: viewModel.isEditingMode,
-                    onReadMoreTapped: viewModel.onReadMoreTapped,
-                    onEditAboutTapped: viewModel.onEditAboutTapped
-                )
-                .padding(.horizontal, 20)
-                
-                Spacer()
-                
-                if viewModel.isEditingMode {
-                    SaveButton(
-                        onSaveTapped: viewModel.onSaveProfileTapped
+            if viewModel.isLoading {
+                ProgressView("Loading...")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let profile = viewModel.profile {
+                VStack(spacing: 32) {
+                    ProfileHeader(
+                        avatarImage: selectedImage ?? viewModel.profileImage,
+                        name: profile.name,
+                        isEditingMode: viewModel.isEditingMode,
+                        onEditProfileTapped: viewModel.onEditProfileTapped,
+                        onEditAvatarTapped: viewModel.onEditAvatarTapped,
+                        onEditNameTapped: viewModel.onEditNameTapped
                     )
-                } else {
-                    SignOutButton(
-                        onSignOutTapped: viewModel.onSignOutTapped
+                    
+                    AboutSection(
+                        aboutText: profile.aboutMe,
+                        isEditingMode: viewModel.isEditingMode,
+                        onEditAboutTapped: viewModel.onEditAboutTapped
                     )
-                }
-            }
-            .padding(.top, 20)
-            .padding(.bottom, 120)
-            .navigationTitle("Profile")
-            .navigationBarTitleDisplayMode(.inline)
-            .alert("Edit Name", isPresented: $viewModel.showingNameAlert) {
-                TextField("Name", text: $viewModel.tempName)
-                Button("Cancel", role: .cancel) { }
-                Button("Save") {
-                    viewModel.updateName()
-                }
-            } message: {
-                Text("Enter your new name")
-            }
-            .alert("Edit About Me", isPresented: $viewModel.showingAboutAlert) {
-                TextField("About Me", text: $viewModel.tempAboutMe, axis: .vertical)
-                    .lineLimit(3...6)
-                Button("Cancel", role: .cancel) { }
-                Button("Save") {
-                    viewModel.updateAbout()
-                }
-            } message: {
-                Text("Tell us about yourself")
-            }
-            .photosPicker(isPresented: $viewModel.showingPhotoPicker, selection: $selectedPhoto)
-            .onChange(of: selectedPhoto) { newValue in
-                if let newValue = newValue {
-                    Task {
-                        if let data = try? await newValue.loadTransferable(type: Data.self) {
-                            selectedImage = UIImage(data: data)
-                        }
+                    .padding(.horizontal, 20)
+                    .frame(maxHeight: .infinity)
+                    
+                    if viewModel.isEditingMode {
+                        SaveButton(
+                            onSaveTapped: viewModel.onSaveProfileTapped
+                        )
+                    } else {
+                        SignOutButton(
+                            onSignOutTapped: viewModel.onSignOutTapped
+                        )
                     }
-                    selectedPhoto = nil
+                }
+                .padding(.bottom, 120)
+            }
+        }
+        .navigationTitle("Profile")
+        .navigationBarTitleDisplayMode(.inline)
+        .alert("Edit Name", isPresented: $viewModel.showingNameAlert) {
+            TextField("Name", text: $viewModel.tempName)
+            Button("Cancel", role: .cancel) { }
+            Button("Done") {
+                viewModel.updateName()
+            }
+        } message: {
+            Text("Enter your new name")
+        }
+        .alert("Edit About Me", isPresented: $viewModel.showingAboutAlert) {
+            TextField("About Me", text: $viewModel.tempAboutMe, axis: .vertical)
+            Button("Cancel", role: .cancel) { }
+            Button("Done") {
+                viewModel.updateAbout()
+            }
+        } message: {
+            Text("Tell us about yourself")
+        }
+        .photosPicker(isPresented: $viewModel.showingPhotoPicker, selection: $selectedPhoto)
+        .onChange(of: selectedPhoto) { newValue in
+            handlePhotoSelection(newValue)
+        }
+        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("OK") {
+                viewModel.errorMessage = nil
+            }
+        } message: {
+            Text(viewModel.errorMessage ?? "")
+        }
+    }
+}
+
+private extension ProfileView {
+    func handlePhotoSelection(_ newValue: PhotosPickerItem?) {
+        if let newValue {
+            Task {
+                if let data = try? await newValue.loadTransferable(type: Data.self),
+                   let image = UIImage(data: data) {
+                    selectedImage = image
+                    viewModel.uploadPhoto(data: data)
                 }
             }
+            selectedPhoto = nil
         }
     }
 }
 
 #Preview {
-    ProfileView(profile: .example)
+    ProfileView()
 }

@@ -18,7 +18,7 @@ struct ProfileHeader: View {
     var body: some View {
         VStack(spacing: 24) {
             ZStack {
-                if let avatarImage = avatarImage {
+                if let avatarImage {
                     Image(uiImage: avatarImage)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -42,6 +42,7 @@ struct ProfileHeader: View {
                     .offset(x: 45, y: -45)
                 }
             }
+            .padding(.top, 20)
             
             VStack(spacing: 16) {
                 HStack {

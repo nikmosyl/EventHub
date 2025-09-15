@@ -36,7 +36,7 @@ enum TabItem: CaseIterable {
         case .map:
             TestView()
         case .profile:
-            ProfileView(profile: .example)
+            ProfileView()
         }
     }
 }
