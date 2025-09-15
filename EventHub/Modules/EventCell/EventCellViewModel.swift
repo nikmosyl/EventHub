@@ -21,8 +21,8 @@ final class EventCellViewModel: ObservableObject {
     }
     
     // изображение
-    var imageURL: URL? {
-        event.images?.first?.image.flatMap(URL.init)
+    var imageURL: String? {
+        event.images?.first?.image
     }
     
     // дата и время

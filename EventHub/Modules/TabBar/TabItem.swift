@@ -105,7 +105,7 @@ struct TestView: View {
             ScrollView {
                 VStack {
                     ForEach(viewModel.events, id: \.id) { event in
-                        EventRow(event: event, viewModel: viewModel)
+                        EventCellView(event: event)
                     }
                 }
             }

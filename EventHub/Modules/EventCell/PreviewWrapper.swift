@@ -14,7 +14,7 @@ struct PreviewWrapper: View {
     var body: some View {
         VStack {
             if let viewModel = viewModel {
-                EventCellView(viewModel: viewModel)
+                EventCellView(event: Event.preview)
             } else {
                 ProgressView("Загрузка события...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

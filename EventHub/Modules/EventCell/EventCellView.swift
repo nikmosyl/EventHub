@@ -10,27 +10,14 @@ import SwiftUI
 struct EventCellView: View {
     @StateObject private var viewModel: EventCellViewModel
     
-    init(viewModel: EventCellViewModel) {
-        self._viewModel = StateObject(wrappedValue: viewModel)
+    init(event: Event) {
+        self._viewModel = StateObject(wrappedValue: EventCellViewModel(event: event))
     }
     
     var body: some View {
         // изображение
         HStack(alignment: .top) {
-            AsyncImage(url: viewModel.imageURL) { phase in
-                switch phase {
-                case .empty:
-                    placeholder
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFit()
-                case .failure(_):
-                    placeholder
-                @unknown default:
-                    placeholder
-                }
-            }
+            NetworkImage(imageUrl: viewModel.imageURL ?? "")
             .frame(width: 79, height: 92)
             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             
@@ -42,7 +29,8 @@ struct EventCellView: View {
                 
                 // название
                 Text(viewModel.title)
-                    .font(.title3.weight(.semibold))
+                    .font(.system(size: 15))
+                    .fontWeight(.medium)
                     .foregroundStyle(.textDarkPrimary)
                     .multilineTextAlignment(.leading)
                     .lineLimit(3)
@@ -99,9 +87,5 @@ struct EventCellView: View {
 }
 
 #Preview {
-    EventCellView(
-        viewModel: EventCellViewModel(
-            event: .preview
-        )
-    )
+    EventCellView(event: Event.preview)
 }
