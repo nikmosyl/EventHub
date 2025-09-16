@@ -298,7 +298,6 @@ final class DataManager {
     @MainActor
     func logoutUser() throws {
         try AuthService.shared.logout()
-        UserDefaults.standard.set(false, forKey: UserSettingsLink.onboarding.rawValue)
         rootViewModel?.logout()
     }
     
@@ -311,5 +310,56 @@ final class DataManager {
     
     func isOnboardingComplete() -> Bool {
         UserDefaults.standard.bool(forKey: UserSettingsLink.onboarding.rawValue)
+    }
+}
+
+// MARK: - DataManager + Избранное
+extension DataManager {
+    private enum FavoritesAction {
+        case add, remove
+    }
+    
+    private var favoritesKey: String { "favoriteEvents"}
+    
+    // Добавление в избранное
+    func addToFavorites(eventId: Int) async throws {
+        try await updateFavorites(eventId: eventId, action: .add)
+    }
+    
+    // Удаление из избранного
+    func removeFromFavorites(eventId: Int) async throws {
+        try await updateFavorites(eventId: eventId, action: .remove)
+    }
+    
+    // Проверка статуса избранного
+    func isEventFavorite(eventId: Int) async -> Bool {
+        let favorites = getStoredFavorites()
+        return favorites.contains(eventId)
+    }
+    
+    // обновляем избранное
+    private func updateFavorites(eventId: Int, action: FavoritesAction) async throws {
+        var favorites = getStoredFavorites()
+        
+        switch action {
+        case .add:
+            if !favorites.contains(eventId) {
+                favorites.append(eventId)
+            }
+        case .remove:
+            favorites.removeAll { $0 == eventId }
+        }
+        
+        saveFavorites(favorites)
+    }
+    
+    // получить сохраненные избранные
+    private func getStoredFavorites() -> [Int] {
+        UserDefaults.standard.array(forKey: favoritesKey) as? [Int] ?? []
+    }
+    
+    // сохранить в избранное
+    private func saveFavorites(_ favorites: [Int]) {
+        UserDefaults.standard.set(favorites, forKey: favoritesKey)
     }
 }
