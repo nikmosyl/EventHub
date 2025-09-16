@@ -17,12 +17,18 @@ struct RootView: View {
     }
     
     var body: some View {
-        if !viewModel.isOnboardingComplete {
-            OnboardingView()
-        } else if viewModel.isLoggedIn {
-            TabBarView()
-        } else {
-            SignInView()
+        ZStack {
+            if !viewModel.isOnboardingComplete {
+                OnboardingView()
+            } else if viewModel.isLoggedIn {
+                TabBarView()
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            } else {
+                SignInView()
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
         }
+        .animation(.easeInOut(duration: 0.5), value: viewModel.isOnboardingComplete)
+        .animation(.easeInOut(duration: 0.5), value: viewModel.isLoggedIn)
     }
 }

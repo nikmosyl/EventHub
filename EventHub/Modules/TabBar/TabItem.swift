@@ -34,9 +34,9 @@ enum TabItem: CaseIterable {
         case .bookmark:
             BookmarkView()
         case .map:
-            MapView()
-        case .profile:
             TestView()
+        case .profile:
+            ProfileView()
         }
     }
 }
