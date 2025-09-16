@@ -105,49 +105,11 @@ struct TestView: View {
             ScrollView {
                 VStack {
                     ForEach(viewModel.events, id: \.id) { event in
-                        EventRow(event: event, viewModel: viewModel)
+                        EventCellView(event: event)
                     }
                 }
             }
         }
-    }
-}
-
-struct EventRow: View {
-    let event: Event
-    @ObservedObject var viewModel: TestViewModel
-    
-    var body: some View {
-        VStack() {
-            Text(event.title)
-            
-            if let imageUrl = event.images?.first?.image {
-                HStack {
-                    NetworkImage(imageUrl: imageUrl)
-                        .frame(width: 50, height: 50)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                    
-                    Text(event.shortTitle ?? "Пустой title")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-            }
-            else {
-                Text("Не удалось загрузить детали")
-                    .foregroundColor(.red)
-                    .font(.footnote)
-            }
-            
-            if let next = event.nextDate, let start = next.start{
-                Text("next: \(next.formatter(date: start, format: "EEE, MMM d • h:mm a"))")
-            }
-            
-            if let prev = event.previousDate, let start = prev.start {
-                Text("prev: \(prev.formatter(date: start, format: "EEE, MMM d • h:mm a"))")
-            }
-        }
-        .background(Color.gray)
-        .padding()
     }
 }
 
