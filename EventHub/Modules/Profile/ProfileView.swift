@@ -20,6 +20,10 @@ struct ProfileView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let profile = viewModel.profile {
                 VStack(spacing: 32) {
+                    Text("Profile")
+                        .font(.system(size: 24))
+                        .fontWeight(.medium)
+                    
                     ProfileHeader(
                         avatarImage: selectedImage ?? viewModel.profileImage,
                         name: profile.name,
@@ -50,8 +54,6 @@ struct ProfileView: View {
                 .padding(.bottom, 120)
             }
         }
-        .navigationTitle("Profile")
-        .navigationBarTitleDisplayMode(.inline)
         .alert("Edit Name", isPresented: $viewModel.showingNameAlert) {
             TextField("Name", text: $viewModel.tempName)
             Button("Cancel", role: .cancel) { }
