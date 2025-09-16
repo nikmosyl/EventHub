@@ -11,8 +11,8 @@ struct EventDetailsView: View {
     @StateObject private var viewModel: EventDetailsViewModel
     @Environment(\.dismiss) private var dismiss
     
-    init(eventId: Int) {
-        _viewModel = StateObject(wrappedValue: EventDetailsViewModel(eventId: eventId))
+    init(event: Event) {
+        _viewModel = StateObject(wrappedValue: EventDetailsViewModel(event: event))
     }
     
     var body: some View {
@@ -45,23 +45,6 @@ struct EventDetailsView: View {
                 )
             }
             .ignoresSafeArea(edges: .top)
-        } else if let errorMessage = viewModel.errorMessage {
-            VStack(spacing: 16) {
-                Text("Error")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                
-                Text(errorMessage)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                
-                Button("Retry") {
-                    viewModel.loadEventDetails()
-                }
-                .foregroundColor(.blue)
-            }
-            .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
             Text("No event details available")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -70,6 +53,6 @@ struct EventDetailsView: View {
 }
 
 #Preview {
-    EventDetailsView(eventId: 1)
+    EventDetailsView(event: .preview)
 }
 

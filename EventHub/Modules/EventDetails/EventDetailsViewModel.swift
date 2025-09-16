@@ -13,7 +13,6 @@ final class EventDetailsViewModel: ObservableObject {
     @Published var eventDetails: EventDetailsModel?
     @Published var isBookmarked: Bool = false
     @Published var isLoading: Bool = false
-    @Published var errorMessage: String?
 
     private let dataManager = DataManager.shared
     private let eventId: Int
@@ -22,28 +21,12 @@ final class EventDetailsViewModel: ObservableObject {
     var shareURL: URL? {
         event?.siteUrl.flatMap(URL.init)
     }
-
-    init(eventId: Int) {
-        self.eventId = eventId
-        loadEventDetails()
-    }
     
-    func loadEventDetails() {
-        guard eventId > 0 else { return }
-
-        isLoading = true
-        errorMessage = nil
-
-        Task {
-            do {
-                let foundEvent = try await dataManager.getEvent(id: eventId)
-                event = foundEvent
-                eventDetails = EventDetailsModel(from: foundEvent)
-            } catch {
-                errorMessage = "Failed to load event details: \(error.localizedDescription)"
-            }
-            isLoading = false
-        }
+    init(event: Event) {
+        self.eventId = event.id ?? 0
+        self.event = event
+        self.eventDetails = EventDetailsModel(from: event)
+        self.isBookmarked = false // TODO: Implement bookmark logic
     }
 
     func onBookmarkTapped() {
