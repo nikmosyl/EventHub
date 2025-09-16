@@ -298,6 +298,7 @@ final class DataManager {
     @MainActor
     func logoutUser() throws {
         try AuthService.shared.logout()
+        UserDefaults.standard.set(false, forKey: UserSettingsLink.onboarding.rawValue)
         rootViewModel?.logout()
     }
     
