@@ -10,9 +10,12 @@ import SwiftUI
 struct ExploreView: View {
     
     @StateObject var viewModel = ExploreViewModel()
+    @State private var isSectionActive: Int?
     
     var body: some View {
         ZStack(alignment: .top) {
+            
+            ExploreNavBar(categories: viewModel.getCategoryViewModel(), isSectionActive: $viewModel.selectedCategoryIds)
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 30) {
@@ -33,16 +36,37 @@ struct ExploreView: View {
                             }
                         }
                     }
+                    
+                    #warning("Не работает логика, которая сортирует по фильтрам и выводит только те события, которые удовлетворяют всем фильтрам")
+                    
+                    if !viewModel.selectedCategoryIds.isEmpty {
+                        Button {
+                            Task {
+                                await viewModel.loadEventsWithSelectedCategories()
+                            }
+                        } label: {
+                            Text("Применить фильтр (\(viewModel.selectedCategoryIds.count))")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.blue)
+                                .cornerRadius(10)
+                        }
+                        .padding()
+                    }
                 }
             }
-            
-            ExploreNavBar(categories: viewModel.getCategoryViewModel())
+            ExploreNavBar(categories: viewModel.getCategoryViewModel(), isSectionActive: $viewModel.selectedCategoryIds)
         }
-        
-        
-        
         .task {
             await viewModel.loadInitialData()
+        }
+        
+        .onReceive(viewModel.$selectedCategoryIds) { _ in
+            Task {
+                await viewModel.loadEventsWithSelectedCategories()
+            }
         }
     }
 }

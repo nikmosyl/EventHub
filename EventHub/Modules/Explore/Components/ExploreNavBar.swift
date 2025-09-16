@@ -10,7 +10,7 @@ import SwiftUI
 struct ExploreNavBar: View {
     
     let categories: [CategoryModel]
-    
+    @Binding var isSectionActive: Set<Int>
     var body: some View {
         VStack(spacing: 0){
             ZStack(alignment: .top) {
@@ -37,7 +37,7 @@ struct ExploreNavBar: View {
             }
             
             VStack(spacing: 20) {
-                VariableSectionView(categories: categories)
+                VariableSectionView(categories: categories, isSectionActive: $isSectionActive)
                     
             }
             .offset(y: -80) // Черновой вариант пока что

@@ -11,10 +11,10 @@ import Foundation
 final class ExploreViewModel: ObservableObject {
     @Published var state: ViewState<[Event]> = .idle
     @Published var categories: [EventCategory] = []
+    @Published var categoryModels: [CategoryModel] = []
     @Published var upcommingEvents: [Event] = []
     @Published var nearbyEvents: [Event] = []
-    
-    private let categoryiesType: CategoryTypes = .art
+    @Published var selectedCategoryIds: Set<Int> = []
     
     private let dataManager = DataManager.shared
     
@@ -23,6 +23,8 @@ final class ExploreViewModel: ObservableObject {
         
         do {
             categories = try await dataManager.getCategories()
+            
+            categoryModels = categories.map {CategoryModel(category: $0)}
             
             upcommingEvents = try await dataManager.getUpcamingEvents()
             
@@ -36,14 +38,35 @@ final class ExploreViewModel: ObservableObject {
         }
     }
     
-    func getCategoryViewModel() -> [CategoryModel] {
-        return categories.map { category in
-            let categores = CategoryTypes.from(name: category.name)
-            return CategoryModel(id: category.id,
-                                 name: category.name,
-                                 icon: categores.systemIcon,
-                                 color: categores.color)
+    func loadEventsWithSelectedCategories() async {
+        guard !selectedCategoryIds.isEmpty else {
+            await loadInitialData()
+            return
         }
+        
+        state = .loading
+        
+        do {
+            let categoryNames = categories
+                .filter { selectedCategoryIds.contains($0.id) }
+                .map { $0.name }
+            
+            upcommingEvents = try await dataManager.getUpcamingEvents(categories: categoryNames)
+            nearbyEvents = try await dataManager.getNearByEvents(
+                location: "msk",
+                categories: categoryNames
+            )
+            
+            state = .loaded(upcommingEvents)
+            
+        } catch {
+            state = .error(error)
+            print("Error loading filtered events: \(error)")
+        }
+    }
+    
+    func getCategoryViewModel() -> [CategoryModel] {
+        return categoryModels
     }
     
     func getUpcommnigViewModel() -> [Event] {
@@ -53,6 +76,8 @@ final class ExploreViewModel: ObservableObject {
     func getNearbyViewModel() -> [Event] {
         return nearbyEvents
     }
+    
+    
 }
 
 // Состояния загрузки
