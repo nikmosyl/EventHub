@@ -16,11 +16,9 @@ struct RootView: View {
         DataManager.shared.setRootViewModel(rootViewModel)
     }
     
-#warning("Уборать дебаг когда появится Onboarding")
     var body: some View {
-        if false {//!viewModel.isOnboardingComplete {
-            //OnboardingView(rootViewModel: viewModel)
-            EmptyView()
+        if !viewModel.isOnboardingComplete {
+            OnboardingView()
         } else if viewModel.isLoggedIn {
             TabBarView()
         } else {

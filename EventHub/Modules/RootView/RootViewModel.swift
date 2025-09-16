@@ -17,7 +17,6 @@ final class RootViewModel: ObservableObject {
     }
     
     func completeOnboarding() {
-        DataManager.shared.completeOnboarding()
         isOnboardingComplete = true
     }
     
