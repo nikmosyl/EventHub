@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-class OnboardingViewModel: ObservableObject {
+final class OnboardingViewModel: ObservableObject {
     @Published var currentStepIndex: Int = 0
     let steps: [OnboardingData] = OnboardingData.steps
     
@@ -15,15 +15,17 @@ class OnboardingViewModel: ObservableObject {
         steps[currentStepIndex]
     }
     
+    @MainActor
     func nextStep() {
         if currentStepIndex < steps.count - 1 {
             currentStepIndex += 1
         } else {
-            print("goToNext")
+            DataManager.shared.completeOnboarding()
         }
     }
     
+    @MainActor
     func skipOnboarding() {
-        print("skipOnboarding")
+        DataManager.shared.completeOnboarding()
     }
 }
