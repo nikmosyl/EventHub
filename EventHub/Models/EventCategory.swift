@@ -10,6 +10,6 @@ import Foundation
 
 // MARK: - Категория события
 struct EventCategory: Decodable, Sendable {
-    let id: Int
-    let name: String
+    let id: Int?
+    let name: String?
 }

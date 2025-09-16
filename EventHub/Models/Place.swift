@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - Место
 struct Place: Decodable, Sendable {
-    let id: Int
+    let id: Int?
     let title: String?
     let address: String?
     let subway: String?

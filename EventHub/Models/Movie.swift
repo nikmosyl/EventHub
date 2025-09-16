@@ -10,19 +10,19 @@ import Foundation
 
 // MARK: - Фильм
 struct Movie: Decodable, Sendable {
-    let id: Int
-    let title: String
+    let id: Int?
+    let title: String?
     let poster: MoviePoster?
     
     // MARK: - Постер фильма
     struct MoviePoster: Decodable, Sendable {
-        let image: String
+        let image: String?
         let source: PosterSource?
         
         // MARK: - Источник постера
         struct PosterSource: Decodable, Sendable {
-            let name: String
-            let link: String
+            let name: String?
+            let link: String?
         }
     }
 }
