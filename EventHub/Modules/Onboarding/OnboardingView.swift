@@ -12,47 +12,53 @@ struct OnboardingView: View {
     
     var body: some View {
         ZStack {
-            Color.textLightPrimary.ignoresSafeArea()
-            VStack(spacing: 0) {
+            Color.background
+                .ignoresSafeArea()
+            
+            VStack(spacing: 0){
+                
                 TabView(selection: $viewModel.currentStepIndex) {
                     ForEach(viewModel.steps.indices, id: \.self) { index in
                         OnboardingImage(imageName: viewModel.steps[index].imageName)
                             .tag(index)
                     }
                 }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                
-                OnboardingPanel(viewModel: viewModel)
-            }
-        }
-    }
-}
+                .tabViewStyle(
+                                    PageTabViewStyle(indexDisplayMode: .never)
+                                )
+                                
+                                Spacer()
+                            }
+                            
+                            VStack {
+                                Spacer()
+                                OnboardingPanel(viewModel: viewModel)
+                            }
+                        }
+                    }
+                }
 
 private struct OnboardingImage: View {
     let imageName: String
-    
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack(alignment: .top) {
             Image(imageName)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 270, height: 538.5)
-                .padding(.top, 15.5)
-                .padding(.horizontal, 52.5)
-                .offset(y: 38)
-            
+                
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color.textLightSecondary.opacity(0.5),
-                    Color.white.opacity(0.6)
+                    Color.background.opacity(0.00),
+                    Color.background.opacity(0.30),
+                    Color.background.opacity(0.99)
                 ]),
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .frame(height: 140)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.bottom, -35)
+        .padding(.top, 20)
+        .background(.textLightPrimary)
     }
 }
 
@@ -69,55 +75,63 @@ private struct OnboardingPanel: View {
                     .lineSpacing(10)
                     .padding(.horizontal, 24)
                 
-                
                 Text(viewModel.currentStep.description)
-                    .font(.system(size: 15,weight: .regular))
+                    .font(.system(size: 15, weight: .regular))
                     .foregroundColor(.textLightSecondary)
                     .multilineTextAlignment(.center)
                     .lineSpacing(10)
                     .frame(width: 295, height: 50, alignment: .center)
                     .padding(.top, 16)
-                
-                
             }
-            .padding(.top,40)
+            .padding(.top, 40)
             
             Spacer()
+            
             HStack {
-                Button("Skip") { viewModel.skipOnboarding() }
-                    .foregroundColor(.textLightSecondary)
-                    .font(.system(size: 18))
-                    .frame(width: 38, height: 34, alignment: .leading)
-                
-                Spacer()
-                
-                HStack(spacing: 8) {
-                    ForEach(viewModel.steps.indices, id: \.self) { idx in
-                        Circle()
-                            .fill(idx == viewModel.currentStepIndex ? Color.textLightPrimary: Color.textLightSecondary)
-                            .frame(width: 8, height: 8)
+                            Button("Skip") {
+                                viewModel.skipOnboarding()
+                            }
+                            .foregroundColor(.textLightSecondary)
+                            .font(.system(size: 18))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            
+                            Spacer()
+                            
+                            HStack(spacing: 8) {
+                                ForEach(viewModel.steps.indices, id: \.self) { idx in
+                                    Circle()
+                                        .fill(idx == viewModel.currentStepIndex ? Color.textLightPrimary : Color.textLightSecondary)
+                                        .frame(width: 8, height: 8, alignment: .center)
+                                }
+                            }
+                            
+                            Spacer()
+                            
+                            Button(viewModel.currentStep.buttonText) {
+                                viewModel.nextStep()
+                            }
+                            .foregroundColor(.textLightPrimary)
+                            .font(.system(size: 18, weight: .bold))
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                        }
+                        .padding(.horizontal, 40)
+                        .padding(.bottom, 37)
                     }
-                }
-                
-                Spacer()
-                
-                Button(viewModel.currentStep.buttonText) { viewModel.nextStep() }
-                    .foregroundColor(.textLightPrimary)
-                    .fontWeight(.bold)
-                    .font(.system(size: 18))
-                    .frame(width: 80, alignment: .trailing)
-            }
-            .padding(.horizontal, 40)
-            .padding(.bottom, 37)
-        }
-        .frame(maxWidth: .infinity, minHeight: 260, maxHeight: 288)
-        .background(
-            Color.buttonPrimary
-                .clipShape(RoundedRectangleShape(radius: 48, corners: [.topLeft, .topRight]))
-                .ignoresSafeArea(edges: .bottom)
-        )
-    }
-}
+                    .frame(maxWidth: .infinity, minHeight: 260, maxHeight: 288)
+                    .background(
+                        Color.buttonPrimary
+                            .clipShape(
+                                RoundedRectangleShape(
+                                    radius: 48,
+                                    corners: [.topLeft, .topRight]
+                                )
+                            )
+                            .ignoresSafeArea(
+                                edges: .bottom
+                            )
+                                    )
+                                }
+                            }
 
 #Preview {
     OnboardingView()
