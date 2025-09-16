@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ExploreNavBar: View {
     
-    let categories: [CategoryCellViewModel]
+    let categories: [CategoryModel]
     
     var body: some View {
         VStack(spacing: 0){

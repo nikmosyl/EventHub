@@ -10,7 +10,7 @@ import SwiftUI
 
 struct EventsCollectionView: View {
     let title: String
-    let events: [EventCardViewModel]
+    let events: [Event]
     
     var body: some View {
         VStack(spacing: 12) {
@@ -27,10 +27,11 @@ struct EventsCollectionView: View {
                 .font(.system(size: 14))
                 .foregroundStyle(Color.textDarkSecondary)
             }
+            .padding(.horizontal, 15)
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 15) {
-                    ForEach(events) { event in
+                    ForEach(events, id: \.id) { event in
                         EventsCard(events: event)
                     }
                 }

@@ -7,77 +7,58 @@
 
 import Foundation
 
-final class ExploreViewModel: ObservableObject{
-    //MARK: - Variables
+@MainActor
+final class ExploreViewModel: ObservableObject {
+    @Published var state: ViewState<[Event]> = .idle
+    @Published var categories: [EventCategory] = []
+    @Published var upcommingEvents: [Event] = []
+    @Published var nearbyEvents: [Event] = []
     
-    @Published var state: State = .idle
-    @Published var selectedCategory: String?
-    @Published var searchText = ""
+    private let categoryiesType: CategoryTypes = .art
     
-    //MARK: - Methods API
+    private let dataManager = DataManager.shared
     
-    @MainActor
     func loadInitialData() async {
         state = .loading
         
         do {
-            async let categoriesTask = DataManager.shared.getCategories()
-            async let upcommingEventsTask = DataManager.shared.getUpcamingEvents()
-            async let nearbyEventsTask = DataManager.shared.getNearByEvents(location: "msk") // Это надо будет исправить(выбор города)
+            categories = try await dataManager.getCategories()
             
-            let (categories, upcommingEvents, nearbyEvents) = try await (categoriesTask, upcommingEventsTask, nearbyEventsTask)
-            let content = ExplorerContent(
-                categories: categories,
-                upCommingEvents: upcommingEvents,
-                nearbyEvents: nearbyEvents
-            )
+            upcommingEvents = try await dataManager.getUpcamingEvents()
             
-            state = .loaded(content)
+            nearbyEvents = try await dataManager.getNearByEvents(location: "msk")
+            
+            state = .loaded(upcommingEvents)
             
         } catch {
             state = .error(error)
-            print("Проблема в loadInitialData!!! : \(error.localizedDescription)")
+            print("Error loading data: \(error)")
         }
     }
     
-    
-    
-    //MARK: - Methods for UI
-    
-    //For VariableSectionView
-    
-    func getCategoryViewModel() -> [CategoryCellViewModel] {
-        guard case .loaded(let content) = state else {return []}
-        return content.categories.map {CategoryCellViewModel(category: $0)}
+    func getCategoryViewModel() -> [CategoryModel] {
+        return categories.map { category in
+            let categores = CategoryTypes.from(name: category.name)
+            return CategoryModel(id: category.id,
+                                 name: category.name,
+                                 icon: categores.systemIcon,
+                                 color: categores.color)
+        }
     }
     
-    //For EventsCard
-    
-    func getUpcommnigViewModel() -> [EventCardViewModel] {
-        guard case .loaded(let content) = state else {return []}
-        return content.upCommingEvents.prefix(5).map {EventCardViewModel(event: $0)}
+    func getUpcommnigViewModel() -> [Event] {
+        return upcommingEvents
     }
     
-    func getNearbyViewModel() -> [EventCardViewModel] {
-        guard case .loaded(let content) = state else {return []}
-        return content.nearbyEvents.prefix(5).map {EventCardViewModel(event: $0)}
+    func getNearbyViewModel() -> [Event] {
+        return nearbyEvents
     }
-    
 }
 
-extension ExploreViewModel {
-    enum State {
-        case idle
-        case loading
-        case loaded(ExplorerContent)
-        case error(Error)
-        
-    }
-    
-    struct ExplorerContent{
-        var categories: [EventCategory] = []
-        var upCommingEvents: [Event] = []
-        var nearbyEvents: [Event] = []
-        var featuresEvents: [Event] = []
-    }
+// Состояния загрузки
+enum ViewState<T> {
+    case idle
+    case loading
+    case loaded(T)
+    case error(Error)
 }

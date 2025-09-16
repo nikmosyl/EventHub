@@ -9,12 +9,12 @@ import SwiftUI
 
 struct VariableSectionView: View {
     
-    let categories: [CategoryCellViewModel]
+    let categories: [CategoryModel]
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                ForEach(categories) { category in
+                ForEach(categories, id: \.id) { category in
                     HStack(spacing: 6) {
                         Image(systemName: category.icon)
                             .resizable()
@@ -38,5 +38,5 @@ struct VariableSectionView: View {
             }
             .padding(.horizontal, 16)
         }
-    }
+     }
 }

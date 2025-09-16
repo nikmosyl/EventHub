@@ -10,15 +10,14 @@ import SwiftUI
 struct EventsCard: View {
     
     @State private var isLiked: Bool = false
-    let events: EventCardViewModel
+    let events: Event
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ZStack(alignment: .top) {
                 
                 if let imageURL = events.imageUrl {
-                    AsyncImage(url: URL(string: imageURL))
-                        .scaledToFill()
+                    NetworkImage(imageUrl: imageURL)
                         .frame(width: 217, height: 140)
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .padding(.horizontal, 10)
@@ -32,7 +31,7 @@ struct EventsCard: View {
                 }
                 HStack {
                     
-                    Text(events.date)
+                    Text(events.formattedDate)
                         .font(.system(size: 16, weight: .semibold))
                         .multilineTextAlignment(.center)
                         .foregroundColor(.textCalored)
@@ -71,7 +70,7 @@ struct EventsCard: View {
                 
                 HStack {
                     Image(systemName: "person.2.fill")
-                    Text(events.peopleCount)
+                    Text("events")
                         .font(.system(size: 14))
                 }
                 .foregroundColor(.pillColor3)
@@ -79,9 +78,9 @@ struct EventsCard: View {
                 
                 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(events.location)
+                    Text(events.locationName)
                         .font(.system(size: 14))
-                    Text(events.price)
+                    Text(events.price ?? "Free")
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
                 }

@@ -14,8 +14,6 @@ struct ExploreView: View {
     var body: some View {
         ZStack(alignment: .top) {
             
-            ExploreNavBar(categories: viewModel.getCategoryViewModel())
-            
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 30) {
                     Spacer()
@@ -36,9 +34,13 @@ struct ExploreView: View {
                         }
                     }
                 }
-                .padding()
             }
+            
+            ExploreNavBar(categories: viewModel.getCategoryViewModel())
         }
+        
+        
+        
         .task {
             await viewModel.loadInitialData()
         }
