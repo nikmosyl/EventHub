@@ -20,19 +20,12 @@ final class EventDetailsViewModel: ObservableObject {
     private var event: Event?
 
     var shareURL: URL? {
-        event?.siteUrl.flatMap(URL.init) ?? URL(string: "https://google.com")
+        event?.siteUrl.flatMap(URL.init)
     }
 
     init(eventId: Int) {
         self.eventId = eventId
         loadEventDetails()
-    }
-
-    init(event: Event) {
-        self.eventId = event.id ?? 0
-        self.event = event
-        self.eventDetails = EventDetailsModel(from: event)
-        self.isBookmarked = false // TODO: Implement bookmark logic
     }
     
     func loadEventDetails() {
@@ -59,10 +52,8 @@ final class EventDetailsViewModel: ObservableObject {
     }
     
     func onReadMoreTapped() {
-        if let siteUrl = event?.siteUrl, let url = URL(string: siteUrl) {
-            UIApplication.shared.open(url)
-        } else if let url = URL(string: "https://google.com") {
-            UIApplication.shared.open(url)
-        }
+        guard let siteUrl = event?.siteUrl, 
+              let url = URL(string: siteUrl) else { return }
+        UIApplication.shared.open(url)
     }
 }

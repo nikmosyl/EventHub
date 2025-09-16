@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentSection: View {
     let eventDetails: EventDetailsModel
     let onReadMoreTapped: () -> Void
+    let hasReadMoreURL: Bool
     
     var body: some View {
         VStack(spacing: 0) {
@@ -60,11 +61,13 @@ struct ContentSection: View {
                             .lineSpacing(10)
                             .lineLimit(3)
                         
-                        Button(action: onReadMoreTapped) {
-                            Text("Read More..")
-                                .font(.system(size: 16, weight: .regular))
-                                .foregroundColor(.blue)
-                                .lineSpacing(10)
+                        if hasReadMoreURL {
+                            Button(action: onReadMoreTapped) {
+                                Text("Read More..")
+                                    .font(.system(size: 16, weight: .regular))
+                                    .foregroundColor(.blue)
+                                    .lineSpacing(10)
+                            }
                         }
                     }
                 }
@@ -77,6 +80,7 @@ struct ContentSection: View {
 #Preview {
     ContentSection(
         eventDetails: .example,
-        onReadMoreTapped: { print("Read more tapped") }
+        onReadMoreTapped: { print("Read more tapped") },
+        hasReadMoreURL: true
     )
 }

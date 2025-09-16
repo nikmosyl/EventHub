@@ -15,10 +15,6 @@ struct EventDetailsView: View {
         _viewModel = StateObject(wrappedValue: EventDetailsViewModel(eventId: eventId))
     }
     
-    init(event: Event) {
-        _viewModel = StateObject(wrappedValue: EventDetailsViewModel(event: event))
-    }
-    
     var body: some View {
         if viewModel.isLoading {
             ProgressView("Loading event details...")
@@ -32,7 +28,8 @@ struct EventDetailsView: View {
                         
                         ContentSection(
                             eventDetails: eventDetails,
-                            onReadMoreTapped: viewModel.onReadMoreTapped
+                            onReadMoreTapped: viewModel.onReadMoreTapped,
+                            hasReadMoreURL: viewModel.shareURL != nil
                         )
                         .padding(.horizontal, 20)
                         .padding(.top, 20)
