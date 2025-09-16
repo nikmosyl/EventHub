@@ -13,8 +13,6 @@ struct ContentSection: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            Spacer()
-                .frame(height: 50)
             
             VStack(alignment: .leading) {
                 Text(eventDetails.title)
