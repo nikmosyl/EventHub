@@ -50,10 +50,13 @@ final class ProfileViewModel: ObservableObject {
     }
     
     func uploadPhoto(data: Data) {
-        #warning("dataManager.uploadUserPhoto кидает 404")
-//        Task {
-//            try? await dataManager.uploadUserPhoto(data: data)
-//        }
+        Task {
+            do {
+                try await dataManager.uploadUserPhoto(data: data)
+            } catch {
+                print("Ошибка загрузки фото на Profile: ", error)
+            }
+        }
         if let image = UIImage(data: data) {
             profileImage = image
         }
