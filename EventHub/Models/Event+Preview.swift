@@ -6,37 +6,7 @@
 //
 
 
-import SwiftUI
-
-struct PreviewWrapper: View {
-    @State private var viewModel: EventCellViewModel?
-    
-    var body: some View {
-        VStack {
-            if let viewModel = viewModel {
-                EventCellView(event: Event.preview)
-            } else {
-                ProgressView("Загрузка события...")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-        }
-        .task {
-            do {
-                let events = try await DataManager.shared.getUpcamingEvents()
-                if let firstEvent = events.first {
-                    viewModel = EventCellViewModel(event: firstEvent)
-                }
-            } catch {
-                print("Ошибка загрузки: \(error)")
-            }
-        }
-    }
-}
-
-#Preview {
-    PreviewWrapper()
-}
-
+// MARK: - Extension Event + Preview
 #if DEBUG
 extension Event {
     static let preview = Event(
@@ -49,7 +19,10 @@ extension Event {
             start: -62135433000,
             end: 1759258800
         )],
-        location: Location(slug: "msk"),
+        location: Location(
+            slug: "msk",
+            name: ""
+        ),
         place: Place(
             id: 936,
             title: "Центр современного искусства «М'АРС»",

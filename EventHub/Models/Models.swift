@@ -59,7 +59,7 @@ struct EventCategory: Decodable, Sendable {
 // MARK: - Локация
 struct Location: Decodable, Sendable {
     let slug: String
-//    let name: String?
+    let name: String?
 }
 
 // MARK: - Дата события
