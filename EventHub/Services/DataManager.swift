@@ -89,18 +89,20 @@ final class DataManager {
             fields: filters.fields ?? [
                 "id",
                 "title",
-                "slug",
                 "description",
-                "short_title",
                 "dates",
+                "place",
                 "location",
                 "images",
                 "categories",
                 "favorites_count",
-                "place"
+                "short_title",
+                "price"
             ],
             expand: filters.expand ?? [
-                "place"
+                "place",
+                "location",
+                "participants"
             ]
         )
         return try await fetchPaged(.events(filters: updatedFilters, id: id))
@@ -319,7 +321,7 @@ extension DataManager {
         case add, remove
     }
     
-    private var favoritesKey: String { "favoriteEvents"}
+    private var favoritesKey: String { "favoriteEvents" }
     
     // Добавление в избранное
     func addToFavorites(eventId: Int) async throws {

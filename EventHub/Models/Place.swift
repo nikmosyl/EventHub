@@ -16,10 +16,4 @@ struct Place: Decodable, Sendable {
     let subway: String?
     let location: String?
     let coords: Coords?
-    
-    // MARK: - Координаты
-    struct Coords: Decodable, Sendable {
-        let lat: Double?
-        let lon: Double?
-    }
 }

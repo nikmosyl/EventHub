@@ -22,44 +22,52 @@ final class EventCellViewModel: ObservableObject {
     
     // изображение
     var imageURL: String? {
-        event.images?.first?.image
+        event.images?.first(where: { $0.image != nil })?.image
     }
     
     // дата и время
     var dateTime: String {
-        if let startTimestamp = event.dates?.first?.start {
-            let startDate = Date(timeIntervalSince1970: TimeInterval(startTimestamp))
-            
-            let formatter = DateFormatter()
-            formatter.locale = Locale(identifier: "ru_RU")
-            formatter.dateFormat = "E, dd MMM • HH:mm"
-            
-            return formatter.string(from: startDate)
+        if let nextDate = event.nextDate, let start = nextDate.start {
+            return nextDate.formatter(date: start, format: "E, dd MMM • HH:mm")
+        }
+        if let previousDate = event.previousDate, let start = previousDate.start {
+            return previousDate.formatter(date: start, format: "E, dd MMM • HH:mm")
         }
         
-        return "Дата не указана"
+        return "Date not specified"
     }
     
     // название мероприятия
     var title: String {
-        event.title
+        event.title ?? event.shortTitle ?? "Empty title"
     }
     
     // место и город
     var location: String {
-        let venue = event.place?.title ?? "Место не указано"
+        let venue = event.place?.title ?? "Address not specified"
+        
+        if let city = event.location?.name {
+            return "\(city) • \(venue)"
+        }
         
         if let citySlug = event.location?.slug,
            let cityName = getCityName(for: citySlug) {
-            return "\(venue) • \(cityName)"
-        } else {
-            return venue
+            return "\(cityName) • \(venue)"
         }
+        
+        if let citySlug = event.place?.location,
+           let cityName = getCityName(for: citySlug) {
+            return "\(cityName) • \(venue)"
+        }
+        
+        return venue
     }
     
     func loadBookmarkStatus() {
         Task {
-            isBookmarked = await dataManager.isEventFavorite(eventId: event.id ?? 0)
+            if let id = event.id {
+                isBookmarked = await dataManager.isEventFavorite(eventId: id)
+            }
         }
     }
     
@@ -70,13 +78,16 @@ final class EventCellViewModel: ObservableObject {
         
         Task {
             do {
-                if isBookmarked {
-                    try await dataManager.removeFromFavorites(eventId: event.id ?? 0)
-                } else {
-                    try await dataManager.addToFavorites(eventId: event.id ?? 0)
+                if let id = event.id {
+                    if isBookmarked {
+                        try await dataManager.removeFromFavorites(eventId: id)
+                    } else {
+                        try await dataManager.addToFavorites(eventId: id)
+                    }
+                    
+                    isBookmarked.toggle()
                 }
                 
-                isBookmarked.toggle()
                 isLoading = false
             } catch {
                 isLoading = false
@@ -88,17 +99,17 @@ final class EventCellViewModel: ObservableObject {
     private func getCityName(for slug: String) -> String? {
         switch slug {
         case "msk":
-            return "Москва"
+            return "Moscow"
         case "spb":
-            return "Санкт-Петербург"
+            return "Saint Petersburg"
         case "ekb":
-            return "Екатеринбург"
+            return "Yekaterinburg"
         case "kzn":
             return "Казань"
         case "nnv":
-            return "Нижний Новгород"
+            return "Kazan"
         default:
-            return "Такого города нет"
+            return nil
         }
     }
 }

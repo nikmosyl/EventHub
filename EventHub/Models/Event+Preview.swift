@@ -21,7 +21,11 @@ extension Event {
         )],
         location: Location(
             slug: "msk",
-            name: ""
+            name: "",
+            coords: Coords(
+                lat: 55.768907,
+                lon: 37.626951
+            )
         ),
         place: Place(
             id: 936,
@@ -29,7 +33,7 @@ extension Event {
             address: "пер. Пушкарёв, д. 5",
             subway: "Сухаревская, Трубная, Цветной бульвар",
             location: "msk",
-            coords: Place.Coords(
+            coords: Coords(
                 lat: 55.768907,
                 lon: 37.626951
             )
