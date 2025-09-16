@@ -97,7 +97,9 @@ final class DataManager {
                 "categories",
                 "favorites_count",
                 "short_title",
-                "price"
+                "price",
+                "site_url",
+                "participants"
             ],
             expand: filters.expand ?? [
                 "place",

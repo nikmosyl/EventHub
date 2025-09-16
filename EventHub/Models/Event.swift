@@ -12,7 +12,7 @@ import Foundation
 struct Event: Decodable, Sendable {
     let id: Int?
     let title: String?
-    let slug: String?
+    //let slug: String?
     let description: String?
     let shortTitle: String?
     let dates: [EventDate]?

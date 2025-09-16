@@ -12,7 +12,6 @@ extension Event {
     static let preview = Event(
         id: 211064,
         title: "выставка «SENSE. Геометрия чувств»",
-        slug: "vyistavka-sense-geometriya-chuvstv",
         description: "Масштабная иммерсивная выставка с использованием современных технологий возвращает человека к природе, задействуя все органы чувств.",
         shortTitle: "SENSE. Геометрия чувств",
         dates: [EventDate(
