@@ -11,6 +11,7 @@ import SwiftUI
 struct EventsCollectionView: View {
     let title: String
     let events: [Event]
+    let tapInSeeAllButton: () -> Void
     
     var body: some View {
         VStack(spacing: 12) {
@@ -22,7 +23,7 @@ struct EventsCollectionView: View {
                 Spacer()
                 
                 Button("See All") {
-                    // Navigation to all events
+                   tapInSeeAllButton()
                 }
                 .font(.system(size: 14))
                 .foregroundStyle(Color.textDarkSecondary)

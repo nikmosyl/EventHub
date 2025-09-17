@@ -24,10 +24,21 @@ struct ExploreView: View {
                         ProgressView()
                             .frame(height: 200)
                     case .loaded(_):
-                        EventsCollectionView(title: "Upcomming Events", events: viewModel.getUpcommingForExploreView())
+                        EventsCollectionView(
+                            title: "Upcomming Events",
+                            events: viewModel.getUpcommingForExploreView(),
+                            tapInSeeAllButton: {
+                                #warning("Получать все ячейки Upcomming Events")
+                                print(viewModel.getAllUpcomingEvents())
+                            }
+                        )
                         EventsCollectionView(
                             title: "Nearby Events",
-                            events: viewModel.getNearbyEventsForExploreView()
+                            events: viewModel.getNearbyEventsForExploreView(),
+                            tapInSeeAllButton: {
+                                #warning("Получать все ивенты, которые находятся рядом по городам")
+                                print(viewModel.getAllNearbyEvents())
+                            }
                         )
                     case .error(let error):
                         ErrorView(error: error)
@@ -37,7 +48,7 @@ struct ExploreView: View {
             
             ExploreNavBar(
                 categories: viewModel.getCategoryForExploreView(),
-                isSectionActive: $viewModel.selectedCategoryIds,
+                excludedCategoryIds: $viewModel.excludedCategoryIds,
                 currentLocationName: viewModel.getCurrentLocationName(),
                 currentLocationSlug: viewModel.selectedLocation,
                 availableLocations: viewModel.availableLocations,

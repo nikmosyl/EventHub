@@ -10,18 +10,17 @@ import SwiftUI
 struct VariableSectionView: View {
     
     let categories: [CategoryModel]
-    @Binding var isSectionActive: Set<Int>
+    @Binding var excludedCategoryIds: Set<Int>
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
                 ForEach(categories, id: \.id) { category in
                     Button {
-                        
-                        if isSectionActive.contains(category.id) {
-                            isSectionActive.remove(category.id)
+                        if excludedCategoryIds.contains(category.id) {
+                            excludedCategoryIds.remove(category.id)
                         } else {
-                            isSectionActive.insert(category.id)
+                            excludedCategoryIds.insert(category.id)
                         }
                     } label: {
                         HStack(spacing: 6) {
@@ -29,18 +28,18 @@ struct VariableSectionView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 16, height: 16)
-                                .foregroundColor(isSectionActive.contains(category.id) ? category.color : .white )
+                                .foregroundColor(excludedCategoryIds.contains(category.id) ? category.color : .white)
                             
                             Text(category.name)
                                 .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(isSectionActive.contains(category.id) ? category.color : .white )
+                                .foregroundColor(excludedCategoryIds.contains(category.id) ? category.color : .white)
                                 .lineLimit(1)
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
                         .background(
                             Capsule()
-                                .fill(isSectionActive.contains(category.id) ? .white : category.color)
+                                .fill(excludedCategoryIds.contains(category.id) ? .white : category.color)
                         )
                         .fixedSize()
                     }
@@ -50,4 +49,3 @@ struct VariableSectionView: View {
         }
      }
 }
-

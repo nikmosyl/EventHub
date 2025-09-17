@@ -10,7 +10,7 @@ import SwiftUI
 struct ExploreNavBar: View {
     
     let categories: [CategoryModel]
-    @Binding var isSectionActive: Set<Int>
+    @Binding var excludedCategoryIds: Set<Int>
     @State private var showCurrentLocation: Bool = false
     let currentLocationName: String
     let currentLocationSlug: String
@@ -61,7 +61,7 @@ struct ExploreNavBar: View {
             }
             
             VStack(spacing: 20) {
-                VariableSectionView(categories: categories, isSectionActive: $isSectionActive)
+                VariableSectionView(categories: categories, excludedCategoryIds: $excludedCategoryIds)
             }
             .offset(y: -80)
         }
