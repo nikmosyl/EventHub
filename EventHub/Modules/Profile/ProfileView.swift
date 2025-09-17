@@ -14,7 +14,7 @@ struct ProfileView: View {
     @State private var selectedImage: UIImage?
     
     var body: some View {
-        NavigationView {
+        ZStack {
             if viewModel.isLoading {
                 ProgressView("Loading...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -41,6 +41,8 @@ struct ProfileView: View {
                     .padding(.horizontal, 20)
                     .frame(maxHeight: .infinity)
                     
+                    Spacer()
+                    
                     if viewModel.isEditingMode {
                         SaveButton(
                             onSaveTapped: viewModel.onSaveProfileTapped
@@ -51,9 +53,9 @@ struct ProfileView: View {
                         )
                     }
                 }
-                .padding(.bottom, 120)
             }
         }
+        .navigationBarBackButtonHidden()
         .alert("Edit Name", isPresented: $viewModel.showingNameAlert) {
             TextField("Name", text: $viewModel.tempName)
             Button("Cancel", role: .cancel) { }
