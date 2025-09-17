@@ -13,7 +13,7 @@ final class EventCellViewModel: ObservableObject {
     @Published var isLoading = false
     
     private let dataManager = DataManager.shared
-    private var event: Event
+    private(set) var event: Event
     
     init(event: Event) {
         self.event = event
@@ -66,9 +66,13 @@ final class EventCellViewModel: ObservableObject {
     func loadBookmarkStatus() {
         Task {
             if let id = event.id {
-                isBookmarked = await dataManager.isEventFavorite(eventId: id)
+                isBookmarked = await dataManager.isEventfavorited(eventId: id)
             }
         }
+    }
+    
+    func onAppear() {
+        loadBookmarkStatus()
     }
     
     func toggleBookmark() {

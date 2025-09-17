@@ -85,6 +85,7 @@ final class DataManager {
             categories: filters.categories,
             search: filters.search,
             page: filters.page,
+            pageSize: filters.pageSize,
             price: filters.price,
             fields: filters.fields ?? [
                 "id",
@@ -176,6 +177,10 @@ final class DataManager {
     
     func getLocations() async throws -> [Location] {
         try await fetchLocations()
+    }
+
+    func getEvent(id: Int) async throws -> Event {
+        try await fetchEvent(id: id)
     }
     
     // MARK: - авторизация пользователя
@@ -326,25 +331,9 @@ extension DataManager {
     
     private var favoritesKey: String { "favoriteEvents" }
     
-    // Добавление в избранное
-    func addToFavorites(eventId: Int) async throws {
-        try await updateFavorites(eventId: eventId, action: .add)
-    }
-    
-    // Удаление из избранного
-    func removeFromFavorites(eventId: Int) async throws {
-        try await updateFavorites(eventId: eventId, action: .remove)
-    }
-    
-    // Проверка статуса избранного
-    func isEventFavorite(eventId: Int) async -> Bool {
-        let favorites = getStoredFavorites()
-        return favorites.contains(eventId)
-    }
-    
     // обновляем избранное
     private func updateFavorites(eventId: Int, action: FavoritesAction) async throws {
-        var favorites = getStoredFavorites()
+        var favorites = getFavorites()
         
         switch action {
         case .add:
@@ -359,12 +348,28 @@ extension DataManager {
     }
     
     // получить сохраненные избранные
-    private func getStoredFavorites() -> [Int] {
+    private func getFavorites() -> [Int] {
         UserDefaults.standard.array(forKey: favoritesKey) as? [Int] ?? []
     }
     
     // сохранить в избранное
-    private func saveFavorites(_ favorites: [Int]) {
-        UserDefaults.standard.set(favorites, forKey: favoritesKey)
+    private func saveFavorites(_ bookmarks: [Int]) {
+        UserDefaults.standard.set(bookmarks, forKey: favoritesKey)
+    }
+    
+    // Добавление в избранное
+    func addToFavorites(eventId: Int) async throws {
+        try await updateFavorites(eventId: eventId, action: .add)
+    }
+    
+    // Удаление из избранного
+    func removeFromFavorites(eventId: Int) async throws {
+        try await updateFavorites(eventId: eventId, action: .remove)
+    }
+    
+    // Проверка статуса избранного
+    func isEventfavorited(eventId: Int) async -> Bool {
+        let favorites = getFavorites()
+        return favorites.contains(eventId)
     }
 }
