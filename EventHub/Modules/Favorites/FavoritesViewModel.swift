@@ -12,7 +12,9 @@ final class FavoritesViewModel: ObservableObject {
     @Published var favoriteEvents: [Event] = []
     @Published var favoritesState: FavoritesViewState = .empty
     @Published var searchText: String = ""
-    @Published var isSearching: Bool = false
+    @Published var navigateToSearch: Bool = false
+    
+    var previousIds: [Int] = []
 
     private let dataManager = DataManager.shared
 
@@ -22,40 +24,25 @@ final class FavoritesViewModel: ObservableObject {
         Task {
             do {
                 let favoriteIds: [Int] = DataManager.shared.getFavoritesIds()
+                if previousIds == favoriteIds {
+                    favoritesState = .loaded
+                    return
+                }
                 
+                previousIds = favoriteIds
                 let favorites: [Event] = try await DataManager.shared.getEventsByIds(ids: favoriteIds)
 
                 if favorites.isEmpty {
                     favoritesState = .empty
                 } else {
                     favoriteEvents = favorites
-                    favoritesState = .loaded(favorites)
+                    favoritesState = .loaded
                 }
             } catch {
                 let message = "Failed to load favorites: \(error.localizedDescription)"
                 favoritesState = .error(message)
             }
         }
-    }
-
-    func toggleSearch() {
-        isSearching.toggle()
-        if !isSearching {
-            searchText = ""
-        }
-    }
-
-    func searchFavorites() {
-        guard !searchText.isEmpty else {
-            favoritesState = favoriteEvents.isEmpty ? .empty : .loaded(favoriteEvents)
-            return
-        }
-
-        let filteredEvents = favoriteEvents.filter { event in
-            event.title?.localizedCaseInsensitiveContains(searchText) ?? false
-        }
-
-        favoritesState = filteredEvents.isEmpty ? .empty : .loaded(filteredEvents)
     }
 }
 

@@ -14,7 +14,7 @@ struct FavoritesLoadingView: View {
 
             ProgressView()
                 .scaleEffect(1.2)
-                .progressViewStyle(CircularProgressViewStyle(tint: .accentColor))
+                .progressViewStyle(CircularProgressViewStyle(tint: .buttonPrimary))
 
             Text("Loading favorites...")
                 .font(.system(size: 16))

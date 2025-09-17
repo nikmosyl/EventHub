@@ -9,26 +9,22 @@ import SwiftUI
 
 struct TabBarView: View {
     @StateObject private var viewModel = TabBarViewModel()
-    
-    let padding: CGFloat = 50
-    
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $viewModel.selectedTab) {
                 ExploreView()
-                    .tabSafeAreaPadding(padding)
+                    .tabSafeAreaPadding()
                     .tag(TabItem.explore)
                 EventsView()
-                    .tabSafeAreaPadding(padding)
+                    .tabSafeAreaPadding()
                     .tag(TabItem.events)
                 FavoritesView()
-                    .tabSafeAreaPadding(padding)
                     .tag(TabItem.bookmark)
                 TestView()
-                    .tabSafeAreaPadding(padding)
+                    .tabSafeAreaPadding()
                     .tag(TabItem.map)
                 ProfileView()
-                    .tabSafeAreaPadding(padding)
+                    .tabSafeAreaPadding()
                     .tag(TabItem.profile)
             }
             
@@ -38,7 +34,7 @@ struct TabBarView: View {
 }
 
 extension View {
-    func tabSafeAreaPadding(_ padding: CGFloat) -> some View {
+    func tabSafeAreaPadding(_ padding: CGFloat = 50) -> some View {
         self.safeAreaInset(edge: .bottom) {
             Color.clear.frame(height: padding)
         }

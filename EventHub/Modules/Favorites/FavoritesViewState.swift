@@ -10,6 +10,6 @@ import Foundation
 enum FavoritesViewState {
     case empty
     case loading
-    case loaded([Event])
+    case loaded
     case error(String)
 }

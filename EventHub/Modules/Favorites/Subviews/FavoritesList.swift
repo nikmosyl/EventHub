@@ -12,18 +12,16 @@ struct FavoritesList: View {
     let refresh: () -> ()
 
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 16) {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 16) {
                 ForEach(events, id: \.id) { event in
                     EventCellView(event: event)
                 }
             }
-            .refreshable {
-                print("Избранные обновляются")
-                refresh()
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+        }
+        .refreshable {
+            print("Избранные обновляются")
+            refresh()
         }
     }
 }

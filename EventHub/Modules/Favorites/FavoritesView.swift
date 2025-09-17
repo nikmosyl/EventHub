@@ -11,51 +11,52 @@ struct FavoritesView: View {
     @StateObject private var viewModel = FavoritesViewModel()
     
     var body: some View {
-        ZStack {
-            VStack(spacing: 0) {
-                if viewModel.favoriteEvents.isEmpty {
-                    FavoritesEmptyView()
-                }
+        VStack(spacing: 0) {
+            ZStack {
+                Text("Favorites")
+                    .font(.system(size: 24))
+                    .foregroundStyle(.textDarkPrimary)
                 
-                FavoritesList(events: viewModel.favoriteEvents, refresh: { print("refresh test")})
-                
-            }
-            .navigationTitle("Favorites")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: viewModel.toggleSearch) {
-                        Image(systemName: viewModel.isSearching ? "xmark" : "magnifyingglass")
-                            .foregroundColor(.primary)
+                HStack {
+                    Spacer()
+                    
+                    NavigationLink {
+                        Text("Тут должен быть search")
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                            .resizable()
+                            .frame(width: 18, height: 18)
+                            .foregroundStyle(.textDarkPrimary)
                     }
+                    
                 }
+            }
+            .padding(.bottom, 16)
+            
+            switch viewModel.favoritesState {
+            case .empty:
+                FavoritesLoadingView()
+                
+            case .loading:
+                FavoritesLoadingView()
+                
+            case .loaded:
+                FavoritesList(
+                    events: viewModel.favoriteEvents,
+                    refresh: viewModel.loadFavorites
+                )
+                .tabSafeAreaPadding(40)
+                
+            case .error(let message):
+                FavoritesErrorView(message: message)
             }
         }
+        .padding()
         .onAppear {
             viewModel.loadFavorites()
         }
     }
 }
-
-// MARK: - Private Views
-//private extension FavoritesView {
-//    @ViewBuilder
-//    var favoritesContent: some View {
-//        switch viewModel.favoritesState {
-//        case .empty:
-//            FavoritesLoadingView()
-//
-//        case .loading:
-//            FavoritesLoadingView()
-//
-//        case .loaded(let events):
-//            FavoritesList(events: events, refresh: { print("refresh test")})
-//
-//        case .error(let message):
-//            FavoritesErrorView(message: message)
-//        }
-//    }
-//}
 
 #Preview {
     FavoritesView()
