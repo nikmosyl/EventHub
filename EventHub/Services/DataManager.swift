@@ -112,7 +112,29 @@ final class DataManager {
     }
     
     private func fetchEventByIds(_ ids: String) async throws -> [Event] {
-        let filter = EventFilters(ids: ids)
+        let filter = EventFilters(
+            fields: [
+                "id",
+                "title",
+                "description",
+                "dates",
+                "place",
+                "location",
+                "images",
+                "categories",
+                "favorites_count",
+                "short_title",
+                "price",
+                "site_url",
+                "participants"
+            ],
+            expand: [
+                "place",
+                "location",
+                "participants"
+            ],
+            ids: ids
+        )
         return try await fetchPaged(.events(filters: filter))
     }
     

@@ -24,21 +24,21 @@ enum TabItem: CaseIterable {
         }
     }
     
-//    @ViewBuilder
-//    var view: some View {
-//        switch self {
-//        case .explore:
-//            ExploreView()
-//        case .events:
-//            EventsView()
-//        case .bookmark:
-//            FavoritesView()
-//        case .map:
-//            TestView()
-//        case .profile:
-//            ProfileView()
-//        }
-//    }
+    //    @ViewBuilder
+    //    var view: some View {
+    //        switch self {
+    //        case .explore:
+    //            ExploreView()
+    //        case .events:
+    //            EventsView()
+    //        case .bookmark:
+    //            FavoritesView()
+    //        case .map:
+    //            TestView()
+    //        case .profile:
+    //            ProfileView()
+    //        }
+    //    }
 }
 
 // MARK: - Примеры экранов
@@ -81,21 +81,10 @@ struct TestView: View {
     @StateObject private var viewModel = TestViewModel()
     
     var body: some View {
-        VStack {
-            Button {
-                Task {
-                    try DataManager.shared.logoutUser()
-                }
-            } label: {
-                Text("Log Out")
-            }
-            
-            
-            ScrollView {
-                VStack {
-                    ForEach(viewModel.events, id: \.id) { event in
-                        EventCellView(event: event)
-                    }
+        ScrollView {
+            VStack {
+                ForEach(viewModel.events, id: \.id) { event in
+                    EventCellView(event: event)
                 }
             }
         }
@@ -113,7 +102,8 @@ final class TestViewModel: ObservableObject {
     func loadEvents() {
         Task {
             do {
-                let events = try await DataManager.shared.getUpcamingEvents()
+                let ids = DataManager.shared.getFavoritesIds()
+                let events = try await DataManager.shared.getEventsByIds(ids: ids)
                 self.events = events
             } catch {
                 print("ProfileViewModel Ошибка при загрузке событий, ошибка: \(error)")

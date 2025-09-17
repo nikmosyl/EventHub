@@ -11,29 +11,35 @@ struct FavoritesView: View {
     @StateObject private var viewModel = FavoritesViewModel()
     
     var body: some View {
-        VStack(spacing: 0) {
-            if viewModel.isSearching {
-                FavoritesSearchBar(
-                    searchText: $viewModel.searchText,
-                    onSearchTextChange: viewModel.searchFavorites
-                )
+        NavigationView {
+            VStack(spacing: 0) {
+                if viewModel.isSearching {
+                    FavoritesSearchBar(
+                        searchText: $viewModel.searchText,
+                        onSearchTextChange: viewModel.searchFavorites
+                    )
+                }
+                
+                if viewModel.favoriteEvents.isEmpty {
+                    FavoritesEmptyView()
+                }
+                
+                FavoritesList(events: viewModel.favoriteEvents, refresh: { print("refresh test")})
+                
             }
-            
-            Spacer()
-            
-            favoritesContent
-            
-            Spacer()
-        }
-        .navigationTitle("Favorites")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: viewModel.toggleSearch) {
-                    Image(systemName: viewModel.isSearching ? "xmark" : "magnifyingglass")
-                        .foregroundColor(.primary)
+            .navigationTitle("Favorites")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: viewModel.toggleSearch) {
+                        Image(systemName: viewModel.isSearching ? "xmark" : "magnifyingglass")
+                            .foregroundColor(.primary)
+                    }
                 }
             }
+        }
+        .onAppear {
+            viewModel.loadFavorites()
         }
     }
 }
@@ -44,13 +50,13 @@ private extension FavoritesView {
     var favoritesContent: some View {
         switch viewModel.favoritesState {
         case .empty:
-            FavoritesEmptyView()
+            FavoritesLoadingView()
             
         case .loading:
             FavoritesLoadingView()
             
         case .loaded(let events):
-            FavoritesList(events: events, refresh: viewModel.loadFavorites)
+            FavoritesList(events: events, refresh: { print("refresh test")})
             
         case .error(let message):
             FavoritesErrorView(message: message)

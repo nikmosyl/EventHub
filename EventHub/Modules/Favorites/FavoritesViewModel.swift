@@ -16,17 +16,11 @@ final class FavoritesViewModel: ObservableObject {
 
     private let dataManager = DataManager.shared
 
-    init() {
-        loadFavorites()
-    }
-
     func loadFavorites() {
         favoritesState = .loading
 
         Task {
             do {
-                // TODO: Implement favorites storage and retrieval
-                // For now, return empty array
                 let favoriteIds: [Int] = DataManager.shared.getFavoritesIds()
                 
                 let favorites: [Event] = try await DataManager.shared.getEventsByIds(ids: favoriteIds)
