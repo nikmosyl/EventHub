@@ -97,6 +97,9 @@ extension EventFilters {
         if let expand = expand, !expand.isEmpty {
             items.append(.init(name: "expand", value: expand.joined(separator: ",")))
         }
+        if let ids = ids {
+            items.append(.init(name: "ids", value: String(ids)))
+        }
         
         return items
     }

@@ -24,21 +24,21 @@ enum TabItem: CaseIterable {
         }
     }
     
-    @ViewBuilder
-    var view: some View {
-        switch self {
-        case .explore:
-            ExploreView()
-        case .events:
-            EventsView()
-        case .bookmark:
-            BookmarkView()
-        case .map:
-            TestView()
-        case .profile:
-            ProfileView()
-        }
-    }
+    //    @ViewBuilder
+    //    var view: some View {
+    //        switch self {
+    //        case .explore:
+    //            ExploreView()
+    //        case .events:
+    //            EventsView()
+    //        case .bookmark:
+    //            FavoritesView()
+    //        case .map:
+    //            TestView()
+    //        case .profile:
+    //            ProfileView()
+    //        }
+    //    }
 }
 
 // MARK: - Примеры экранов
@@ -50,17 +50,6 @@ struct EventsView: View {
                 .green
                 .ignoresSafeArea()
             Text("EventsView")
-        }
-    }
-}
-
-struct BookmarkView: View {
-    var body: some View {
-        ZStack {
-            Color
-                .blue
-                .ignoresSafeArea()
-            Text("BookmarkView")
         }
     }
 }
@@ -82,24 +71,14 @@ struct TestView: View {
     @StateObject private var viewModel = TestViewModel()
     
     var body: some View {
-        VStack {
-            Button {
-                Task {
-                    try DataManager.shared.logoutUser()
-                }
-            } label: {
-                Text("Log Out")
-            }
-            
-            
-            ScrollView {
-                VStack {
-                    ForEach(viewModel.events, id: \.id) { event in
-                        EventCellView(event: event)
-                    }
+        ScrollView {
+            VStack {
+                ForEach(viewModel.events, id: \.id) { event in
+                    EventCellView(event: event)
                 }
             }
         }
+        .navigationTitle("TEST")
     }
 }
 
@@ -114,6 +93,7 @@ final class TestViewModel: ObservableObject {
     func loadEvents() {
         Task {
             do {
+                let ids = DataManager.shared.getFavoritesIds()
                 let events = try await DataManager.shared.getUpcamingEvents()
                 self.events = events
             } catch {
