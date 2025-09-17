@@ -16,7 +16,7 @@ struct EventCellView: View {
     
     var body: some View {
         NavigationLink {
-            Text("Экран в разработке...")
+            EventDetailsView(event: viewModel.event)
         } label: {
             HStack(alignment: .top) {
                 // изображение
@@ -75,10 +75,12 @@ struct EventCellView: View {
             .padding(12)
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 2)
+                    .fill(Color.background)
+                    .shadow(color: Color.shadow, radius: 8, x: 0, y: 2)
             )
-            .padding(.horizontal)
+            .onAppear {
+                viewModel.onAppear()
+            }
         }
     }
     

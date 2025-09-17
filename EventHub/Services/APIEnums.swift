@@ -88,10 +88,12 @@ extension EventFilters {
         if let page = page {
             items.append(.init(name: "page", value: String(page)))
         }
+        if let pageSize = pageSize {
+            items.append(.init(name: "page_size", value: String(pageSize)))
+        }
         if let fields = fields, !fields.isEmpty {
             items.append(.init(name: "fields", value: fields.joined(separator: ",")))
         }
-        
         if let expand = expand, !expand.isEmpty {
             items.append(.init(name: "expand", value: expand.joined(separator: ",")))
         }
