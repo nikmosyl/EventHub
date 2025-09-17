@@ -55,7 +55,7 @@ extension Event {
     private func formatDate(from timestamp: Int) -> String {
         let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_EN")
+        formatter.locale = Locale(identifier: "en_US")
         formatter.dateFormat = "dd\nMMM"
         return formatter.string(from: date).capitalized
     }

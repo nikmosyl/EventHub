@@ -25,7 +25,7 @@ struct ExploreView: View {
                         ProgressView()
                             .frame(height: 200)
                     case .loaded(_):
-                        EventsCollectionView(title: "Upcommning Events", events: viewModel.getUpcommnigViewModel())
+                        EventsCollectionView(title: "Upcommning Events", events: viewModel.getUpcommingViewModel())
                         EventsCollectionView(title: "Nearby Events", events: viewModel.getNearbyViewModel())
                     case .error(let error):
                         ErrorView(error: error) {

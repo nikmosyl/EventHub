@@ -15,9 +15,9 @@ struct CategoryModel: Identifiable {
     let color: Color
     
     init(category: EventCategory) {
-        self.id = category.id
-        self.name = category.name
-        self.icon = CategoryIconCarousel.icon(for: category.name)
-        self.color = CategoryColorCarousel.color(for: category.name)
+        self.id = category.id ?? 0
+        self.name = category.name ?? "Unknown"
+        self.icon = CategoryIconCarousel.icon(for: category.name ?? "Unknown")
+        self.color = CategoryColorCarousel.color(for: category.name ?? "Unknown")
     }
 }

@@ -15,6 +15,8 @@ final class ExploreViewModel: ObservableObject {
     @Published var upcommingEvents: [Event] = []
     @Published var nearbyEvents: [Event] = []
     @Published var selectedCategoryIds: Set<Int> = []
+    @Published var searchQuery: String = ""
+    @Published var selectedLocation: String = "msk" // Добавим переменную для локации
     
     private let dataManager = DataManager.shared
     
@@ -22,13 +24,15 @@ final class ExploreViewModel: ObservableObject {
         state = .loading
         
         do {
+            // Загружаем категории
             categories = try await dataManager.getCategories()
             
-            categoryModels = categories.map {CategoryModel(category: $0)}
+            // Создаем модели категорий с цветами и иконками
+            categoryModels = categories.map { CategoryModel(category: $0) }
             
+            // Загружаем события без фильтрации
             upcommingEvents = try await dataManager.getUpcamingEvents()
-            
-            nearbyEvents = try await dataManager.getNearByEvents(location: "msk")
+            nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
             
             state = .loaded(upcommingEvents)
             
@@ -39,23 +43,32 @@ final class ExploreViewModel: ObservableObject {
     }
     
     func loadEventsWithSelectedCategories() async {
-        guard !selectedCategoryIds.isEmpty else {
-            await loadInitialData()
-            return
-        }
-        
         state = .loading
         
         do {
-            let categoryNames = categories
-                .filter { selectedCategoryIds.contains($0.id) }
-                .map { $0.name }
+            let categoryNames: [String]
             
-            upcommingEvents = try await dataManager.getUpcamingEvents(categories: categoryNames)
-            nearbyEvents = try await dataManager.getNearByEvents(
-                location: "msk",
-                categories: categoryNames
-            )
+            if selectedCategoryIds.isEmpty {
+                // Если нет выбранных категорий, загружаем все события
+                upcommingEvents = try await dataManager.getUpcamingEvents()
+                nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
+            } else {
+                // Фильтруем по выбранным категориям
+                categoryNames = categories
+                    .filter { category in
+                        if let categoryId = category.id {
+                            return selectedCategoryIds.contains(categoryId)
+                        }
+                        return false
+                    }
+                    .map { $0.name ?? "Unknown" }
+                
+                upcommingEvents = try await dataManager.getUpcamingEvents(categories: categoryNames)
+                nearbyEvents = try await dataManager.getNearByEvents(
+                    location: selectedLocation,
+                    categories: categoryNames
+                )
+            }
             
             state = .loaded(upcommingEvents)
             
@@ -65,20 +78,54 @@ final class ExploreViewModel: ObservableObject {
         }
     }
     
+    // Функция для поиска событий
+    func searchEvents() async {
+        state = .loading
+        
+        do {
+            let events = try await dataManager.searchEvents(
+                query: searchQuery,
+                location: selectedLocation
+            )
+            
+            upcommingEvents = events
+            state = .loaded(events)
+            
+        } catch {
+            state = .error(error)
+            print("Error searching events: \(error)")
+        }
+    }
+    
+    // Функция для обновления локации
+    func updateLocation(_ location: String) async {
+        selectedLocation = location
+        await loadEventsWithSelectedCategories()
+    }
+    
+    // Функция для сброса фильтров
+    func clearFilters() {
+        selectedCategoryIds.removeAll()
+        searchQuery = ""
+    }
+    
+    // Функция для проверки, активны ли какие-либо фильтры
+    var hasActiveFilters: Bool {
+        !selectedCategoryIds.isEmpty || !searchQuery.isEmpty
+    }
+    
+    // MARK: - Getter Methods
+    
     func getCategoryViewModel() -> [CategoryModel] {
         return categoryModels
     }
     
-    func getUpcommnigViewModel() -> [Event] {
-        return Array(upcommingEvents.prefix(5))
+    func getUpcommingViewModel() -> [Event] {
+        return Array(upcommingEvents.prefix(6)) // Показываем первые 6 событий
     }
     
     func getNearbyViewModel() -> [Event] {
-        return Array(nearbyEvents.prefix(5))
-    }
-    
-    func getLocation() {
-        
+        return Array(nearbyEvents.prefix(6)) // Показываем первые 6 событий
     }
     
     func getAllUpcomingEvents() -> [Event] {
@@ -89,6 +136,26 @@ final class ExploreViewModel: ObservableObject {
         return nearbyEvents
     }
     
+    // Проверяем, есть ли еще события для показа
+    func hasMoreUpcomingEvents() -> Bool {
+        upcommingEvents.count > 6
+    }
+    
+    func hasMoreNearbyEvents() -> Bool {
+        nearbyEvents.count > 6
+    }
+    
+    // Получаем выбранные категории для отображения
+    func getSelectedCategoryNames() -> [String] {
+        categories
+            .filter { category in
+                if let categoryId = category.id {
+                    return selectedCategoryIds.contains(categoryId)
+                }
+                return false
+            }
+            .map { $0.name ?? "Unknown" }
+    }
 }
 
 // Состояния загрузки
@@ -97,4 +164,22 @@ enum ViewState<T> {
     case loading
     case loaded(T)
     case error(Error)
+}
+
+// Расширение для удобного отображения ошибок
+extension ViewState: Equatable where T: Equatable {
+    static func == (lhs: ViewState<T>, rhs: ViewState<T>) -> Bool {
+        switch (lhs, rhs) {
+        case (.idle, .idle):
+            return true
+        case (.loading, .loading):
+            return true
+        case (.loaded(let lhsValue), .loaded(let rhsValue)):
+            return lhsValue == rhsValue
+        case (.error(let lhsError), .error(let rhsError)):
+            return lhsError.localizedDescription == rhsError.localizedDescription
+        default:
+            return false
+        }
+    }
 }

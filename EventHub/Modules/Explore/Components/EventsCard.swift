@@ -60,7 +60,7 @@ struct EventsCard: View {
             
             VStack(alignment: .leading, spacing: 8) {
                 
-                Text(events.title)
+                Text(events.title ?? "Unknown")
                     .font(.system(size: 16, weight: .semibold))
                     .lineLimit(2)
                     .multilineTextAlignment(.leading)
