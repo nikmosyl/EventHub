@@ -27,7 +27,9 @@ final class FavoritesViewModel: ObservableObject {
             do {
                 // TODO: Implement favorites storage and retrieval
                 // For now, return empty array
-                let favorites: [Event] = []
+                let favoriteIds: [Int] = DataManager.shared.getFavoritesIds()
+                
+                let favorites: [Event] = try await DataManager.shared.getEventsByIds(ids: favoriteIds)
 
                 if favorites.isEmpty {
                     favoritesState = .empty
@@ -39,22 +41,6 @@ final class FavoritesViewModel: ObservableObject {
                 let message = "Failed to load favorites: \(error.localizedDescription)"
                 favoritesState = .error(message)
             }
-        }
-    }
-
-    func toggleFavorite(event: Event) {
-        // TODO: Implement favorite toggle logic
-        print("Toggle favorite for event: \(event.title)")
-    }
-
-    func removeFavorite(event: Event) {
-        // TODO: Implement remove favorite logic
-        favoriteEvents.removeAll { $0.id == event.id }
-
-        if favoriteEvents.isEmpty {
-            favoritesState = .empty
-        } else {
-            favoritesState = .loaded(favoriteEvents)
         }
     }
 

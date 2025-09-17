@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FavoritesList: View {
     let events: [Event]
+    let refresh: () -> ()
 
     var body: some View {
         ScrollView {
@@ -17,6 +18,10 @@ struct FavoritesList: View {
                     EventCellView(event: event)
                 }
             }
+            .refreshable {
+                print("Избранные обновляются")
+                refresh()
+            }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
         }
@@ -24,5 +29,5 @@ struct FavoritesList: View {
 }
 
 #Preview {
-    FavoritesList(events: [])
+    FavoritesList(events: [], refresh: {})
 }

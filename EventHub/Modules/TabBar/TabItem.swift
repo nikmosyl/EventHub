@@ -24,21 +24,21 @@ enum TabItem: CaseIterable {
         }
     }
     
-    @ViewBuilder
-    var view: some View {
-        switch self {
-        case .explore:
-            ExploreView()
-        case .events:
-            EventsView()
-        case .bookmark:
-            BookmarkView()
-        case .map:
-            TestView()
-        case .profile:
-            ProfileView()
-        }
-    }
+//    @ViewBuilder
+//    var view: some View {
+//        switch self {
+//        case .explore:
+//            ExploreView()
+//        case .events:
+//            EventsView()
+//        case .bookmark:
+//            FavoritesView()
+//        case .map:
+//            TestView()
+//        case .profile:
+//            ProfileView()
+//        }
+//    }
 }
 
 // MARK: - Примеры экранов
@@ -60,17 +60,6 @@ struct EventsView: View {
                 .green
                 .ignoresSafeArea()
             Text("EventsView")
-        }
-    }
-}
-
-struct BookmarkView: View {
-    var body: some View {
-        ZStack {
-            Color
-                .blue
-                .ignoresSafeArea()
-            Text("BookmarkView")
         }
     }
 }

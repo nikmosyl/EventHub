@@ -111,6 +111,11 @@ final class DataManager {
         return try await fetchPaged(.events(filters: updatedFilters, id: id))
     }
     
+    private func fetchEventByIds(_ ids: String) async throws -> [Event] {
+        let filter = EventFilters(ids: ids)
+        return try await fetchPaged(.events(filters: filter))
+    }
+    
     // MARK: - Получение одного события по ID
     private func fetchEvent(id: Int) async throws -> Event {
         let events = try await fetchEvents(id: id)
@@ -169,6 +174,11 @@ final class DataManager {
             categories: categories
         )
         return try await fetchEvents(filters: filters)
+    }
+    
+    func getEventsByIds(ids: [Int]) async throws -> [Event] {
+        let str = ids.map{ String($0) }.joined(separator: ",")
+        return try await fetchEventByIds(str)
     }
     
     func getCategories() async throws -> [EventCategory] {
@@ -333,7 +343,7 @@ extension DataManager {
     
     // обновляем избранное
     private func updateFavorites(eventId: Int, action: FavoritesAction) async throws {
-        var favorites = getFavorites()
+        var favorites = getFavoritesIds()
         
         switch action {
         case .add:
@@ -347,14 +357,14 @@ extension DataManager {
         saveFavorites(favorites)
     }
     
-    // получить сохраненные избранные
-    private func getFavorites() -> [Int] {
-        UserDefaults.standard.array(forKey: favoritesKey) as? [Int] ?? []
-    }
-    
     // сохранить в избранное
     private func saveFavorites(_ bookmarks: [Int]) {
         UserDefaults.standard.set(bookmarks, forKey: favoritesKey)
+    }
+    
+    // получить  избранные
+    func getFavoritesIds() -> [Int] {
+        UserDefaults.standard.array(forKey: favoritesKey) as? [Int] ?? []
     }
     
     // Добавление в избранное
@@ -369,7 +379,7 @@ extension DataManager {
     
     // Проверка статуса избранного
     func isEventfavorited(eventId: Int) async -> Bool {
-        let favorites = getFavorites()
+        let favorites = getFavoritesIds()
         return favorites.contains(eventId)
     }
 }

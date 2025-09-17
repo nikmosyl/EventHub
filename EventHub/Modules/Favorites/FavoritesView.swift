@@ -11,34 +11,29 @@ struct FavoritesView: View {
     @StateObject private var viewModel = FavoritesViewModel()
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                if viewModel.isSearching {
-                    FavoritesSearchBar(
-                        searchText: $viewModel.searchText,
-                        onSearchTextChange: viewModel.searchFavorites
-                    )
-                }
-                
-                Spacer()
-                
-                favoritesContent
-                
-                Spacer()
+        VStack(spacing: 0) {
+            if viewModel.isSearching {
+                FavoritesSearchBar(
+                    searchText: $viewModel.searchText,
+                    onSearchTextChange: viewModel.searchFavorites
+                )
             }
-            .navigationTitle("Favorites")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: viewModel.toggleSearch) {
-                        Image(systemName: viewModel.isSearching ? "xmark" : "magnifyingglass")
-                            .foregroundColor(.primary)
-                    }
-                }
-            }
+            
+            Spacer()
+            
+            favoritesContent
+            
+            Spacer()
         }
-        .onAppear {
-            viewModel.loadFavorites()
+        .navigationTitle("Favorites")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: viewModel.toggleSearch) {
+                    Image(systemName: viewModel.isSearching ? "xmark" : "magnifyingglass")
+                        .foregroundColor(.primary)
+                }
+            }
         }
     }
 }
@@ -55,7 +50,7 @@ private extension FavoritesView {
             FavoritesLoadingView()
             
         case .loaded(let events):
-            FavoritesList(events: events)
+            FavoritesList(events: events, refresh: viewModel.loadFavorites)
             
         case .error(let message):
             FavoritesErrorView(message: message)

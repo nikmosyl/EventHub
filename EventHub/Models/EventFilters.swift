@@ -20,6 +20,7 @@ struct EventFilters {
     let pageSize: String?
     let fields: [String]?
     let expand: [String]?
+    let ids: String?
     
     init(
         location: String? = nil,
@@ -31,7 +32,8 @@ struct EventFilters {
         pageSize: String? = nil,
         price: String? = nil,
         fields: [String]? = nil,
-        expand: [String]? = nil
+        expand: [String]? = nil,
+        ids: String? = nil
     ) {
         self.location = location
         self.actualSince = actualSince
@@ -43,5 +45,6 @@ struct EventFilters {
         self.price = price
         self.fields = fields
         self.expand = expand
+        self.ids = ids
     }
 }

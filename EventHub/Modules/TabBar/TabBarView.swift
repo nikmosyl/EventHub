@@ -22,7 +22,7 @@ struct TabBarView: View {
                     EventsView()
                         .tabSafeAreaPadding(padding)
                         .tag(TabItem.events)
-                    BookmarkView()
+                    FavoritesView()
                         .tabSafeAreaPadding(padding)
                         .tag(TabItem.bookmark)
                     TestView()
