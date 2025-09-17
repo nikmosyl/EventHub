@@ -16,15 +16,19 @@ struct RootView: View {
         DataManager.shared.setRootViewModel(rootViewModel)
     }
     
-#warning("Уборать дебаг когда появится Onboarding")
     var body: some View {
-        if false {//!viewModel.isOnboardingComplete {
-            //OnboardingView(rootViewModel: viewModel)
-            EmptyView()
-        } else if viewModel.isLoggedIn {
-            TabBarView()
-        } else {
-            SignInView()
+        ZStack {
+            if !viewModel.isOnboardingComplete {
+                OnboardingView()
+            } else if viewModel.isLoggedIn {
+                TabBarView()
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            } else {
+                SignInView()
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
         }
+        .animation(.easeInOut(duration: 0.5), value: viewModel.isOnboardingComplete)
+        .animation(.easeInOut(duration: 0.5), value: viewModel.isLoggedIn)
     }
 }
