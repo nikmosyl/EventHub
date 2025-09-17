@@ -46,21 +46,37 @@ struct SearchView: View {
             .background(Color.white)
             
             Spacer()
-            
-            if viewModel.searchResults.isEmpty || viewModel.searchText.isEmpty {
+
+            switch viewModel.viewState {
+            case .empty:
                 SearchEmptyView()
-            } else {
+            case .loading:
+                ProgressView()
+                    .scaleEffect(1.5)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            case .loaded(let events):
                 ScrollView {
                     LazyVStack(spacing: 16) {
-                        ForEach(viewModel.searchResults, id: \.id) { event in
-                            // TODO: replace cell
-                            Text(event.title)
+                        ForEach(events, id: \.id) { event in
+                            EventCellView(event: event)
                         }
                     }
                     .padding(.vertical)
                 }
+            case .error(let message):
+                VStack {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.largeTitle)
+                        .foregroundColor(.red)
+                    Text("Error: \(message)")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            
+
             Spacer()
         }
         .background(Color.white.ignoresSafeArea())

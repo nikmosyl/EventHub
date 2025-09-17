@@ -11,8 +11,7 @@ import Combine
 @MainActor
 final class SearchViewModel: ObservableObject {
     @Published var searchText: String = ""
-    @Published var searchResults: [Event] = []
-    @Published var isLoading: Bool = false
+    @Published var viewState: SearchViewState = .empty
     @Published var showFilters: Bool = false
     
     private var cancellables = Set<AnyCancellable>()
@@ -23,25 +22,27 @@ final class SearchViewModel: ObservableObject {
     
     func performSearch(query: String) async {
         guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            searchResults = []
+            viewState = .empty
             return
         }
-        
-        isLoading = true
-        
+
+        viewState = .loading
+
         do {
             let events = try await DataManager.shared.searchEvents(query: query)
-            searchResults = events
+            if events.isEmpty {
+                viewState = .empty
+            } else {
+                viewState = .loaded(events)
+            }
         } catch {
-            searchResults = []
+            viewState = .error(error.localizedDescription)
         }
-        
-        isLoading = false
     }
     
     func clearSearch() {
         searchText = ""
-        searchResults = []
+        viewState = .empty
     }
     
     func applyFilters() {
