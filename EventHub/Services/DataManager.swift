@@ -329,47 +329,47 @@ extension DataManager {
         case add, remove
     }
     
-    private var bookmarksKey: String { "favoriteEvents" }
+    private var favoritesKey: String { "favoriteEvents" }
     
     // обновляем избранное
-    private func updateBookmarks(eventId: Int, action: FavoritesAction) async throws {
-        var bookmarks = getBookmarks()
+    private func updateFavorites(eventId: Int, action: FavoritesAction) async throws {
+        var favorites = getFavorites()
         
         switch action {
         case .add:
-            if !bookmarks.contains(eventId) {
-                bookmarks.append(eventId)
+            if !favorites.contains(eventId) {
+                favorites.append(eventId)
             }
         case .remove:
-            bookmarks.removeAll { $0 == eventId }
+            favorites.removeAll { $0 == eventId }
         }
         
-        saveBookmraks(bookmarks)
+        saveFavorites(favorites)
     }
     
     // получить сохраненные избранные
-    private func getBookmarks() -> [Int] {
-        UserDefaults.standard.array(forKey: bookmarksKey) as? [Int] ?? []
+    private func getFavorites() -> [Int] {
+        UserDefaults.standard.array(forKey: favoritesKey) as? [Int] ?? []
     }
     
     // сохранить в избранное
-    private func saveBookmraks(_ bookmarks: [Int]) {
-        UserDefaults.standard.set(bookmarks, forKey: bookmarksKey)
+    private func saveFavorites(_ bookmarks: [Int]) {
+        UserDefaults.standard.set(bookmarks, forKey: favoritesKey)
     }
     
     // Добавление в избранное
-    func addToBookmarks(eventId: Int) async throws {
-        try await updateBookmarks(eventId: eventId, action: .add)
+    func addToFavorites(eventId: Int) async throws {
+        try await updateFavorites(eventId: eventId, action: .add)
     }
     
     // Удаление из избранного
-    func removeFromBookmarks(eventId: Int) async throws {
-        try await updateBookmarks(eventId: eventId, action: .remove)
+    func removeFromFavorites(eventId: Int) async throws {
+        try await updateFavorites(eventId: eventId, action: .remove)
     }
     
     // Проверка статуса избранного
-    func isEventBookmarked(eventId: Int) async -> Bool {
-        let bookmarks = getBookmarks()
-        return bookmarks.contains(eventId)
+    func isEventfavorited(eventId: Int) async -> Bool {
+        let favorites = getFavorites()
+        return favorites.contains(eventId)
     }
 }

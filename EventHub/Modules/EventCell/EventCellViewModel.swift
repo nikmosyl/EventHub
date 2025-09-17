@@ -66,7 +66,7 @@ final class EventCellViewModel: ObservableObject {
     func loadBookmarkStatus() {
         Task {
             if let id = event.id {
-                isBookmarked = await dataManager.isEventBookmarked(eventId: id)
+                isBookmarked = await dataManager.isEventfavorited(eventId: id)
             }
         }
     }
@@ -84,9 +84,9 @@ final class EventCellViewModel: ObservableObject {
             do {
                 if let id = event.id {
                     if isBookmarked {
-                        try await dataManager.removeFromBookmarks(eventId: id)
+                        try await dataManager.removeFromFavorites(eventId: id)
                     } else {
-                        try await dataManager.addToBookmarks(eventId: id)
+                        try await dataManager.addToFavorites(eventId: id)
                     }
                     
                     isBookmarked.toggle()

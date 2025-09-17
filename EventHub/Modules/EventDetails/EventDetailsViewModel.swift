@@ -27,7 +27,7 @@ final class EventDetailsViewModel: ObservableObject {
         self.event = event
         self.eventDetails = EventDetailsModel(from: event)
         Task {
-            self.isBookmarked = await DataManager.shared.isEventBookmarked(eventId: eventId)
+            self.isBookmarked = await DataManager.shared.isEventfavorited(eventId: eventId)
         }
     }
     
@@ -36,9 +36,9 @@ final class EventDetailsViewModel: ObservableObject {
             do {
                 if let id = event.id {
                     if isBookmarked {
-                        try await dataManager.removeFromBookmarks(eventId: id)
+                        try await dataManager.removeFromFavorites(eventId: id)
                     } else {
-                        try await dataManager.addToBookmarks(eventId: id)
+                        try await dataManager.addToFavorites(eventId: id)
                     }
                     
                     isBookmarked.toggle()

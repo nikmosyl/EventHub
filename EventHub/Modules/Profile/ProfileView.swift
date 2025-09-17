@@ -24,14 +24,20 @@ struct ProfileView: View {
                         .font(.system(size: 24))
                         .fontWeight(.medium)
                     
-                    ProfileHeader(
-                        avatarImage: selectedImage ?? viewModel.profileImage,
-                        name: profile.name,
-                        isEditingMode: viewModel.isEditingMode,
-                        onEditProfileTapped: viewModel.onEditProfileTapped,
-                        onEditAvatarTapped: viewModel.onEditAvatarTapped,
-                        onEditNameTapped: viewModel.onEditNameTapped
-                    )
+                    ScrollView(showsIndicators: false) {
+                        ProfileHeader(
+                            avatarImage: selectedImage ?? viewModel.profileImage,
+                            name: profile.name,
+                            isEditingMode: viewModel.isEditingMode,
+                            onEditProfileTapped: viewModel.onEditProfileTapped,
+                            onEditAvatarTapped: viewModel.onEditAvatarTapped,
+                            onEditNameTapped: viewModel.onEditNameTapped
+                        )
+                        .padding(.horizontal)
+                    }
+                    .refreshable {
+                        viewModel.loadUserData()
+                    }
                     
                     AboutSection(
                         aboutText: profile.aboutMe,
