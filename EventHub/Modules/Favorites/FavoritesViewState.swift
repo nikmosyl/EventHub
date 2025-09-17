@@ -8,9 +8,8 @@
 import Foundation
 
 enum FavoritesViewState {
-    case initial
-    case loading
     case empty
+    case loading
     case loaded([Event])
     case error(String)
 }

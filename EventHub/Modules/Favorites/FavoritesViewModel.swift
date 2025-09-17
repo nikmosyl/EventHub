@@ -10,7 +10,9 @@ import Foundation
 @MainActor
 final class FavoritesViewModel: ObservableObject {
     @Published var favoriteEvents: [Event] = []
-    @Published var favoritesState: FavoritesViewState = .initial
+    @Published var favoritesState: FavoritesViewState = .empty
+    @Published var searchText: String = ""
+    @Published var isSearching: Bool = false
 
     private let dataManager = DataManager.shared
 
@@ -55,4 +57,25 @@ final class FavoritesViewModel: ObservableObject {
             favoritesState = .loaded(favoriteEvents)
         }
     }
+
+    func toggleSearch() {
+        isSearching.toggle()
+        if !isSearching {
+            searchText = ""
+        }
+    }
+
+    func searchFavorites() {
+        guard !searchText.isEmpty else {
+            favoritesState = favoriteEvents.isEmpty ? .empty : .loaded(favoriteEvents)
+            return
+        }
+
+        let filteredEvents = favoriteEvents.filter { event in
+            event.title?.localizedCaseInsensitiveContains(searchText) ?? false
+        }
+
+        favoritesState = filteredEvents.isEmpty ? .empty : .loaded(filteredEvents)
+    }
 }
+
