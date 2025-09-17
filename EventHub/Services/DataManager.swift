@@ -193,7 +193,7 @@ final class DataManager {
         let uid = user.uid
         let email = user.email ?? "empty"
         let displayName = user.displayName ?? "User"
-        let photoURL = user.photoURL?.absoluteString ?? "empty"
+        let photoURL = user.photoURL?.absoluteString ?? ""
         let bio = "empty"
         
         do {
@@ -235,7 +235,7 @@ final class DataManager {
             uid: uid,
             displayName: fullName,
             email: email,
-            photoURL: "empty",
+            photoURL: "",
             bio: "empty"
         )
         try await AuthService.shared.saveUser(user)
