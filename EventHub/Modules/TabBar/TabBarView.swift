@@ -9,38 +9,32 @@ import SwiftUI
 
 struct TabBarView: View {
     @StateObject private var viewModel = TabBarViewModel()
-    
-    let padding: CGFloat = 50
-    
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
-                TabView(selection: $viewModel.selectedTab) {
-                    ExploreView()
-                        .tabSafeAreaPadding(padding)
-                        .tag(TabItem.explore)
-                    EventsView()
-                        .tabSafeAreaPadding(padding)
-                        .tag(TabItem.events)
-                    BookmarkView()
-                        .tabSafeAreaPadding(padding)
-                        .tag(TabItem.bookmark)
-                    TestView()
-                        .tabSafeAreaPadding(padding)
-                        .tag(TabItem.map)
-                    ProfileView()
-                        .tabSafeAreaPadding(padding)
-                        .tag(TabItem.profile)
-                }
-                
-                CustomTabBarView(viewModel: viewModel)
+        ZStack(alignment: .bottom) {
+            TabView(selection: $viewModel.selectedTab) {
+                ExploreView()
+                    .tabSafeAreaPadding()
+                    .tag(TabItem.explore)
+                EventsView()
+                    .tabSafeAreaPadding()
+                    .tag(TabItem.events)
+                FavoritesView()
+                    .tag(TabItem.bookmark)
+                TestView()
+                    .tabSafeAreaPadding()
+                    .tag(TabItem.map)
+                ProfileView()
+                    .tabSafeAreaPadding()
+                    .tag(TabItem.profile)
             }
+            
+            CustomTabBarView(viewModel: viewModel)
         }
     }
 }
 
 extension View {
-    func tabSafeAreaPadding(_ padding: CGFloat) -> some View {
+    func tabSafeAreaPadding(_ padding: CGFloat = 50) -> some View {
         self.safeAreaInset(edge: .bottom) {
             Color.clear.frame(height: padding)
         }
