@@ -68,19 +68,22 @@ struct EventsCard: View {
                     .padding(.top, 12)
                 
                 
-                HStack {
-                    Image(systemName: "person.2.fill")
-                    Text("events")
-                        .font(.system(size: 14))
+                if events.participantCount > 0 {
+                    HStack(spacing: 4) {
+                        Image(systemName: "person.2.fill")
+                            .font(.system(size: 12))
+                        Text(events.formattedParticipantCount)
+                            .font(.system(size: 12))
+                    }
+                    .foregroundColor(.pillColor3)
+                    .padding(.horizontal, 16)
                 }
-                .foregroundColor(.pillColor3)
-                .padding(.horizontal, 16)
                 
                 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(events.locationName)
                         .font(.system(size: 14))
-                    Text(events.price ?? "Free")
+                    Text(events.formattedPrice)
                         .font(.system(size: 14))
                         .foregroundColor(.gray)
                 }

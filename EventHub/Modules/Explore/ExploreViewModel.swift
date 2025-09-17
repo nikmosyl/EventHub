@@ -70,13 +70,24 @@ final class ExploreViewModel: ObservableObject {
     }
     
     func getUpcommnigViewModel() -> [Event] {
-        return upcommingEvents
+        return Array(upcommingEvents.prefix(5))
     }
     
     func getNearbyViewModel() -> [Event] {
-        return nearbyEvents
+        return Array(nearbyEvents.prefix(5))
     }
     
+    func getLocation() {
+        
+    }
+    
+    func getAllUpcomingEvents() -> [Event] {
+        return upcommingEvents
+    }
+    
+    func getAllNearbyEvents() -> [Event] {
+        return nearbyEvents
+    }
     
 }
 

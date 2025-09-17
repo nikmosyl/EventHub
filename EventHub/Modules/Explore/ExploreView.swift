@@ -15,8 +15,6 @@ struct ExploreView: View {
     var body: some View {
         ZStack(alignment: .top) {
             
-            ExploreNavBar(categories: viewModel.getCategoryViewModel(), isSectionActive: $viewModel.selectedCategoryIds)
-            
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 30) {
                     Spacer()
