@@ -16,7 +16,7 @@ struct EventCellView: View {
     
     var body: some View {
         NavigationLink {
-            Text("Экран в разработке...")
+            EventDetailsView(event: viewModel.event)
         } label: {
             HStack(alignment: .top) {
                 // изображение

@@ -16,7 +16,7 @@ final class EventDetailsViewModel: ObservableObject {
 
     private let dataManager = DataManager.shared
     private let eventId: Int
-    private var event: Event?
+    private(set) var event: Event?
 
     var shareURL: URL? {
         event?.siteUrl.flatMap(URL.init)

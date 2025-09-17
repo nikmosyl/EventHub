@@ -13,7 +13,7 @@ final class EventCellViewModel: ObservableObject {
     @Published var isLoading = false
     
     private let dataManager = DataManager.shared
-    private var event: Event
+    private(set) var event: Event
     
     init(event: Event) {
         self.event = event
