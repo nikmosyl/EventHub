@@ -24,40 +24,19 @@ struct ExploreView: View {
                         ProgressView()
                             .frame(height: 200)
                     case .loaded(_):
-                        EventsCollectionView(title: "Upcomming Events", events: viewModel.getUpcommingViewModel())
+                        EventsCollectionView(title: "Upcomming Events", events: viewModel.getUpcommingForExploreView())
                         EventsCollectionView(
-                            title: "Nearby Events in \(viewModel.getCurrentLocationName())",
-                            events: viewModel.getNearbyViewModel()
+                            title: "Nearby Events",
+                            events: viewModel.getNearbyEventsForExploreView()
                         )
                     case .error(let error):
-                        ErrorView(error: error) {
-                            Task {
-                                await viewModel.loadInitialData()
-                            }
-                        }
-                    }
-                    
-                    if !viewModel.selectedCategoryIds.isEmpty {
-                        Button {
-                            Task {
-                                await viewModel.loadEventsWithSelectedCategories()
-                            }
-                        } label: {
-                            Text("Применить фильтр (\(viewModel.selectedCategoryIds.count))")
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue)
-                                .cornerRadius(10)
-                        }
-                        .padding()
+                        ErrorView(error: error)
                     }
                 }
             }
             
             ExploreNavBar(
-                categories: viewModel.getCategoryViewModel(),
+                categories: viewModel.getCategoryForExploreView(),
                 isSectionActive: $viewModel.selectedCategoryIds,
                 currentLocationName: viewModel.getCurrentLocationName(),
                 currentLocationSlug: viewModel.selectedLocation,
@@ -71,11 +50,6 @@ struct ExploreView: View {
         }
         .task {
             await viewModel.loadInitialData()
-        }
-        .onReceive(viewModel.$selectedCategoryIds) { _ in
-            Task {
-                await viewModel.loadEventsWithSelectedCategories()
-            }
         }
     }
 }

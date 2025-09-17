@@ -10,6 +10,7 @@ import SwiftUI
 struct CityLocationView: View {
     
     @Binding var showCurrentLocation: Bool
+    let currentLocation: String
     
     var body: some View {
         HStack {
@@ -29,8 +30,8 @@ struct CityLocationView: View {
                 .foregroundStyle(Color.textLightSecondary)
                 .fontWeight(.regular)
                 
-                Text("New York, USA")
-                    .foregroundStyle(.black) //Change in White
+                Text(currentLocation)
+                    .foregroundStyle(.white)
                     .fontWeight(.regular)
                     .font(.system(size: 13))
             }

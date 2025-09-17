@@ -31,7 +31,7 @@ struct ExploreNavBar: View {
                 
                 VStack(spacing: 20) {
                     CityLocationView(
-                        showCurrentLocation: $showCurrentLocation
+                        showCurrentLocation: $showCurrentLocation, currentLocation: currentLocationName
                     )
                     .padding(.horizontal, 20)
                     .padding(.top, 20)

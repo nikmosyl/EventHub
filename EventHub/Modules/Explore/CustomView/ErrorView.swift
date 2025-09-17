@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ErrorView: View {
     let error: Error
-    let onRetry: () -> Void
     
     var body: some View {
         VStack(spacing: 16) {
@@ -20,13 +19,19 @@ struct ErrorView: View {
             Text("Something went wrong")
                 .font(.headline)
             
-            Text(error.localizedDescription)
-                .font(.caption)
-                .foregroundColor(.gray)
-                .multilineTextAlignment(.center)
-            
-            Button("Try Again", action: onRetry)
-                .buttonStyle(.borderedProminent)
+            if let networkError = error as? NetworkError {
+                Text(networkError.localizedDescription)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            } else {
+                Text(error.localizedDescription)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
         }
         .padding()
         .frame(maxWidth: .infinity)

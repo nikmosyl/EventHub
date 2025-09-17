@@ -14,12 +14,20 @@ final class ExploreViewModel: ObservableObject {
     @Published var categoryModels: [CategoryModel] = []
     @Published var upcommingEvents: [Event] = []
     @Published var nearbyEvents: [Event] = []
-    @Published var selectedCategoryIds: Set<Int> = []
+    @Published var selectedCategoryIds: Set<Int> = [] {
+        didSet {
+            if isInitialLoadComplete {
+                Task{
+                    await loadEventsWithSelectedCategories()
+                }
+            }
+        }
+    }
     @Published var searchQuery: String = ""
     @Published var availableLocations: [Location] = []
     @Published var selectedLocation: String = "msk"
     @Published var isLoadingLocations: Bool = false
-    
+    private var isInitialLoadComplete: Bool = false
     private let dataManager = DataManager.shared
     
     func loadInitialData() async {
@@ -27,16 +35,16 @@ final class ExploreViewModel: ObservableObject {
         
         do {
             async let categoriesTask = dataManager.getCategories()
-            async let locationsTask: () = loadLocations()
+            await loadLocations()
             
             categories = try await categoriesTask
             categoryModels = categories.map { CategoryModel(category: $0) }
-
+            
             upcommingEvents = try await dataManager.getUpcamingEvents()
             nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
             
             state = .loaded(upcommingEvents)
-            
+            isInitialLoadComplete = true
         } catch {
             state = .error(error)
             print("Error loading data: \(error)")
@@ -57,11 +65,6 @@ final class ExploreViewModel: ObservableObject {
             
         } catch {
             print("Ошибка загрузки локаций: \(error)")
-            availableLocations = [
-                Location(slug: "msk", name: "Москва", coords: nil),
-                Location(slug: "spb", name: "Санкт-Петербург", coords: nil),
-                Location(slug: "nsk", name: "Новосибирск", coords: nil)
-            ]
             print("Используем fallback локации: \(availableLocations.map { $0.name ?? "" })")
         }
         
@@ -70,38 +73,56 @@ final class ExploreViewModel: ObservableObject {
     
     func loadEventsWithSelectedCategories() async {
         state = .loading
-        
+        print("Входим в do")
         do {
-            let categoryNames: [String]
-            
+            print("Зашли в do")
+            let categorySlugs: [String]
+            print("Обработали categoryNames")
             if selectedCategoryIds.isEmpty {
                 upcommingEvents = try await dataManager.getUpcamingEvents()
                 nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
+                print("Проверили если пустота")
             } else {
-                categoryNames = categories
-                    .filter { category in
-                        if let categoryId = category.id {
-                            return selectedCategoryIds.contains(categoryId)
-                        }
-                        return false
-                    }
-                    .map { $0.name ?? "Unknown" }
+                categorySlugs = getSelectedCategorySlug()
                 
-                upcommingEvents = try await dataManager.getUpcamingEvents(categories: categoryNames)
+                upcommingEvents = try await dataManager.getUpcamingEvents(categories: categorySlugs)
                 nearbyEvents = try await dataManager.getNearByEvents(
                     location: selectedLocation,
-                    categories: categoryNames
+                    categories: categorySlugs
                 )
+                print("Если не пустота")
             }
             
             state = .loaded(upcommingEvents)
             
         } catch {
-            state = .error(error)
-            print("Error loading filtered events: \(error)")
+            let formattedError = formatError(error)
+            state = .error(formattedError)
+            print("Error loading filtered events: \(formattedError)")
         }
     }
-
+    
+    private func formatError(_ error: Error) -> Error {
+        if let networkError = error as? NetworkError {
+            return networkError
+        } else if let decodingError = error as? DecodingError {
+            return NetworkError.invalidURL
+        } else {
+            return NetworkError.invalidResponse
+        }
+    }
+    
+    private func getSelectedCategorySlug() -> [String] {
+        categories
+            .filter { category in
+                if let categoryId = category.id {
+                    return selectedCategoryIds.contains(categoryId)
+                }
+                return false
+            }
+            .compactMap { $0.slug }
+    }
+    
     func searchEvents() async {
         state = .loading
         
@@ -119,7 +140,7 @@ final class ExploreViewModel: ObservableObject {
             print("Error searching events: \(error)")
         }
     }
-
+    
     func updateLocation(_ location: String) async {
         selectedLocation = location
         await loadEventsWithSelectedCategories()
@@ -143,15 +164,15 @@ final class ExploreViewModel: ObservableObject {
     
     // MARK: - Getter Methods
     
-    func getCategoryViewModel() -> [CategoryModel] {
+    func getCategoryForExploreView() -> [CategoryModel] {
         return categoryModels
     }
     
-    func getUpcommingViewModel() -> [Event] {
+    func getUpcommingForExploreView() -> [Event] {
         return Array(upcommingEvents.prefix(6))
     }
     
-    func getNearbyViewModel() -> [Event] {
+    func getNearbyEventsForExploreView() -> [Event] {
         return Array(nearbyEvents.prefix(6))
     }
     
@@ -162,7 +183,7 @@ final class ExploreViewModel: ObservableObject {
     func getAllNearbyEvents() -> [Event] {
         return nearbyEvents
     }
-
+    
     func hasMoreUpcomingEvents() -> Bool {
         upcommingEvents.count > 6
     }
@@ -170,39 +191,10 @@ final class ExploreViewModel: ObservableObject {
     func hasMoreNearbyEvents() -> Bool {
         nearbyEvents.count > 6
     }
-    
-    func getSelectedCategoryNames() -> [String] {
-        categories
-            .filter { category in
-                if let categoryId = category.id {
-                    return selectedCategoryIds.contains(categoryId)
-                }
-                return false
-            }
-            .map { $0.name ?? "Unknown" }
-    }
 }
-
 enum ViewState<T> {
     case idle
     case loading
     case loaded(T)
     case error(Error)
-}
-
-extension ViewState: Equatable where T: Equatable {
-    static func == (lhs: ViewState<T>, rhs: ViewState<T>) -> Bool {
-        switch (lhs, rhs) {
-        case (.idle, .idle):
-            return true
-        case (.loading, .loading):
-            return true
-        case (.loaded(let lhsValue), .loaded(let rhsValue)):
-            return lhsValue == rhsValue
-        case (.error(let lhsError), .error(let rhsError)):
-            return lhsError.localizedDescription == rhsError.localizedDescription
-        default:
-            return false
-        }
-    }
 }

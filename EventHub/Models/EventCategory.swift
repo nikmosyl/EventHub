@@ -12,4 +12,5 @@ import Foundation
 struct EventCategory: Decodable, Sendable {
     let id: Int?
     let name: String?
+    let slug: String?
 }
