@@ -11,15 +11,8 @@ struct FavoritesView: View {
     @StateObject private var viewModel = FavoritesViewModel()
     
     var body: some View {
-        NavigationView {
+        ZStack {
             VStack(spacing: 0) {
-                if viewModel.isSearching {
-                    FavoritesSearchBar(
-                        searchText: $viewModel.searchText,
-                        onSearchTextChange: viewModel.searchFavorites
-                    )
-                }
-                
                 if viewModel.favoriteEvents.isEmpty {
                     FavoritesEmptyView()
                 }
@@ -45,24 +38,24 @@ struct FavoritesView: View {
 }
 
 // MARK: - Private Views
-private extension FavoritesView {
-    @ViewBuilder
-    var favoritesContent: some View {
-        switch viewModel.favoritesState {
-        case .empty:
-            FavoritesLoadingView()
-            
-        case .loading:
-            FavoritesLoadingView()
-            
-        case .loaded(let events):
-            FavoritesList(events: events, refresh: { print("refresh test")})
-            
-        case .error(let message):
-            FavoritesErrorView(message: message)
-        }
-    }
-}
+//private extension FavoritesView {
+//    @ViewBuilder
+//    var favoritesContent: some View {
+//        switch viewModel.favoritesState {
+//        case .empty:
+//            FavoritesLoadingView()
+//
+//        case .loading:
+//            FavoritesLoadingView()
+//
+//        case .loaded(let events):
+//            FavoritesList(events: events, refresh: { print("refresh test")})
+//
+//        case .error(let message):
+//            FavoritesErrorView(message: message)
+//        }
+//    }
+//}
 
 #Preview {
     FavoritesView()

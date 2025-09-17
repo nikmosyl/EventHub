@@ -199,6 +199,7 @@ final class DataManager {
     }
     
     func getEventsByIds(ids: [Int]) async throws -> [Event] {
+        if ids.isEmpty { return [] }
         let str = ids.map{ String($0) }.joined(separator: ",")
         return try await fetchEventByIds(str)
     }

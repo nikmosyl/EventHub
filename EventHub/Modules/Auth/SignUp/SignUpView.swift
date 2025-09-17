@@ -20,89 +20,87 @@ struct SignUpView: View {
     @Binding var isPresented: Bool
     
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color("background")
-                    .ignoresSafeArea()
+        ZStack {
+            Color("background")
+                .ignoresSafeArea()
+            
+            VStack(alignment: .center, spacing: 50) {
+                /// Custom Text Fields
+                CustomTF(sfIcon: "person", hint: "Full name", value: $fullName)
                 
-                VStack(alignment: .center, spacing: 50) {
-                    /// Custom Text Fields
-                    CustomTF(sfIcon: "person", hint: "Full name", value: $fullName)
-                    
-                    CustomTF(sfIcon: "envelope", hint: "abc@email.com", value: $emailID)
-                    
-                    CustomTF(sfIcon: "lock", hint: "Your password", isPassword: true, value: $password)
-                        .textContentType(.none)
-                        .autocorrectionDisabled(true)
-                        .textInputAutocapitalization(.never)
-                    
-                    CustomTF(sfIcon: "lock", hint: "Confirm password", isPassword: true, value: $confirmPassword)
-                        .textContentType(.none)
-                        .autocorrectionDisabled(true)
-                        .textInputAutocapitalization(.never)
-                    
-                    VStack(alignment: .center, spacing: 40) {
-                        SignInButton(
-                            backgroundColor: .buttonPrimary,
-                            circleColor: .buttonSecondary,
-                            title: isSigningByEmail ? "PLEASE WAIT…" : "SIGN UP") {
-                                //handle sign up action
-                                handleEmailSignUp()
-                            }
-                            .disabled(isSigningByEmail)
-                            .frame(width: 300)
-                            .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
-                            .background(.buttonPrimary, in: RoundedRectangle(cornerRadius: 16))
-                            .foregroundStyle(.white)
-                        
-                        Text("OR")
-                            .foregroundStyle(.secondary)
-                        
-                        GoogleButton(
-                            title: isSigningByGoogle ? "Signing in…" : "Login with Google",
-                            image: "googleIcon",
-                            action: {
-                                //Login with Google Auth Service
-                                handleGoogleSignIn()
-                            }
-                        )
-                        .disabled(isSigningByGoogle)
+                CustomTF(sfIcon: "envelope", hint: "abc@email.com", value: $emailID)
+                
+                CustomTF(sfIcon: "lock", hint: "Your password", isPassword: true, value: $password)
+                    .textContentType(.none)
+                    .autocorrectionDisabled(true)
+                    .textInputAutocapitalization(.never)
+                
+                CustomTF(sfIcon: "lock", hint: "Confirm password", isPassword: true, value: $confirmPassword)
+                    .textContentType(.none)
+                    .autocorrectionDisabled(true)
+                    .textInputAutocapitalization(.never)
+                
+                VStack(alignment: .center, spacing: 40) {
+                    SignInButton(
+                        backgroundColor: .buttonPrimary,
+                        circleColor: .buttonSecondary,
+                        title: isSigningByEmail ? "PLEASE WAIT…" : "SIGN UP") {
+                            //handle sign up action
+                            handleEmailSignUp()
+                        }
+                        .disabled(isSigningByEmail)
                         .frame(width: 300)
                         .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
-                        .background(Color.background, in: RoundedRectangle(cornerRadius: 16))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                        )
-                        .foregroundStyle(.black)
-                    }
+                        .background(.buttonPrimary, in: RoundedRectangle(cornerRadius: 16))
+                        .foregroundStyle(.white)
                     
-                    HStack {
-                        Text("Already have an account?")
-                        
-                        Button(action: {
-                            //handle sign in action
-                            isPresented = false
-                        }) {
-                            Text("Sign in")
-                                .foregroundColor(Color.buttonPrimary)
+                    Text("OR")
+                        .foregroundStyle(.secondary)
+                    
+                    GoogleButton(
+                        title: isSigningByGoogle ? "Signing in…" : "Login with Google",
+                        image: "googleIcon",
+                        action: {
+                            //Login with Google Auth Service
+                            handleGoogleSignIn()
                         }
+                    )
+                    .disabled(isSigningByGoogle)
+                    .frame(width: 300)
+                    .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
+                    .background(Color.background, in: RoundedRectangle(cornerRadius: 16))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                    )
+                    .foregroundStyle(.black)
+                }
+                
+                HStack {
+                    Text("Already have an account?")
+                    
+                    Button(action: {
+                        //handle sign in action
+                        isPresented = false
+                    }) {
+                        Text("Sign in")
+                            .foregroundColor(Color.buttonPrimary)
                     }
                 }
-                .padding(.horizontal, 25)
-                
             }
-            .navigationTitle("Sign up")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden()
-            .alert("Oops", isPresented: Binding(
-                get: { alertMessage != nil },
-                set: { _ in alertMessage = nil }
-            )) {
-                Button("OK", role: .cancel) { alertMessage = nil }
-            } message: {
-                Text(alertMessage ?? "")
-            }
+            .padding(.horizontal, 25)
+            
+        }
+        .navigationTitle("Sign up")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
+        .alert("Oops", isPresented: Binding(
+            get: { alertMessage != nil },
+            set: { _ in alertMessage = nil }
+        )) {
+            Button("OK", role: .cancel) { alertMessage = nil }
+        } message: {
+            Text(alertMessage ?? "")
         }
     }
     
@@ -143,7 +141,7 @@ struct SignUpView: View {
     }
     
     private func handleGoogleSignIn() {
-        #warning("TO DO: поднять какой-то флаг, чтобы отслеживать пока процесс идёт и крутить ромашку")
+#warning("TO DO: поднять какой-то флаг, чтобы отслеживать пока процесс идёт и крутить ромашку")
         Task {
             do {
                 try await DataManager.shared.loginUserWithGoogle(
@@ -153,7 +151,7 @@ struct SignUpView: View {
                 print("Ошибка в SignIn.handleGoogleSignInButton: ", error)
             }
         }
-        #warning("TO DO: снять флаг")
+#warning("TO DO: снять флаг")
     }
     
     // MARK: - Utils

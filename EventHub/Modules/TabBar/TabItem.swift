@@ -88,6 +88,7 @@ struct TestView: View {
                 }
             }
         }
+        .navigationTitle("TEST")
     }
 }
 
@@ -103,7 +104,7 @@ final class TestViewModel: ObservableObject {
         Task {
             do {
                 let ids = DataManager.shared.getFavoritesIds()
-                let events = try await DataManager.shared.getEventsByIds(ids: ids)
+                let events = try await DataManager.shared.getUpcamingEvents()
                 self.events = events
             } catch {
                 print("ProfileViewModel Ошибка при загрузке событий, ошибка: \(error)")
