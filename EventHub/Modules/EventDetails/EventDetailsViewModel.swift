@@ -13,29 +13,44 @@ final class EventDetailsViewModel: ObservableObject {
     @Published var eventDetails: EventDetailsModel?
     @Published var isBookmarked: Bool = false
     @Published var isLoading: Bool = false
-
+    
     private let dataManager = DataManager.shared
     private let eventId: Int
-    private(set) var event: Event?
-
+    private(set) var event: Event
+    
     var shareURL: URL? {
-        event?.siteUrl.flatMap(URL.init)
+        event.siteUrl.flatMap(URL.init)
     }
     
     init(event: Event) {
         self.eventId = event.id ?? 0
         self.event = event
         self.eventDetails = EventDetailsModel(from: event)
-        self.isBookmarked = false // TODO: Implement bookmark logic
+        Task {
+            self.isBookmarked = await DataManager.shared.isEventBookmarked(eventId: eventId)
+        }
     }
-
+    
     func onBookmarkTapped() {
-        // TODO: Implement bookmark functionality with DataManager
-        isBookmarked.toggle()
+        Task {
+            do {
+                if let id = event.id {
+                    if isBookmarked {
+                        try await dataManager.removeFromBookmarks(eventId: id)
+                    } else {
+                        try await dataManager.addToBookmarks(eventId: id)
+                    }
+                    
+                    isBookmarked.toggle()
+                }
+            } catch {
+                print("Ошибка при изменении избранного: \(error)")
+            }
+        }
     }
     
     func onReadMoreTapped() {
-        guard let siteUrl = event?.siteUrl, 
+        guard let siteUrl = event.siteUrl,
               let url = URL(string: siteUrl) else { return }
         UIApplication.shared.open(url)
     }

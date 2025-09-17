@@ -23,7 +23,7 @@ struct HeaderSection: View {
                         .aspectRatio(contentMode: .fill)
                 } placeholder: {
                     LinearGradient(
-                        colors: [Color.red.opacity(0.8), Color.orange.opacity(0.6)],
+                        colors: [Color.buttonPrimary, Color.buttonCalored],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -52,7 +52,7 @@ struct HeaderSection: View {
                         }
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 20)
+                    .padding(.top, 56)
                     
                     Spacer()
                     

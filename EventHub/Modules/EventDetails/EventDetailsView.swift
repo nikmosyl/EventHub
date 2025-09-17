@@ -45,6 +45,7 @@ struct EventDetailsView: View {
                 )
             }
             .ignoresSafeArea(edges: .top)
+            .navigationBarBackButtonHidden()
         } else {
             Text("No event details available")
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

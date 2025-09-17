@@ -85,6 +85,7 @@ final class DataManager {
             categories: filters.categories,
             search: filters.search,
             page: filters.page,
+            pageSize: filters.pageSize,
             price: filters.price,
             fields: filters.fields ?? [
                 "id",
@@ -328,47 +329,47 @@ extension DataManager {
         case add, remove
     }
     
-    private var favoritesKey: String { "favoriteEvents" }
-    
-    // Добавление в избранное
-    func addToFavorites(eventId: Int) async throws {
-        try await updateFavorites(eventId: eventId, action: .add)
-    }
-    
-    // Удаление из избранного
-    func removeFromFavorites(eventId: Int) async throws {
-        try await updateFavorites(eventId: eventId, action: .remove)
-    }
-    
-    // Проверка статуса избранного
-    func isEventFavorite(eventId: Int) async -> Bool {
-        let favorites = getStoredFavorites()
-        return favorites.contains(eventId)
-    }
+    private var bookmarksKey: String { "favoriteEvents" }
     
     // обновляем избранное
-    private func updateFavorites(eventId: Int, action: FavoritesAction) async throws {
-        var favorites = getStoredFavorites()
+    private func updateBookmarks(eventId: Int, action: FavoritesAction) async throws {
+        var bookmarks = getBookmarks()
         
         switch action {
         case .add:
-            if !favorites.contains(eventId) {
-                favorites.append(eventId)
+            if !bookmarks.contains(eventId) {
+                bookmarks.append(eventId)
             }
         case .remove:
-            favorites.removeAll { $0 == eventId }
+            bookmarks.removeAll { $0 == eventId }
         }
         
-        saveFavorites(favorites)
+        saveBookmraks(bookmarks)
     }
     
     // получить сохраненные избранные
-    private func getStoredFavorites() -> [Int] {
-        UserDefaults.standard.array(forKey: favoritesKey) as? [Int] ?? []
+    private func getBookmarks() -> [Int] {
+        UserDefaults.standard.array(forKey: bookmarksKey) as? [Int] ?? []
     }
     
     // сохранить в избранное
-    private func saveFavorites(_ favorites: [Int]) {
-        UserDefaults.standard.set(favorites, forKey: favoritesKey)
+    private func saveBookmraks(_ bookmarks: [Int]) {
+        UserDefaults.standard.set(bookmarks, forKey: bookmarksKey)
+    }
+    
+    // Добавление в избранное
+    func addToBookmarks(eventId: Int) async throws {
+        try await updateBookmarks(eventId: eventId, action: .add)
+    }
+    
+    // Удаление из избранного
+    func removeFromBookmarks(eventId: Int) async throws {
+        try await updateBookmarks(eventId: eventId, action: .remove)
+    }
+    
+    // Проверка статуса избранного
+    func isEventBookmarked(eventId: Int) async -> Bool {
+        let bookmarks = getBookmarks()
+        return bookmarks.contains(eventId)
     }
 }
