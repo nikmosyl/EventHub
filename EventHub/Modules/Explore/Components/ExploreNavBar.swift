@@ -11,6 +11,13 @@ struct ExploreNavBar: View {
     
     let categories: [CategoryModel]
     @Binding var isSectionActive: Set<Int>
+    @State private var showCurrentLocation: Bool = false
+    let currentLocationName: String
+    let currentLocationSlug: String
+    let availableLocations: [Location]
+    let isLoadingLocations: Bool
+    let onLocationSelect: (String) -> Void
+    
     var body: some View {
         VStack(spacing: 0){
             ZStack(alignment: .top) {
@@ -23,9 +30,26 @@ struct ExploreNavBar: View {
                     .ignoresSafeArea(.all)
                 
                 VStack(spacing: 20) {
-                    CityLocationView()
-                        .padding(.horizontal, 20)
-                        .padding(.top, 20)
+                    CityLocationView(
+                        showCurrentLocation: $showCurrentLocation
+                    )
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .contextMenu {
+                        if availableLocations.isEmpty {
+                            Text("Загрузка городов...")
+                        } else {
+                            ForEach(availableLocations, id: \.slug) { location in
+                                if let slug = location.slug, let name = location.name {
+                                    Button {
+                                        onLocationSelect(slug)
+                                    } label: {
+                                        Text(name)
+                                    }
+                                }
+                            }
+                        }
+                    }
                     
                     Button {
                         // Go to Search Screen
@@ -38,9 +62,18 @@ struct ExploreNavBar: View {
             
             VStack(spacing: 20) {
                 VariableSectionView(categories: categories, isSectionActive: $isSectionActive)
-                    
             }
-            .offset(y: -80) // Черновой вариант пока что
+            .offset(y: -80)
+        }
+        .sheet(isPresented: $showCurrentLocation) {
+            LocationSelectionView(
+                locations: availableLocations,
+                onSelect: { locationSlug in
+                    onLocationSelect(locationSlug)
+                    showCurrentLocation = false
+                },
+                currentLocationSlug: currentLocationSlug
+            )
         }
     }
 }

@@ -10,7 +10,6 @@ import SwiftUI
 struct ExploreView: View {
     
     @StateObject var viewModel = ExploreViewModel()
-    @State private var isSectionActive: Int?
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -25,8 +24,11 @@ struct ExploreView: View {
                         ProgressView()
                             .frame(height: 200)
                     case .loaded(_):
-                        EventsCollectionView(title: "Upcommning Events", events: viewModel.getUpcommingViewModel())
-                        EventsCollectionView(title: "Nearby Events", events: viewModel.getNearbyViewModel())
+                        EventsCollectionView(title: "Upcomming Events", events: viewModel.getUpcommingViewModel())
+                        EventsCollectionView(
+                            title: "Nearby Events in \(viewModel.getCurrentLocationName())",
+                            events: viewModel.getNearbyViewModel()
+                        )
                     case .error(let error):
                         ErrorView(error: error) {
                             Task {
@@ -34,8 +36,6 @@ struct ExploreView: View {
                             }
                         }
                     }
-                    
-                    #warning("Не работает логика, которая сортирует по фильтрам и выводит только те события, которые удовлетворяют всем фильтрам")
                     
                     if !viewModel.selectedCategoryIds.isEmpty {
                         Button {
@@ -55,12 +55,23 @@ struct ExploreView: View {
                     }
                 }
             }
-            ExploreNavBar(categories: viewModel.getCategoryViewModel(), isSectionActive: $viewModel.selectedCategoryIds)
+            
+            ExploreNavBar(
+                categories: viewModel.getCategoryViewModel(),
+                isSectionActive: $viewModel.selectedCategoryIds,
+                currentLocationName: viewModel.getCurrentLocationName(),
+                currentLocationSlug: viewModel.selectedLocation,
+                availableLocations: viewModel.availableLocations,
+                isLoadingLocations: viewModel.isLoadingLocations && viewModel.availableLocations.isEmpty
+            ) { locationSlug in
+                Task {
+                    await viewModel.updateLocation(locationSlug)
+                }
+            }
         }
         .task {
             await viewModel.loadInitialData()
         }
-        
         .onReceive(viewModel.$selectedCategoryIds) { _ in
             Task {
                 await viewModel.loadEventsWithSelectedCategories()

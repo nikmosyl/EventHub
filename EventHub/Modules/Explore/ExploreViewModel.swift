@@ -16,7 +16,9 @@ final class ExploreViewModel: ObservableObject {
     @Published var nearbyEvents: [Event] = []
     @Published var selectedCategoryIds: Set<Int> = []
     @Published var searchQuery: String = ""
-    @Published var selectedLocation: String = "msk" // Добавим переменную для локации
+    @Published var availableLocations: [Location] = []
+    @Published var selectedLocation: String = "msk"
+    @Published var isLoadingLocations: Bool = false
     
     private let dataManager = DataManager.shared
     
@@ -24,13 +26,12 @@ final class ExploreViewModel: ObservableObject {
         state = .loading
         
         do {
-            // Загружаем категории
-            categories = try await dataManager.getCategories()
+            async let categoriesTask = dataManager.getCategories()
+            async let locationsTask: () = loadLocations()
             
-            // Создаем модели категорий с цветами и иконками
+            categories = try await categoriesTask
             categoryModels = categories.map { CategoryModel(category: $0) }
-            
-            // Загружаем события без фильтрации
+
             upcommingEvents = try await dataManager.getUpcamingEvents()
             nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
             
@@ -42,6 +43,31 @@ final class ExploreViewModel: ObservableObject {
         }
     }
     
+    func loadLocations() async {
+        isLoadingLocations = true
+        print("Начинаем загрузку локаций...")
+        
+        do {
+            availableLocations = try await dataManager.getLocations()
+            print("Успешно загружено локаций: \(availableLocations.count)")
+            
+            for (index, location) in availableLocations.enumerated() {
+                print("Локация \(index): \(location.name ?? "No name"), slug: \(location.slug ?? "No slug")")
+            }
+            
+        } catch {
+            print("Ошибка загрузки локаций: \(error)")
+            availableLocations = [
+                Location(slug: "msk", name: "Москва", coords: nil),
+                Location(slug: "spb", name: "Санкт-Петербург", coords: nil),
+                Location(slug: "nsk", name: "Новосибирск", coords: nil)
+            ]
+            print("Используем fallback локации: \(availableLocations.map { $0.name ?? "" })")
+        }
+        
+        isLoadingLocations = false
+    }
+    
     func loadEventsWithSelectedCategories() async {
         state = .loading
         
@@ -49,11 +75,9 @@ final class ExploreViewModel: ObservableObject {
             let categoryNames: [String]
             
             if selectedCategoryIds.isEmpty {
-                // Если нет выбранных категорий, загружаем все события
                 upcommingEvents = try await dataManager.getUpcamingEvents()
                 nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
             } else {
-                // Фильтруем по выбранным категориям
                 categoryNames = categories
                     .filter { category in
                         if let categoryId = category.id {
@@ -77,8 +101,7 @@ final class ExploreViewModel: ObservableObject {
             print("Error loading filtered events: \(error)")
         }
     }
-    
-    // Функция для поиска событий
+
     func searchEvents() async {
         state = .loading
         
@@ -96,20 +119,24 @@ final class ExploreViewModel: ObservableObject {
             print("Error searching events: \(error)")
         }
     }
-    
-    // Функция для обновления локации
+
     func updateLocation(_ location: String) async {
         selectedLocation = location
         await loadEventsWithSelectedCategories()
     }
     
-    // Функция для сброса фильтров
+    func getCurrentLocationName() -> String {
+        if let currentLocation = availableLocations.first(where: {$0.slug == selectedLocation}) {
+            return currentLocation.name ?? selectedLocation
+        }
+        return selectedLocation
+    }
+    
     func clearFilters() {
         selectedCategoryIds.removeAll()
         searchQuery = ""
     }
     
-    // Функция для проверки, активны ли какие-либо фильтры
     var hasActiveFilters: Bool {
         !selectedCategoryIds.isEmpty || !searchQuery.isEmpty
     }
@@ -121,11 +148,11 @@ final class ExploreViewModel: ObservableObject {
     }
     
     func getUpcommingViewModel() -> [Event] {
-        return Array(upcommingEvents.prefix(6)) // Показываем первые 6 событий
+        return Array(upcommingEvents.prefix(6))
     }
     
     func getNearbyViewModel() -> [Event] {
-        return Array(nearbyEvents.prefix(6)) // Показываем первые 6 событий
+        return Array(nearbyEvents.prefix(6))
     }
     
     func getAllUpcomingEvents() -> [Event] {
@@ -135,8 +162,7 @@ final class ExploreViewModel: ObservableObject {
     func getAllNearbyEvents() -> [Event] {
         return nearbyEvents
     }
-    
-    // Проверяем, есть ли еще события для показа
+
     func hasMoreUpcomingEvents() -> Bool {
         upcommingEvents.count > 6
     }
@@ -145,7 +171,6 @@ final class ExploreViewModel: ObservableObject {
         nearbyEvents.count > 6
     }
     
-    // Получаем выбранные категории для отображения
     func getSelectedCategoryNames() -> [String] {
         categories
             .filter { category in
@@ -158,7 +183,6 @@ final class ExploreViewModel: ObservableObject {
     }
 }
 
-// Состояния загрузки
 enum ViewState<T> {
     case idle
     case loading
@@ -166,7 +190,6 @@ enum ViewState<T> {
     case error(Error)
 }
 
-// Расширение для удобного отображения ошибок
 extension ViewState: Equatable where T: Equatable {
     static func == (lhs: ViewState<T>, rhs: ViewState<T>) -> Bool {
         switch (lhs, rhs) {

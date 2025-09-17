@@ -8,12 +8,20 @@
 import SwiftUI
 
 struct CityLocationView: View {
+    
+    @Binding var showCurrentLocation: Bool
+    
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 10) {
                 HStack(spacing: 5){
-                    Text("City location")
-                        .font(.system(size: 12))
+                    
+                    Button {
+                        showCurrentLocation = true
+                    } label: {
+                        Text("City location")
+                            .font(.system(size: 12))
+                    }
                     Image(systemName: "arrowtriangle.down.fill")
                         .resizable()
                         .frame(width: 10, height: 5)
@@ -39,8 +47,3 @@ struct CityLocationView: View {
     }
 }
 
-#if DEBUG
-#Preview{
-    CityLocationView()
-}
-#endif
