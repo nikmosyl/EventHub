@@ -9,17 +9,34 @@ import SwiftUI
 
 struct TabBarView: View {
     @StateObject private var viewModel = TabBarViewModel()
-    
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .bottom) {
-                viewModel.selectedTab.view
-                    .safeAreaInset(edge: .bottom) {
-                        Color.clear.frame(height: 100)
-                    }
-                
-                CustomTabBarView(viewModel: viewModel)
+        ZStack(alignment: .bottom) {
+            TabView(selection: $viewModel.selectedTab) {
+                ExploreView()
+                    .tabSafeAreaPadding()
+                    .tag(TabItem.explore)
+                EventsView()
+                    .tabSafeAreaPadding()
+                    .tag(TabItem.events)
+                FavoritesView()
+                    .tag(TabItem.bookmark)
+                TestView()
+                    .tabSafeAreaPadding()
+                    .tag(TabItem.map)
+                ProfileView()
+                    .tabSafeAreaPadding()
+                    .tag(TabItem.profile)
             }
+            
+            CustomTabBarView(viewModel: viewModel)
+        }
+    }
+}
+
+extension View {
+    func tabSafeAreaPadding(_ padding: CGFloat = 50) -> some View {
+        self.safeAreaInset(edge: .bottom) {
+            Color.clear.frame(height: padding)
         }
     }
 }
