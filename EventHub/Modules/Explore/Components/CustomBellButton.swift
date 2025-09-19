@@ -11,7 +11,7 @@ struct CustomBellButton: View {
     var body: some View {
         ZStack {
             Image(systemName: "bell")
-                .foregroundStyle(Color.background)
+                .foregroundStyle(Color.textLightPrimary)
                 .frame(width: 15, height: 15)
                 .background{
                     Circle()

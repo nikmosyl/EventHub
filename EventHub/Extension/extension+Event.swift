@@ -13,66 +13,31 @@ extension Event {
     }
     
     var participantCount: Int {
-        participants?.count ?? 0
+        let favorites = favoritesCount ?? 0
+        let participantsCount = participants?.count ?? 0
+        return favorites + participantsCount
     }
     
     var locationName: String {
-        place?.title ?? place?.address ?? location?.name ?? "Место не указано"
+        place?.title ?? place?.address ?? location?.name ?? "No Location"
     }
     
-    var isFree: Bool {
-        guard let price = price else { return true }
-        return price.lowercased() == "free" || price == "0" || price.isEmpty
-    }
-    
-    var formattedPrice: String {
-        if isFree {
-            return "Бесплатно"
-        } else if let price = price, !price.isEmpty {
-            return price
-        }
-        return "Платно"
-    }
-    
-    var formattedDate: String {
+    var formattedEventDate: String {
+        let dateFormat = "dd\nMMM"
+        
         if let nextDate = nextDate,
            let startTime = nextDate.start {
-            return formatDate(from: startTime)
+            return nextDate.formatter(date: startTime, format: dateFormat)
         }
         else if let previousDate = previousDate,
                 let startTime = previousDate.start {
-            return formatDate(from: startTime)
+            return previousDate.formatter(date: startTime, format: dateFormat)
         }
         else if let firstDate = dates?.first,
                 let startTime = firstDate.start {
-            return formatDate(from: startTime)
+            return firstDate.formatter(date: startTime, format: dateFormat)
         }
         
         return "Дата не указана"
-    }
-    
-    // Вспомогательная функция для форматирования даты
-    private func formatDate(from timestamp: Int) -> String {
-        let date = Date(timeIntervalSince1970: TimeInterval(timestamp))
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US")
-        formatter.dateFormat = "dd\nMMM"
-        return formatter.string(from: date).capitalized
-    }
-    
-    
-    // Форматирование количества участников
-    var formattedParticipantCount: String {
-        let count = participantCount
-        switch count {
-        case 0:
-            return "Нет участников"
-        case 1:
-            return "1 участник"
-        case 2...4:
-            return "\(count) участника"
-        default:
-            return "\(count) участников"
-        }
     }
 }

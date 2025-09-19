@@ -8,14 +8,23 @@
 import Foundation
 import SwiftUI
 
-struct CategoryColorCarousel{
+struct CategoryColorCarousel {
     static let colors: [Color] = [
-        .blue, .green, .red, .orange, .purple, .pink, 
-        .yellow, .teal, .indigo, .mint, .cyan, .brown
+        .pillColor1, .pillColor2, .pillColor3, .pillColor4
     ]
     
+    private static var colorIndex: [String: Int] = [:]
+    private static var currentIndex = 0
+    
     static func color(for categoryName: String) -> Color {
-        let index = abs(categoryName.hashValue) % colors.count
+        if let index = colorIndex[categoryName] {
+            return colors[index]
+        }
+        let index = currentIndex
+        colorIndex[categoryName] = index
+        
+        currentIndex = (currentIndex + 1) % colors.count
+        
         return colors[index]
     }
 }
