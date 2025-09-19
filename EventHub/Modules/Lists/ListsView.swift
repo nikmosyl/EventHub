@@ -36,9 +36,6 @@ struct ListsView: View {
                  }
                  */
             }
-            .refreshable {
-                await viewModel.load()
-            }
         }
         .background(Color.background.ignoresSafeArea())
         .navigationTitle("Lists")
@@ -59,8 +56,10 @@ struct ListsView: View {
             SearchView(searchText: $searchText) { query in
                 Task {
                     await viewModel.search(query: query)
-                    
                 }
+            }
+            .onDisappear {
+                Task { await viewModel.clearSearch() }
             }
         }
     }
