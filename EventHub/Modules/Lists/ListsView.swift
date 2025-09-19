@@ -10,10 +10,11 @@ import SwiftUI
 struct ListsView: View {
     @StateObject private var viewModel = ListsViewModel()
     @State private var selectedWebURL: WebURL?
-    @State private var isWebViewPresented = false
+    @State private var isSearchPresented = false
+    @State private var searchText = ""
     
     @Environment(\.dismiss) var dismiss
-
+    
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 40) {
@@ -28,10 +29,15 @@ struct ListsView: View {
                     }
                     .frame(height: 106)
                 }
-                    
-                if viewModel.isLoading {
-                    ProfileView().padding(.top, 12)
-                }
+                /*
+                 if viewModel.isLoading {
+                 ProgressView("Загрузка подборок...")
+                 .padding(.top, 12)
+                 }
+                 */
+            }
+            .refreshable {
+                await viewModel.load()
             }
         }
         .background(Color.background.ignoresSafeArea())
@@ -39,7 +45,7 @@ struct ListsView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button(action: { /* поиск */ }) {
+                Button(action: { isSearchPresented = true }) {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.textDarkPrimary)
                 }
@@ -48,6 +54,14 @@ struct ListsView: View {
         .task { await viewModel.load() }
         .sheet(item: $selectedWebURL) { webURL in
             WebView(url: webURL.url)
+        }
+        .sheet(isPresented: $isSearchPresented) {
+            SearchView(searchText: $searchText) { query in
+                Task {
+                    await viewModel.search(query: query)
+                    
+                }
+            }
         }
     }
 }
