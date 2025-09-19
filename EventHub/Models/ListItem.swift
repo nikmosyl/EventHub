@@ -9,7 +9,7 @@
 import Foundation
 
 // MARK: - Подборки
-struct ListItem: Decodable, Sendable {
+struct ListItem: Decodable, Sendable, Identifiable {
     let id: Int?
     let publicationDate: Int?
     let title: String?
