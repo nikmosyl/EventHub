@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct ListCardView: View {
+struct ListCellView: View {
     let title: String
     let action: () -> Void
 
@@ -19,8 +19,9 @@ struct ListCardView: View {
                 .font(.system(size: 15))
                 .fontWeight(.medium)
                 .foregroundStyle(.textDarkPrimary)
+                .multilineTextAlignment(.leading)
                 .lineLimit(2)
-                .padding(.trailing, 24)
+                .padding(.trailing, 20)
             // кнопка Read
             ReadButtonView(action: action)
         }
@@ -35,7 +36,7 @@ struct ListCardView: View {
 }
 
 #Preview {
-    ListCardView(
+    ListCellView(
         title: "Jo Malone London’s Mother’s Day Presents",
         action: {}
     )

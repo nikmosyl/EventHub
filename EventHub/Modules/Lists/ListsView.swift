@@ -8,21 +8,29 @@
 import SwiftUI
 
 struct ListsView: View {
-    private let items: [ListItem] = [
-        .init(id: 1, publicationDate: nil, title: "Jo Malone London’s Mother’s Day\nPresents", slug: nil, siteUrl: nil),
-        .init(id: 2, publicationDate: nil, title: "The Best Brunch Spots in the City", slug: nil, siteUrl: nil),
-        .init(id: 3, publicationDate: nil, title: "Top 10 Exhibitions This Week", slug: nil, siteUrl: nil)
-    ]
+    @StateObject private var viewModel = ListsViewModel()
+    @State private var selectedWebURL: WebURL?
+    @State private var isWebViewPresented = false
     
     @Environment(\.dismiss) var dismiss
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 20) {
-                ForEach(items) { item in
-                    ListCardView(title: item.title ?? "Без названия") {
-                        
+            LazyVStack(spacing: 40) {
+                if let error = viewModel.errorText {
+                    Text(error).foregroundStyle(.buttonCalored)
+                }
+                ForEach(viewModel.items) { item in
+                    ListCellView(title: item.title ?? "Без названия") {
+                        if let url = item.siteUrl {
+                            selectedWebURL = WebURL(url)
+                        }
                     }
+                    .frame(height: 106)
+                }
+                    
+                if viewModel.isLoading {
+                    ProfileView().padding(.top, 12)
                 }
             }
         }
@@ -36,6 +44,10 @@ struct ListsView: View {
                         .foregroundStyle(.textDarkPrimary)
                 }
             }
+        }
+        .task { await viewModel.load() }
+        .sheet(item: $selectedWebURL) { webURL in
+            WebView(url: webURL.url)
         }
     }
 }
