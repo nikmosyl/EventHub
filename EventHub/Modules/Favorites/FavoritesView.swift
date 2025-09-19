@@ -21,7 +21,7 @@ struct FavoritesView: View {
                     Spacer()
                     
                     NavigationLink {
-                        Text("Тут должен быть search")
+                        SearchView()
                     } label: {
                         Image(systemName: "magnifyingglass")
                             .resizable()

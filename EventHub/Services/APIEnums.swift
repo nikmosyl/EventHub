@@ -24,22 +24,24 @@ enum APIRequest {
     case lists(page: Int? = nil)
     case locations
     case movies(page: Int? = nil)
+    case search
 
     // MARK: - Путь запроса
     var path: String {
-        switch self {
-        case .eventCategories: return "event-categories/"
-        case .events: return "events/"
-        case .lists: return "lists/"
-        case .locations: return "locations/"
-        case .movies: return "movies/"
+        return switch self {
+        case .eventCategories: "event-categories/"
+        case .events: "events/"
+        case .lists: "lists/"
+        case .locations: "locations/"
+        case .movies: "movies/"
+        case .search: "search/"
         }
     }
 
     // MARK: - Параметры запроса
     var query: [URLQueryItem] {
             switch self {
-            case .eventCategories, .locations:
+            case .eventCategories, .locations, .search:
                 return []
                 
             case .events(let filters, _):
