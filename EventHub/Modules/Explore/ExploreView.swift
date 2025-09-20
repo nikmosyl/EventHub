@@ -47,6 +47,10 @@ struct ExploreView: View {
                     }
                 }
             }
+            .refreshable {
+                await viewModel.refreshData()
+            }
+            .tint(Color.blue)
             
             ExploreNavBar(
                 categories: viewModel.getCategoryForExploreView(),

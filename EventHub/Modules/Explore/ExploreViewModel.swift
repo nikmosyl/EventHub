@@ -40,6 +40,7 @@ final class ExploreViewModel: ObservableObject {
     //MARK: - Public Methods
     
     func loadInitialData() async {
+        guard !isInitialLoadComplete else {return}
         state = .loading
         
         do {
@@ -52,7 +53,6 @@ final class ExploreViewModel: ObservableObject {
             upcommingEvents = try await dataManager.getUpcamingEvents()
             nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
             
-            // Применяем фильтрацию
             filterEventsByExcludedCategories()
             
             state = .loaded(filteredUpcommingEvents)
@@ -61,6 +61,27 @@ final class ExploreViewModel: ObservableObject {
         } catch {
             state = .error(error)
             print("Error loading data: \(error)")
+        }
+    }
+    
+    func refreshData() async {
+        state = .loading
+        do {
+            async let categoriesTask = dataManager.getCategories()
+            await loadLocations()
+            
+            categories = try await categoriesTask
+            categoryModels = categories.map { CategoryModel(category: $0) }
+
+            upcommingEvents = try await dataManager.getUpcamingEvents()
+            nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
+            
+            filterEventsByExcludedCategories()
+            
+            state = .loaded(filteredUpcommingEvents)
+        } catch {
+            state = .error(error)
+            print("Error Refresh Data: \(error)")
         }
     }
     
@@ -142,11 +163,9 @@ final class ExploreViewModel: ObservableObject {
     
     private func filterEventsByExcludedCategories() {
         if cachedExcludedCategorySlugs.isEmpty {
-            // Если не исключено ни одной категории, показываем все события
             filteredUpcommingEvents = upcommingEvents
             filteredNearbyEvents = nearbyEvents
         } else {
-            // Фильтруем события, исключая выбранные категории
             filteredUpcommingEvents = upcommingEvents.filter { event in
                 !eventContainsExcludedCategories(event)
             }
@@ -159,8 +178,7 @@ final class ExploreViewModel: ObservableObject {
     
     private func eventContainsExcludedCategories(_ event: Event) -> Bool {
         guard let eventCategorySlugs = event.categories, !eventCategorySlugs.isEmpty else { return false }
-        
-        // Проверяем, есть ли пересечение между категориями события и исключенными категориями
+
         return eventCategorySlugs.contains { cachedExcludedCategorySlugs.contains($0) }
     }
     

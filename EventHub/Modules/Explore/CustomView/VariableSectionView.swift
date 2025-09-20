@@ -41,11 +41,21 @@ struct VariableSectionView: View {
                             Capsule()
                                 .fill(excludedCategoryIds.contains(category.id) ? .white : category.color)
                         )
+                        .overlay(
+                            Capsule()
+                                .stroke(excludedCategoryIds.contains(category.id) ? category.color.opacity(0.3) : Color.clear, lineWidth: 1)
+                        )
+                        .shadow(
+                            color: excludedCategoryIds.contains(category.id) ? .black.opacity(0.1) : .clear,
+                            radius: 3,
+                            x: 0,
+                            y: 2
+                        )
                         .fixedSize()
                     }
                 }
             }
             .padding(.horizontal, 16)
         }
-     }
+    }
 }
