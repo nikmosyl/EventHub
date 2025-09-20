@@ -35,7 +35,7 @@ struct FavoritesView: View {
             
             switch viewModel.favoritesState {
             case .empty:
-                FavoritesLoadingView()
+                FavoritesEmptyView(refresh: viewModel.loadFavorites)
                 
             case .loading:
                 FavoritesLoadingView()
@@ -48,7 +48,7 @@ struct FavoritesView: View {
                 .tabSafeAreaPadding(40)
                 
             case .error(let message):
-                FavoritesErrorView(message: message)
+                FavoritesErrorView(message: message, refresh: viewModel.loadFavorites)
             }
         }
         .padding()

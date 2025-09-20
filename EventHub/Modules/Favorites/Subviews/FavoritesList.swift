@@ -20,7 +20,6 @@ struct FavoritesList: View {
             }
         }
         .refreshable {
-            print("Избранные обновляются")
             refresh()
         }
     }
