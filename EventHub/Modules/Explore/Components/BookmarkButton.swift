@@ -16,11 +16,10 @@ struct BookmarkButton: View {
         Button {
             action()
         } label: {
-            Image(systemName: isLiked ? "bookmark.fill" : "bookmark")
+            Image(isLiked ? "bookmark.fill" : "bookmark")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 10, height: 5)
-                .foregroundStyle(Color.buttonCalored)
+                .frame(width: 14, height: 14)
                 .background {
                     RoundedRectangle(cornerRadius: 5)
                         .fill(Color.textLightSecondary)

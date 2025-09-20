@@ -17,7 +17,7 @@ struct ExploreView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 30) {
                     Spacer()
-                        .frame(height: 140)
+                        .frame(height: 150)
                     
                     switch viewModel.state {
                     case .idle, .loading:

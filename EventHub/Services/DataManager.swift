@@ -190,6 +190,18 @@ final class DataManager {
         return try await fetchEvents(filters: filters)
     }
     
+    func getPastEvents(categories: [String]? = nil) async throws -> [Event] {
+        let actualUntil = Int(Date().timeIntervalSince1970)
+        let actualSince = actualUntil - (7 * 24 * 60 * 60)
+
+        let filters = EventFilters(
+            actualSince: actualSince,
+            actualUntil: actualUntil,
+            categories: categories
+        )
+        return try await fetchEvents(filters: filters)
+    }
+    
     func getNearByEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
         let filters = EventFilters(
             location: location,
