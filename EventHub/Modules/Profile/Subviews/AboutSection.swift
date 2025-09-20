@@ -30,7 +30,7 @@ struct AboutSection: View {
                 Spacer()
             }
 
-            ScrollView {
+            ScrollView(showsIndicators: false) {
                 Text(aboutText)
                     .font(.system(size: 16))
                     .foregroundColor(.secondary)

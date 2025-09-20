@@ -85,6 +85,7 @@ final class DataManager {
             categories: filters.categories,
             search: filters.search,
             page: filters.page,
+            pageSize: filters.pageSize,
             price: filters.price,
             fields: filters.fields ?? [
                 "id",
@@ -108,6 +109,33 @@ final class DataManager {
             ]
         )
         return try await fetchPaged(.events(filters: updatedFilters, id: id))
+    }
+    
+    private func fetchEventByIds(_ ids: String) async throws -> [Event] {
+        let filter = EventFilters(
+            fields: [
+                "id",
+                "title",
+                "description",
+                "dates",
+                "place",
+                "location",
+                "images",
+                "categories",
+                "favorites_count",
+                "short_title",
+                "price",
+                "site_url",
+                "participants"
+            ],
+            expand: [
+                "place",
+                "location",
+                "participants"
+            ],
+            ids: ids
+        )
+        return try await fetchPaged(.events(filters: filter))
     }
     
     // MARK: - Получение одного события по ID
@@ -170,12 +198,22 @@ final class DataManager {
         return try await fetchEvents(filters: filters)
     }
     
+    func getEventsByIds(ids: [Int]) async throws -> [Event] {
+        if ids.isEmpty { return [] }
+        let str = ids.map{ String($0) }.joined(separator: ",")
+        return try await fetchEventByIds(str)
+    }
+    
     func getCategories() async throws -> [EventCategory] {
         try await fetchEventCategories()
     }
     
     func getLocations() async throws -> [Location] {
         try await fetchLocations()
+    }
+
+    func getEvent(id: Int) async throws -> Event {
+        try await fetchEvent(id: id)
     }
     
     // MARK: - авторизация пользователя
@@ -326,25 +364,9 @@ extension DataManager {
     
     private var favoritesKey: String { "favoriteEvents" }
     
-    // Добавление в избранное
-    func addToFavorites(eventId: Int) async throws {
-        try await updateFavorites(eventId: eventId, action: .add)
-    }
-    
-    // Удаление из избранного
-    func removeFromFavorites(eventId: Int) async throws {
-        try await updateFavorites(eventId: eventId, action: .remove)
-    }
-    
-    // Проверка статуса избранного
-    func isEventFavorite(eventId: Int) async -> Bool {
-        let favorites = getStoredFavorites()
-        return favorites.contains(eventId)
-    }
-    
     // обновляем избранное
     private func updateFavorites(eventId: Int, action: FavoritesAction) async throws {
-        var favorites = getStoredFavorites()
+        var favorites = getFavoritesIds()
         
         switch action {
         case .add:
@@ -358,13 +380,29 @@ extension DataManager {
         saveFavorites(favorites)
     }
     
-    // получить сохраненные избранные
-    private func getStoredFavorites() -> [Int] {
+    // сохранить в избранное
+    private func saveFavorites(_ bookmarks: [Int]) {
+        UserDefaults.standard.set(bookmarks, forKey: favoritesKey)
+    }
+    
+    // получить  избранные
+    func getFavoritesIds() -> [Int] {
         UserDefaults.standard.array(forKey: favoritesKey) as? [Int] ?? []
     }
     
-    // сохранить в избранное
-    private func saveFavorites(_ favorites: [Int]) {
-        UserDefaults.standard.set(favorites, forKey: favoritesKey)
+    // Добавление в избранное
+    func addToFavorites(eventId: Int) async throws {
+        try await updateFavorites(eventId: eventId, action: .add)
+    }
+    
+    // Удаление из избранного
+    func removeFromFavorites(eventId: Int) async throws {
+        try await updateFavorites(eventId: eventId, action: .remove)
+    }
+    
+    // Проверка статуса избранного
+    func isEventfavorited(eventId: Int) async -> Bool {
+        let favorites = getFavoritesIds()
+        return favorites.contains(eventId)
     }
 }
