@@ -61,7 +61,8 @@ struct ExploreNavBar: View {
             }
             
             VStack(spacing: 20) {
-                VariableSectionView(categories: categories, excludedCategoryIds: $excludedCategoryIds)
+                VariableSectionView(categories: categories,
+                                    excludedCategoryIds: $excludedCategoryIds)
             }
             .offset(y: -80)
         }

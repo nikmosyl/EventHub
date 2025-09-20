@@ -18,13 +18,14 @@ final class ExploreViewModel: ObservableObject {
     @Published var nearbyEvents: [Event] = []
     @Published var excludedCategoryIds: Set<Int> = [] {
         didSet {
+            updateCachedExcludedCategorySlugs()
             if isInitialLoadComplete {
-                Task {
-                    await loadEventsWithExcludedCategories()
-                }
+                filterEventsByExcludedCategories()
             }
         }
     }
+    @Published var filteredUpcommingEvents: [Event] = []
+    @Published var filteredNearbyEvents: [Event] = []
     @Published var favoriteEventIds: Set<Int> = []
     @Published var searchQuery: String = ""
     @Published var availableLocations: [Location] = []
@@ -34,6 +35,7 @@ final class ExploreViewModel: ObservableObject {
     //MARK: - Private Properties
     private var isInitialLoadComplete: Bool = false
     private let dataManager = DataManager.shared
+    private var cachedExcludedCategorySlugs: Set<String> = []
     
     //MARK: - Public Methods
     
@@ -47,12 +49,13 @@ final class ExploreViewModel: ObservableObject {
             categories = try await categoriesTask
             categoryModels = categories.map { CategoryModel(category: $0) }
 
-            excludedCategoryIds = []
-            
             upcommingEvents = try await dataManager.getUpcamingEvents()
             nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
             
-            state = .loaded(upcommingEvents)
+            // Применяем фильтрацию
+            filterEventsByExcludedCategories()
+            
+            state = .loaded(filteredUpcommingEvents)
             isInitialLoadComplete = true
             
         } catch {
@@ -72,19 +75,19 @@ final class ExploreViewModel: ObservableObject {
     }
     
     func getUpcommingForExploreView() -> [Event] {
-        Array(upcommingEvents.prefix(6))
+        Array(filteredUpcommingEvents.prefix(6))
     }
     
     func getNearbyEventsForExploreView() -> [Event] {
-        Array(nearbyEvents.prefix(6))
+        Array(filteredNearbyEvents.prefix(6))
     }
     
     func getAllUpcomingEvents() -> [Event] {
-        upcommingEvents
+        filteredUpcommingEvents
     }
     
     func getAllNearbyEvents() -> [Event] {
-        nearbyEvents
+        filteredNearbyEvents
     }
     
     var hasActiveFilters: Bool {
@@ -92,16 +95,16 @@ final class ExploreViewModel: ObservableObject {
     }
     
     var hasMoreUpcomingEvents: Bool {
-        upcommingEvents.count > 6
+        filteredUpcommingEvents.count > 6
     }
     
     var hasMoreNearbyEvents: Bool {
-        nearbyEvents.count > 6
+        filteredNearbyEvents.count > 6
     }
     
     func updateLocation(_ location: String) async {
-           selectedLocation = location
-           await loadEventsWithExcludedCategories()
+        selectedLocation = location
+        await reloadEventsForCurrentLocation()
     }
     
     //MARK: - Private Methods
@@ -120,44 +123,56 @@ final class ExploreViewModel: ObservableObject {
         isLoadingLocations = false
     }
     
-    private func loadEventsWithExcludedCategories() async {
+    private func reloadEventsForCurrentLocation() async {
         state = .loading
         
         do {
-            let excludedCategorySlugs: [String]
+            upcommingEvents = try await dataManager.getUpcamingEvents()
+            nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
             
-            if excludedCategoryIds.isEmpty {
-                upcommingEvents = try await dataManager.getUpcamingEvents()
-                nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
-            } else {
-                excludedCategorySlugs = getExcludedCategorySlugs()
-                
-                let allCategories = categories.compactMap { $0.slug }
-                let includedCategories = allCategories.filter { !excludedCategorySlugs.contains($0) }
-                
-                upcommingEvents = try await dataManager.getUpcamingEvents(categories: includedCategories)
-                nearbyEvents = try await dataManager.getNearByEvents(
-                    location: selectedLocation,
-                    categories: includedCategories
-                )
-            }
-            
-            state = .loaded(upcommingEvents)
+            filterEventsByExcludedCategories()
+            state = .loaded(filteredUpcommingEvents)
             
         } catch {
             let formattedError = formatError(error)
             state = .error(formattedError)
-            print("Error loading filtered events: \(formattedError)")
+            print("Error loading events for location: \(formattedError)")
         }
     }
     
-    private func getExcludedCategorySlugs() -> [String] {
-        categories
-            .filter { category in
-                guard let categoryId = category.id else { return false }
-                return excludedCategoryIds.contains(categoryId)
+    private func filterEventsByExcludedCategories() {
+        if cachedExcludedCategorySlugs.isEmpty {
+            // Если не исключено ни одной категории, показываем все события
+            filteredUpcommingEvents = upcommingEvents
+            filteredNearbyEvents = nearbyEvents
+        } else {
+            // Фильтруем события, исключая выбранные категории
+            filteredUpcommingEvents = upcommingEvents.filter { event in
+                !eventContainsExcludedCategories(event)
             }
-            .compactMap { $0.slug }
+            
+            filteredNearbyEvents = nearbyEvents.filter { event in
+                !eventContainsExcludedCategories(event)
+            }
+        }
+    }
+    
+    private func eventContainsExcludedCategories(_ event: Event) -> Bool {
+        guard let eventCategorySlugs = event.categories, !eventCategorySlugs.isEmpty else { return false }
+        
+        // Проверяем, есть ли пересечение между категориями события и исключенными категориями
+        return eventCategorySlugs.contains { cachedExcludedCategorySlugs.contains($0) }
+    }
+    
+    private func updateCachedExcludedCategorySlugs() {
+        cachedExcludedCategorySlugs = Set(
+            categories
+                .filter { category in
+                    guard let categoryId = category.id else { return false }
+                    return excludedCategoryIds.contains(categoryId)
+                }
+                .compactMap { $0.slug }
+        )
     }
     
     private func formatError(_ error: Error) -> Error {
