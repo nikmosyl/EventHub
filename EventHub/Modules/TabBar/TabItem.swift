@@ -23,22 +23,6 @@ enum TabItem: CaseIterable {
         case .profile: "Profile"
         }
     }
-    
-    //    @ViewBuilder
-    //    var view: some View {
-    //        switch self {
-    //        case .explore:
-    //            ExploreView()
-    //        case .events:
-    //            EventsView()
-    //        case .bookmark:
-    //            FavoritesView()
-    //        case .map:
-    //            TestView()
-    //        case .profile:
-    //            ProfileView()
-    //        }
-    //    }
 }
 
 // MARK: - Примеры экранов
@@ -72,6 +56,14 @@ struct TestView: View {
     
     var body: some View {
         ScrollView {
+            NavigationLink("Lists") {
+                ListsView()
+            }
+            
+            NavigationLink("Notifications") {
+                NotificationsView()
+            }
+            
             VStack {
                 ForEach(viewModel.events, id: \.id) { event in
                     EventCellView(event: event)

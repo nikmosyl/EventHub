@@ -20,10 +20,16 @@ final class FavoritesViewModel: ObservableObject {
 
     func loadFavorites() {
         favoritesState = .loading
-
+        
         Task {
             do {
                 let favoriteIds: [Int] = DataManager.shared.getFavoritesIds()
+                
+                if favoriteIds.isEmpty {
+                    favoritesState = .empty
+                    return
+                }
+                
                 if previousIds == favoriteIds {
                     favoritesState = .loaded
                     return
