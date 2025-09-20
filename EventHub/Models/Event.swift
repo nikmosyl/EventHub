@@ -9,7 +9,7 @@
 import Foundation
 
 // MARK: - Детальная информация о событии
-struct Event: Decodable, Sendable {
+struct Event: Decodable, Sendable, Identifiable {
     let id: Int?
     let title: String?
     //let slug: String?

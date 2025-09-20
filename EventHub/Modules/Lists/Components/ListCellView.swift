@@ -37,7 +37,7 @@ struct ListCellView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color.background)
         )
-        .shadow(color: Color.secondary.opacity(0.5), radius: 16, x: 0, y: 10)
+        .shadow(color: Color.shadow, radius: 16, x: 0, y: 10)
     }
 }
 
