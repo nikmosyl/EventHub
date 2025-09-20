@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ErrorView: View {
     let error: Error
+    let orRetry: () -> Void
     
     var body: some View {
         VStack(spacing: 16) {

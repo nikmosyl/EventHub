@@ -9,8 +9,13 @@ import SwiftUI
 
 struct EventsCard: View {
     
-    @State private var isLiked: Bool = false
+    @StateObject private var viewModel: EventCardViewModel
     let events: Event
+    
+    init(events: Event) {
+        self.events = events
+        self._viewModel = StateObject(wrappedValue: EventCardViewModel(event: events))
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -21,7 +26,7 @@ struct EventsCard: View {
                         .frame(width: 218, height: 131)
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                         .padding(.horizontal, 10)
-                }else {
+                } else {
                     Image(systemName: "photo")
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -47,9 +52,9 @@ struct EventsCard: View {
                     Spacer()
                     
                     BookmarkButton(action: {
-                        //Сохранение мероприятия
-                        isLiked.toggle()
-                    }, isLiked: $isLiked)
+                        // Сохранение мероприятия
+                        viewModel.eventsToggle()
+                    }, isLiked: $viewModel.isLiked)
                     .padding(.trailing, 15)
                     .padding(.top, 2)
                 }

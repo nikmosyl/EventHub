@@ -41,7 +41,9 @@ struct ExploreView: View {
                             }
                         )
                     case .error(let error):
-                        ErrorView(error: error)
+                        ErrorView(error: error) {
+                            
+                        }
                     }
                 }
             }

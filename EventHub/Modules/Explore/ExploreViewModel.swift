@@ -25,6 +25,7 @@ final class ExploreViewModel: ObservableObject {
             }
         }
     }
+    @Published var favoriteEventIds: Set<Int> = []
     @Published var searchQuery: String = ""
     @Published var availableLocations: [Location] = []
     @Published var selectedLocation: String = "msk"
