@@ -77,10 +77,10 @@ struct TestView: View {
             VStack {
                 ForEach(viewModel.events, id: \.id) { event in
                     EventCellView(event: event)
+                        .padding(.horizontal, 8)
                 }
             }
         }
-        .navigationTitle("TEST")
     }
 }
 

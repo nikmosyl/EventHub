@@ -389,13 +389,11 @@ extension DataManager {
     
     // сохранить в избранное
     private func saveFavorites(_ favoritesIds: [Int]) async throws {
-        //UserDefaults.standard.set(bookmarks, forKey: favoritesKey)
         try await updateUserData(favoritesIds: favoritesIds)
     }
     
     // получить  избранные
     func getFavoritesIds() async throws -> [Int] {
-        //UserDefaults.standard.array(forKey: favoritesKey) as? [Int] ?? []
         let userModel = try await getUserData()
         return userModel.favoritesIds
     }

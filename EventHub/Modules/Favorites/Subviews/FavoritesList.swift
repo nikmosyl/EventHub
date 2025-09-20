@@ -16,6 +16,7 @@ struct FavoritesList: View {
             VStack(spacing: 16) {
                 ForEach(events, id: \.id) { event in
                     EventCellView(event: event)
+                        .padding(.horizontal, 16)
                 }
             }
         }
