@@ -28,4 +28,8 @@ final class ListsViewModel: ObservableObject {
             self.errorText = error.localizedDescription
         }
     }
+    
+    func processedTitle(for item: ListItem) -> String {
+        item.title ?? "Unknown title"
+    }
 }

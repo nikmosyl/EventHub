@@ -20,7 +20,7 @@ struct ListsView: View {
                     Text(error).foregroundStyle(.buttonCalored)
                 }
                 ForEach(viewModel.items) { item in
-                    ListCellView(title: item.title ?? "Без названия") {
+                    ListCellView(title: viewModel.processedTitle(for: item)) {
                         if let url = item.siteUrl {
                             selectedWebURL = WebURL(url)
                         }
@@ -28,7 +28,7 @@ struct ListsView: View {
                     .padding(.top, 16)
                 }
                 if viewModel.isLoading {
-                    ProgressView("Загрузка подборок...")
+                    ProgressView("Uploading lists...")
                         .padding(.top, 12)
                 }
             }
@@ -53,7 +53,7 @@ struct ListsView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink(destination: {
-                    Text("Экран поиска будет реализован позднее...")
+                    Text("The search screen will be implemented later...")
                 }, label: {
                     Image(systemName: "magnifyingglass")
                         .foregroundStyle(.textDarkPrimary)
