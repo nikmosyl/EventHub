@@ -95,7 +95,6 @@ final class TestViewModel: ObservableObject {
     func loadEvents() {
         Task {
             do {
-                let ids = DataManager.shared.getFavoritesIds()
                 let events = try await DataManager.shared.getUpcamingEvents()
                 self.events = events
             } catch {

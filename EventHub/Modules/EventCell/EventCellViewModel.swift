@@ -66,7 +66,11 @@ final class EventCellViewModel: ObservableObject {
     func loadBookmarkStatus() {
         Task {
             if let id = event.id {
-                isBookmarked = await dataManager.isEventfavorited(eventId: id)
+                do {
+                    isBookmarked = try await dataManager.isEventfavorited(eventId: id)
+                } catch {
+                    print("❌ не удалось загрузить favorite статус для id: \(id), ошибка:", error)
+                }
             }
         }
     }

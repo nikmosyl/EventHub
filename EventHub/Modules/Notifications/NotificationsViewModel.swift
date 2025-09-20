@@ -17,7 +17,7 @@ final class NotificationsViewModel: ObservableObject {
         defer { isLoading = false }
         
         do {
-            let ids = DataManager.shared.getFavoritesIds()
+            let ids = try await DataManager.shared.getFavoritesIds()
             let events = try await DataManager.shared.getEventsByIds(ids: ids)
             
             self.notifications = events

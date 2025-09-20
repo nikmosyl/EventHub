@@ -12,6 +12,7 @@ struct HeaderSection: View {
     let onBackTapped: () -> Void
     let onBookmarkTapped: () -> Void
     let isBookmarked: Bool
+    let isBookmarking: Bool
     let shareURL: URL?
     
     var body: some View {
@@ -44,12 +45,19 @@ struct HeaderSection: View {
                         }
                         Spacer()
                         Button(action: onBookmarkTapped) {
-                            Image(isBookmarked ? .bookmarkFill : .bookmark)
-                                .font(.system(size: 18, weight: .medium))
-                                .frame(width: 36, height: 36)
-                                .background(.ultraThinMaterial.opacity(0.3))
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                            if isBookmarking {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .frame(width: 36, height: 36)
+                            } else {
+                                Image(isBookmarked ? .bookmarkFill : .bookmark)
+                                    .font(.system(size: 18, weight: .medium))
+                                    .frame(width: 36, height: 36)
+                            }
                         }
+                        .disabled(isBookmarking)
+                        .background(.ultraThinMaterial.opacity(0.3))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 56)
@@ -87,6 +95,7 @@ struct HeaderSection: View {
         onBackTapped: { print("Back tapped") },
         onBookmarkTapped: { print("Bookmark tapped") },
         isBookmarked: false,
+        isBookmarking: false,
         shareURL: URL(string: "https://google.com")
     )
 }
