@@ -101,6 +101,11 @@ struct TestView: View {
                 Text("Log Out")
             }
             
+            NavigationLink {
+                ListsView()
+            } label: {
+                Text("Lists")
+            }
             
             ScrollView {
                 VStack {
