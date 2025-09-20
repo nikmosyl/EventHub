@@ -21,9 +21,15 @@ struct ListCellView: View {
                 .foregroundStyle(.textDarkPrimary)
                 .multilineTextAlignment(.leading)
                 .lineLimit(2)
-                .padding(.trailing, 20)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal)
+                .padding(.top, 16)
+            
+            Spacer()
             // кнопка Read
             ReadButtonView(action: action)
+                .padding(.horizontal, 8)
+                .padding(.bottom, 8)
         }
         .frame(width: 327,height: 106, alignment: .leading)
         .padding(8)

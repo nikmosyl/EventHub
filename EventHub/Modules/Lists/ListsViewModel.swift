@@ -28,21 +28,4 @@ final class ListsViewModel: ObservableObject {
             self.errorText = error.localizedDescription
         }
     }
-    
-    func search(query: String) async {
-        guard !query.isEmpty else {
-            self.items = allItems
-            return
-        }
-        
-        let filtered = items.filter { item in
-            item.title?.localizedCaseInsensitiveContains(query) == true
-        }
-        
-        self.items = filtered
-    }
-    
-    func clearSearch() async {
-        self.items = allItems
-    }
 }
