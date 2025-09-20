@@ -148,7 +148,7 @@ final class DataManager {
     }
     
     // MARK: - Получение подборок
-    private func fetchLists(page: Int? = nil) async throws -> [ListItem] {
+    func fetchLists(page: Int? = nil) async throws -> [ListItem] {
         try await fetchPaged(.lists(page: page))
     }
     

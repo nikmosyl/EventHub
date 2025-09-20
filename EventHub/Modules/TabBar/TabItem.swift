@@ -86,6 +86,10 @@ struct TestView: View {
                 ForEach(viewModel.events, id: \.id) { event in
                     EventCellView(event: event)
                 }
+                
+                NavigationLink("Lists") {
+                    ListsView()
+                }
             }
         }
         .navigationTitle("TEST")
