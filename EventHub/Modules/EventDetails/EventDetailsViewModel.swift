@@ -12,6 +12,7 @@ import SwiftUI
 final class EventDetailsViewModel: ObservableObject {
     @Published var eventDetails: EventDetailsModel?
     @Published var isBookmarked: Bool = false
+    @Published var isBookmarking: Bool = false
     @Published var isLoading: Bool = false
     
     private let dataManager = DataManager.shared
@@ -27,12 +28,20 @@ final class EventDetailsViewModel: ObservableObject {
         self.event = event
         self.eventDetails = EventDetailsModel(from: event)
         Task {
-            self.isBookmarked = await DataManager.shared.isEventfavorited(eventId: eventId)
+            do {
+                self.isBookmarked = try await DataManager.shared.isEventfavorited(eventId: eventId)
+            } catch {
+                print("❌ не удалось загрузить favorite статус в Details для id: \(eventId), ошибка:", error)
+            }
+            
         }
     }
     
     func onBookmarkTapped() {
         Task {
+            isBookmarking = true
+            defer { isBookmarking = false }
+            
             do {
                 if let id = event.id {
                     if isBookmarked {

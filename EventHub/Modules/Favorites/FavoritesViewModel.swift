@@ -23,7 +23,7 @@ final class FavoritesViewModel: ObservableObject {
         
         Task {
             do {
-                let favoriteIds: [Int] = DataManager.shared.getFavoritesIds()
+                let favoriteIds: [Int] = try await DataManager.shared.getFavoritesIds()
                 
                 if favoriteIds.isEmpty {
                     favoritesState = .empty

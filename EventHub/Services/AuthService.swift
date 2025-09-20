@@ -18,6 +18,7 @@ struct UserModel: Codable {
     var email: String
     var photoURL: String
     var bio: String
+    var favoritesIds: [Int]
 }
 
 @MainActor
@@ -91,6 +92,12 @@ final class AuthService {
     func updateUser(uid: String, bio: String) async throws {
         try await database.collection("users").document(uid).updateData([
             "bio": bio
+            ])
+    }
+    
+    func updateUser(uid: String, favoritesIds: [Int]) async throws {
+        try await database.collection("users").document(uid).updateData([
+            "favoritesIds": favoritesIds
             ])
     }
     
