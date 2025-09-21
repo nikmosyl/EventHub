@@ -30,9 +30,9 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
         }
     }
     
-    func loadPins(lat: Double, lon: Double, radious: Int) async {
+    func loadPins(lat: Double, lon: Double, radius: Int) async {
         do {
-            let events = try await DataManager.shared.getEventsByCoords(lat: lat, lon: lon, radious: radious)
+            let events = try await DataManager.shared.getEventsByCoords(lat: lat, lon: lon, radius: radius)
             
             events.forEach { event in
                 print(
@@ -43,7 +43,7 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
             }
             
         } catch {
-            print("ек удалось загрузить map events, ошибка:", error)
+            print("не удалось загрузить map events, ошибка:", error)
         }
     }
 }

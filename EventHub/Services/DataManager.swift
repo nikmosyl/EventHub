@@ -138,7 +138,7 @@ final class DataManager {
         return try await fetchPaged(.events(filters: filter))
     }
     
-    private func fetchEventByCoords(lat: Double, lon: Double, radious: Int) async throws -> [Event] {
+    private func fetchEventByCoords(lat: Double, lon: Double, radius: Int) async throws -> [Event] {
         let filter = EventFilters(
             fields: [
                 "id",
@@ -153,9 +153,9 @@ final class DataManager {
                 "place",
                 "location"
             ],
-            lat: lat,
             lon: lon,
-            radious: radious
+            lat: lat,
+            radius: radius
         )
         return try await fetchPaged(.events(filters: filter))
     }
@@ -431,7 +431,7 @@ extension DataManager {
 
 // MARK: - Map
 extension DataManager {
-    func getEventsByCoords(lat: Double, lon: Double, radious: Int) async throws -> [Event] {
-        try await fetchEventByCoords(lat: lat, lon: lon, radious: radious)
+    func getEventsByCoords(lat: Double, lon: Double, radius: Int) async throws -> [Event] {
+        try await fetchEventByCoords(lat: lat, lon: lon, radius: radius)
     }
 }

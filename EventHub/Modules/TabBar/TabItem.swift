@@ -51,12 +51,12 @@ struct TestView: View {
                 NotificationsView()
             }
             
-            VStack {
-                ForEach(viewModel.events, id: \.id) { event in
-                    EventCellView(event: event)
-                        .padding(.horizontal, 8)
-                }
-            }
+//            VStack {
+//                ForEach(viewModel.events, id: \.id) { event in
+//                    EventCellView(event: event)
+//                        .padding(.horizontal, 8)
+//                }
+//            }
         }
     }
 }
@@ -66,7 +66,7 @@ final class TestViewModel: ObservableObject {
     @Published var events: [Event] = []
     
     init() {
-        loadEvents()
+        //loadEvents()
     }
     
     func loadEvents() {
