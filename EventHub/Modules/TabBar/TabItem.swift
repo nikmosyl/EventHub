@@ -26,17 +26,6 @@ enum TabItem: CaseIterable {
 }
 
 // MARK: - Примеры экранов
-struct ExploreView: View {
-    var body: some View {
-        ZStack {
-            Color
-                .red
-                .ignoresSafeArea()
-            Text("ExploreView")
-        }
-    }
-}
-
 struct EventsView: View {
     var body: some View {
         ZStack {
@@ -47,18 +36,6 @@ struct EventsView: View {
         }
     }
 }
-
-struct MapView: View {
-    var body: some View {
-        ZStack {
-            Color
-                .cyan
-                .ignoresSafeArea()
-            Text("MapView")
-        }
-    }
-}
-
 
 //MARK: пример использования DataManager
 struct TestView: View {
