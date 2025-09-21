@@ -26,6 +26,14 @@ struct MapView: View {
                 showsUserLocation: true
             )
             .ignoresSafeArea()
+            .onChange(of: EquatableRegion(region: region)) { newWrapped in
+                let newRegion = newWrapped.region
+                viewModel.updateRegion(
+                    lat: newRegion.center.latitude,
+                    lon: newRegion.center.longitude,
+                    radius: Int(newRegion.radiusInMeters)
+                )
+            }
             
             MapToolbar(searchText: $viewModel.searchText) {
                 if let location = viewModel.lastLocation {
@@ -34,9 +42,6 @@ struct MapView: View {
                     }
                 }
             }
-        }
-        .task {
-            await viewModel.loadPins(lat: 55.7558, lon: 37.6173, radius: 10000)
         }
     }
 }

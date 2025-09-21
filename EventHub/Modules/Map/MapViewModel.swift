@@ -10,10 +10,12 @@ import MapKit
 
 final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var lastLocation: CLLocation?
-    
     @Published var searchText = ""
     
+    @Published var events: [Event] = []
+    
     private let manager = CLLocationManager()
+    private var debounceTask: Task<Void, Never>?
     
     override init() {
         super.init()
@@ -30,20 +32,28 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
         }
     }
     
+    func updateRegion(lat: Double, lon: Double, radius: Int) {
+        debounceTask?.cancel()
+        
+        debounceTask = Task {
+            try? await Task.sleep(nanoseconds: 3_000_000_000) // ждём 3 сек
+            guard !Task.isCancelled else { return }
+            
+            print("‼️ обновляем данные")
+            await loadPins(lat: lat, lon: lon, radius: radius)
+        }
+    }
+    
     func loadPins(lat: Double, lon: Double, radius: Int) async {
         do {
-            let events = try await DataManager.shared.getEventsByCoords(lat: lat, lon: lon, radius: radius)
-            
-            events.forEach { event in
-                print(
-                    "event id:", event.id ?? "???",
-                    "lat:", event.location?.coords?.lat ?? "???",
-                    "lon:", event.location?.coords?.lon ?? "???"
-                )
-            }
-            
+            events = try await DataManager.shared.getEventsByCoords(
+                lat: lat,
+                lon: lon,
+                radius: radius
+            )
+            print("Загружено \(events.count) событий")
         } catch {
-            print("не удалось загрузить map events, ошибка:", error)
+            print("Ошибка загрузки событий: \(error)")
         }
     }
 }
