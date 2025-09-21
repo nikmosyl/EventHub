@@ -28,7 +28,7 @@ struct CustomTabBarView: View {
                             Circle()
                                 .fill(
                                     viewModel.selectedTab == .bookmark
-                                    ? Color.buttonCalored
+                                    ? Color.buttonColored
                                     : Color.buttonPrimary
                                 )
                                 .frame(width: buttonSize, height: buttonSize)

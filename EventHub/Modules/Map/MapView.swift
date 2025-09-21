@@ -30,6 +30,11 @@ struct MapView: View {
                     coordinate: CLLocationCoordinate2D(latitude: pin.lat, longitude: pin.lon)
                 ) {
                     MapPin(icon: pin.icon, color: pin.color)
+                        .onTapGesture {
+                            Task {
+                                await viewModel.loadEvent(id: pin.id)
+                            }
+                        }
                 }
             }
             .ignoresSafeArea()
@@ -58,6 +63,16 @@ struct MapView: View {
                         CustomProgressView()
                             .padding(.horizontal, 24)
                     }
+                }
+            }
+            
+            if let event = viewModel.currentEvent {
+                VStack {
+                    Spacer()
+                    
+                    EventCellView(event: event)
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 10)
                 }
             }
         }

@@ -19,6 +19,14 @@ extension NSError {
             userInfo: [NSLocalizedDescriptionKey: "Не удалось получить текущего пользователя"]
         )
     }
+    
+    static var eventNotFound: NSError {
+        NSError(
+            domain: "DataManager",
+            code: -1,
+            userInfo: [NSLocalizedDescriptionKey: "Не удалось получить event"]
+        )
+    }
 }
 
 final class DataManager {
@@ -37,7 +45,7 @@ final class DataManager {
     // MARK: - Универсальный запрос
     private func fetch<T: Decodable>(_ request: APIRequest) async throws -> T {
         
-        #warning("убрать Debug")
+#warning("убрать Debug")
         print("request.urlRequest():", try request.urlRequest())
         
         let (data, response) = try await URLSession.shared.data(for: try request.urlRequest())
@@ -234,9 +242,13 @@ final class DataManager {
     func getLocations() async throws -> [Location] {
         try await fetchLocations()
     }
-
+    
     func getEvent(id: Int) async throws -> Event {
-        try await fetchEvent(id: id)
+        if let event = try await getEventsByIds(ids: [id]).first {
+            return event
+        } else {
+            throw NSError.eventNotFound
+        }
     }
     
     // MARK: - авторизация пользователя
@@ -272,7 +284,7 @@ final class DataManager {
         
         await rootViewModel?.login()
     }
-
+    
     
     func loginUser(email: String, password: String, rememberUser: Bool) async throws {
         _ = try await AuthService.shared.login(email: email, password: password)

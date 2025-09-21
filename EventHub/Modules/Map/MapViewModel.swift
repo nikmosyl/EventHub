@@ -14,6 +14,8 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
     @Published var pins: [PinModel] = []
     @Published var isLoading = false
     
+    @Published var currentEvent: Event? = nil
+    
     private let manager = CLLocationManager()
     private var debounceTask: Task<Void, Never>?
     
@@ -62,6 +64,20 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
             pins = events.compactMap { PinModel(event: $0) }
         } catch {
             print("Ошибка загрузки событий: \(error)")
+        }
+    }
+    
+    @MainActor
+    func loadEvent(id: Int) async {
+        currentEvent = nil
+        
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            currentEvent = try await DataManager.shared.getEvent(id: id)
+        } catch {
+            print("Не удалось загрузить event c id:", id)
         }
     }
     

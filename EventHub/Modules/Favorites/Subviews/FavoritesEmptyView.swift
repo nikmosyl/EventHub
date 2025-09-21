@@ -34,7 +34,7 @@ struct FavoritesEmptyView: View {
                 Image(systemName: "arrow.clockwise.circle.fill")
                     .resizable()
                     .frame(width: 20, height: 20)
-                    .foregroundStyle(.buttonCalored)
+                    .foregroundStyle(.buttonColored)
             }
             
             Spacer()
