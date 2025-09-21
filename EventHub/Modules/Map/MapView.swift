@@ -35,6 +35,9 @@ struct MapView: View {
                 }
             }
         }
+        .task {
+            await viewModel.loadPins(lat: 0, lon: 0, radious: 0)
+        }
     }
 }
 

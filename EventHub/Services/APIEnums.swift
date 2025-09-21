@@ -100,6 +100,15 @@ extension EventFilters {
         if let ids = ids {
             items.append(.init(name: "ids", value: String(ids)))
         }
+        if let lat = lat {
+            items.append(.init(name: "lat", value: String(lat)))
+        }
+        if let lon = lon {
+            items.append(.init(name: "lon", value: String(lon)))
+        }
+        if let radious = radious {
+            items.append(.init(name: "radious", value: String(radious)))
+        }
         
         return items
     }

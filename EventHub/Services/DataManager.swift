@@ -138,6 +138,28 @@ final class DataManager {
         return try await fetchPaged(.events(filters: filter))
     }
     
+    private func fetchEventByCoords(lat: Double, lon: Double, radious: Int) async throws -> [Event] {
+        let filter = EventFilters(
+            fields: [
+                "id",
+                "title",
+                "dates",
+                "place",
+                "location",
+                "images",
+                "favorites_count",
+            ],
+            expand: [
+                "place",
+                "location"
+            ],
+            lat: lat,
+            lon: lon,
+            radious: radious
+        )
+        return try await fetchPaged(.events(filters: filter))
+    }
+    
     // MARK: - Получение одного события по ID
     private func fetchEvent(id: Int) async throws -> Event {
         let events = try await fetchEvents(id: id)
@@ -404,5 +426,12 @@ extension DataManager {
     func isEventfavorited(eventId: Int) async throws -> Bool {
         let favorites = try await getFavoritesIds()
         return favorites.contains(eventId)
+    }
+}
+
+// MARK: - Map
+extension DataManager {
+    func getEventsByCoords(lat: Double, lon: Double, radious: Int) async throws -> [Event] {
+        try await fetchEventByCoords(lat: lat, lon: lon, radious: radious)
     }
 }

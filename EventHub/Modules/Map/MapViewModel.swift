@@ -29,4 +29,21 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
             self.lastLocation = location
         }
     }
+    
+    func loadPins(lat: Double, lon: Double, radious: Int) async {
+        do {
+            let events = try await DataManager.shared.getEventsByCoords(lat: lat, lon: lon, radious: radious)
+            
+            events.forEach { event in
+                print(
+                    "event id:", event.id ?? "???",
+                    "lat:", event.location?.coords?.lat ?? "???",
+                    "lon:", event.location?.coords?.lon ?? "???"
+                )
+            }
+            
+        } catch {
+            print("ек удалось загрузить map events, ошибка:", error)
+        }
+    }
 }

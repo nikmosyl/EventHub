@@ -21,6 +21,9 @@ struct EventFilters {
     let fields: [String]?
     let expand: [String]?
     let ids: String?
+    let lat: Double?
+    let lon: Double?
+    let radious: Int?
     
     init(
         location: String? = nil,
@@ -33,7 +36,10 @@ struct EventFilters {
         price: String? = nil,
         fields: [String]? = nil,
         expand: [String]? = nil,
-        ids: String? = nil
+        ids: String? = nil,
+        lat: Double? = nil,
+        lon: Double? = nil,
+        radious: Int? = nil
     ) {
         self.location = location
         self.actualSince = actualSince
@@ -46,5 +52,8 @@ struct EventFilters {
         self.fields = fields
         self.expand = expand
         self.ids = ids
+        self.lat = lat
+        self.lon = lon
+        self.radious = radious
     }
 }
