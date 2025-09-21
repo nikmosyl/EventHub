@@ -19,6 +19,14 @@ extension NSError {
             userInfo: [NSLocalizedDescriptionKey: "Не удалось получить текущего пользователя"]
         )
     }
+    
+    static var eventNotFound: NSError {
+        NSError(
+            domain: "DataManager",
+            code: -1,
+            userInfo: [NSLocalizedDescriptionKey: "Не удалось получить event"]
+        )
+    }
 }
 
 final class DataManager {
@@ -37,7 +45,7 @@ final class DataManager {
     // MARK: - Универсальный запрос
     private func fetch<T: Decodable>(_ request: APIRequest) async throws -> T {
         
-        #warning("убрать Debug")
+#warning("убрать Debug")
         print("request.urlRequest():", try request.urlRequest())
         
         let (data, response) = try await URLSession.shared.data(for: try request.urlRequest())
@@ -138,6 +146,29 @@ final class DataManager {
         return try await fetchPaged(.events(filters: filter))
     }
     
+    private func fetchEventByCoords(lat: Double, lon: Double, radius: Int) async throws -> [Event] {
+        let filter = EventFilters(
+            fields: [
+                "id",
+                "title",
+                "dates",
+                "place",
+                "location",
+                "images",
+                "favorites_count",
+                "categories"
+            ],
+            expand: [
+                "place",
+                "location"
+            ],
+            lon: lon,
+            lat: lat,
+            radius: radius
+        )
+        return try await fetchPaged(.events(filters: filter))
+    }
+    
     // MARK: - Получение одного события по ID
     private func fetchEvent(id: Int) async throws -> Event {
         let events = try await fetchEvents(id: id)
@@ -148,7 +179,7 @@ final class DataManager {
     }
     
     // MARK: - Получение подборок
-    private func fetchLists(page: Int? = nil) async throws -> [ListItem] {
+    func fetchLists(page: Int? = nil) async throws -> [ListItem] {
         try await fetchPaged(.lists(page: page))
     }
     
@@ -211,9 +242,13 @@ final class DataManager {
     func getLocations() async throws -> [Location] {
         try await fetchLocations()
     }
-
+    
     func getEvent(id: Int) async throws -> Event {
-        try await fetchEvent(id: id)
+        if let event = try await getEventsByIds(ids: [id]).first {
+            return event
+        } else {
+            throw NSError.eventNotFound
+        }
     }
     
     // MARK: - авторизация пользователя
@@ -229,6 +264,7 @@ final class DataManager {
         let displayName = user.displayName ?? "User"
         let photoURL = user.photoURL?.absoluteString ?? ""
         let bio = "empty"
+        let favoritesIds: [Int] = []
         
         do {
             _ = try await AuthService.shared.getUser(uid: uid)
@@ -238,7 +274,8 @@ final class DataManager {
                 displayName: displayName,
                 email: email,
                 photoURL: photoURL,
-                bio: bio
+                bio: bio,
+                favoritesIds: favoritesIds
             )
             try await AuthService.shared.saveUser(newUser)
         }
@@ -247,7 +284,7 @@ final class DataManager {
         
         await rootViewModel?.login()
     }
-
+    
     
     func loginUser(email: String, password: String, rememberUser: Bool) async throws {
         _ = try await AuthService.shared.login(email: email, password: password)
@@ -270,7 +307,8 @@ final class DataManager {
             displayName: fullName,
             email: email,
             photoURL: "",
-            bio: "empty"
+            bio: "empty",
+            favoritesIds: []
         )
         try await AuthService.shared.saveUser(user)
         
@@ -318,6 +356,7 @@ final class DataManager {
     func updateUserData(
         displayName: String? = nil,
         bio: String? = nil,
+        favoritesIds: [Int]? = nil,
         userModel: UserModel? = nil
     ) async throws {
         guard let uid = await AuthService.shared.currentUser?.uid else {
@@ -329,6 +368,9 @@ final class DataManager {
         }
         if let bio {
             try await AuthService.shared.updateUser(uid: uid, bio: bio)
+        }
+        if let favoritesIds {
+            try await AuthService.shared.updateUser(uid: uid, favoritesIds: favoritesIds)
         }
         if let userModel {
             try await AuthService.shared.updateUser(uid: uid, displayName: userModel.displayName)
@@ -362,11 +404,8 @@ extension DataManager {
         case add, remove
     }
     
-    private var favoritesKey: String { "favoriteEvents" }
-    
-    // обновляем избранное
     private func updateFavorites(eventId: Int, action: FavoritesAction) async throws {
-        var favorites = getFavoritesIds()
+        var favorites = try await getFavoritesIds()
         
         switch action {
         case .add:
@@ -377,32 +416,35 @@ extension DataManager {
             favorites.removeAll { $0 == eventId }
         }
         
-        saveFavorites(favorites)
+        try await saveFavorites(favorites)
     }
     
-    // сохранить в избранное
-    private func saveFavorites(_ bookmarks: [Int]) {
-        UserDefaults.standard.set(bookmarks, forKey: favoritesKey)
+    private func saveFavorites(_ favoritesIds: [Int]) async throws {
+        try await updateUserData(favoritesIds: favoritesIds)
     }
     
-    // получить  избранные
-    func getFavoritesIds() -> [Int] {
-        UserDefaults.standard.array(forKey: favoritesKey) as? [Int] ?? []
+    func getFavoritesIds() async throws -> [Int] {
+        let userModel = try await getUserData()
+        return userModel.favoritesIds
     }
     
-    // Добавление в избранное
     func addToFavorites(eventId: Int) async throws {
         try await updateFavorites(eventId: eventId, action: .add)
     }
     
-    // Удаление из избранного
     func removeFromFavorites(eventId: Int) async throws {
         try await updateFavorites(eventId: eventId, action: .remove)
     }
     
-    // Проверка статуса избранного
-    func isEventfavorited(eventId: Int) async -> Bool {
-        let favorites = getFavoritesIds()
+    func isEventfavorited(eventId: Int) async throws -> Bool {
+        let favorites = try await getFavoritesIds()
         return favorites.contains(eventId)
+    }
+}
+
+// MARK: - Map
+extension DataManager {
+    func getEventsByCoords(lat: Double, lon: Double, radius: Int) async throws -> [Event] {
+        try await fetchEventByCoords(lat: lat, lon: lon, radius: radius)
     }
 }

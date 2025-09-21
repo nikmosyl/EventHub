@@ -23,5 +23,7 @@
     		<string>com.google.GPPShare</string>
     		<string>com.google.GPP</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Please allow the app to access geolocation for this module to work properly</string>
 </dict>
 </plist>

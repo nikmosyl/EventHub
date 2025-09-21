@@ -8,8 +8,12 @@
 import SwiftUI
 
 struct FavoritesEmptyView: View {
+    let refresh: () -> ()
+    
     var body: some View {
         VStack(spacing: 50) {
+            Spacer()
+            
             Text("NO FAVORITES")
                 .font(.system(size: 24, weight: .bold))
                 .foregroundColor(.primary)
@@ -23,11 +27,22 @@ struct FavoritesEmptyView: View {
                         .foregroundColor(.red.opacity(0.6))
                         .offset(x: 0, y: -10)
                 )
+            
+            Button {
+                refresh()
+            } label: {
+                Image(systemName: "arrow.clockwise.circle.fill")
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .foregroundStyle(.buttonColored)
+            }
+            
+            Spacer()
         }
         .frame(maxWidth: .infinity)
     }
 }
 
 #Preview {
-    FavoritesEmptyView()
+    FavoritesEmptyView(refresh: {})
 }
