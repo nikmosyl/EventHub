@@ -28,6 +28,7 @@ struct FavoritesView: View {
                             .frame(width: 18, height: 18)
                             .foregroundStyle(.textDarkPrimary)
                     }
+                    .padding(.horizontal, 16)
                     
                 }
             }

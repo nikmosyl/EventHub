@@ -24,7 +24,7 @@ enum APIRequest {
     case lists(page: Int? = nil)
     case locations
     case movies(page: Int? = nil)
-    case search
+    case search(filters: EventFilters, query: String, lat: Double? = nil, lon: Double? = nil, radius: Int? = nil, page: Int? = nil)
 
     // MARK: - Путь запроса
     var path: String {
@@ -41,8 +41,27 @@ enum APIRequest {
     // MARK: - Параметры запроса
     var query: [URLQueryItem] {
             switch self {
-            case .eventCategories, .locations, .search:
+            case .eventCategories, .locations:
                 return []
+                
+            case .search(let filters, let query, let lat, let lon, let radius, let page):
+                print("это сёрч")
+                var items: [URLQueryItem] = []
+                items.append(.init(name: "q", value: String(query)))
+                if let lat = lat {
+                    items.append(.init(name: "lat", value: String(lat)))
+                }
+                if let lon = lon {
+                    items.append(.init(name: "lon", value: String(lon)))
+                }
+                if let radius = radius {
+                    items.append(.init(name: "radius", value: String(radius)))
+                }
+                if let page = page {
+                    items.append(.init(name: "page", value: String(page)))
+                }
+                items += filters.toQueryItems()
+                return items
                 
             case .events(let filters, _):
                 return filters.toQueryItems()
@@ -84,8 +103,8 @@ extension EventFilters {
         if let categories = categories, !categories.isEmpty {
             items.append(.init(name: "categories", value: categories.joined(separator: ",")))
         }
-        if let search = search {
-            items.append(.init(name: "search", value: search))
+        if let ctype = ctype {
+            items.append(.init(name: "ctype", value: ctype))
         }
         if let page = page {
             items.append(.init(name: "page", value: String(page)))

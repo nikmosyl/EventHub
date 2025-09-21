@@ -29,13 +29,15 @@ final class SearchViewModel: ObservableObject {
         viewState = .loading
 
         do {
-            let events = try await DataManager.shared.searchEvents(query: query)
+            let searchResults = try await DataManager.shared.searchEvents(query: query)
+            let events = searchResults.map{ Event(from: $0) }
             if events.isEmpty {
                 viewState = .empty
             } else {
                 viewState = .loaded(events)
             }
         } catch {
+            print("Ошибка во время поиска:", error)
             viewState = .error(error.localizedDescription)
         }
     }

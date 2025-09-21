@@ -200,13 +200,25 @@ final class DataManager {
     
     
     // MARK: - Простое получение данных
-    func searchEvents(query: String, location: String? = nil, page: Int? = nil) async throws -> [Event] {
+    func searchEvents(
+        query: String,
+        lat: Double? = nil,
+        lon: Double? = nil,
+        radius: Int? = nil,
+        page: Int? = nil
+    ) async throws -> [SearchResult] {
         let filters = EventFilters(
-            location: location,
             search: query,
-            page: page
+            expand: [
+                "place",
+                "dates",
+            ],
+            lon: lon,
+            lat: lat,
+            radius: radius,
+            ctype: "event"
         )
-        return try await fetchEvents(filters: filters)
+        return try await fetchPaged(.search(filters: filters, query: query, lat: lat, lon: lon, radius: radius, page: page))
     }
     
     func getUpcamingEvents(categories: [String]? = nil) async throws -> [Event] {

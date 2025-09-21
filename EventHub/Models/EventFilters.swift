@@ -24,6 +24,7 @@ struct EventFilters {
     let lon: Double?
     let lat: Double?
     let radius: Int?
+    let ctype: String?
     
     init(
         location: String? = nil,
@@ -39,7 +40,8 @@ struct EventFilters {
         ids: String? = nil,
         lon: Double? = nil,
         lat: Double? = nil,
-        radius: Int? = nil
+        radius: Int? = nil,
+        ctype: String? = nil
     ) {
         self.location = location
         self.actualSince = actualSince
@@ -55,5 +57,6 @@ struct EventFilters {
         self.lon = lon
         self.lat = lat
         self.radius = radius
+        self.ctype = ctype
     }
 }

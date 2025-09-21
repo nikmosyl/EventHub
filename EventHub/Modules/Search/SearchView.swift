@@ -46,22 +46,20 @@ struct SearchView: View {
             .background(Color.white)
             
             Spacer()
-
+            
             switch viewModel.viewState {
             case .empty:
                 SearchEmptyView()
             case .loading:
-                ProgressView()
-                    .scaleEffect(1.5)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                CustomProgressView()
             case .loaded(let events):
                 ScrollView {
                     LazyVStack(spacing: 16) {
-                        ForEach(events, id: \.id) { event in
+                        ForEach(events) { event in
                             EventCellView(event: event)
+                                .padding(.horizontal, 24)
                         }
                     }
-                    .padding(.vertical)
                 }
             case .error(let message):
                 VStack {
@@ -76,9 +74,10 @@ struct SearchView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-
+            
             Spacer()
         }
+        .navigationBarBackButtonHidden()
         .background(Color.white.ignoresSafeArea())
         .sheet(isPresented: $viewModel.showFilters) {
             EmptyView()
