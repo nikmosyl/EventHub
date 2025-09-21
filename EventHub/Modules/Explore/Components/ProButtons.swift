@@ -38,7 +38,7 @@ struct ProButtons: View {
             //MARK: - Films
             Button {
                 Task {
-                   try await print(viewModel.fetchLists())
+                    await viewModel.loadFilms()
                 }
             } label: {
                 Text("FILMS")

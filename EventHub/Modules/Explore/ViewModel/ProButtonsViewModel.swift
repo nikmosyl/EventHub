@@ -1,19 +1,21 @@
-//
-//  ProButtonsViewModel.swift
-//  EventHub
-//
-//  Created by Drolllted on 22.09.2025.
-//
-
 import Foundation
 
+@MainActor
 final class ProButtonsViewModel: ObservableObject {
     
     @Published var todayEvents = [Event]()
     @Published var filmsEvents = [Event]()
-    @Published var ListsEvents = [Event]()
+    @Published var listsEvents = [Event]()
+    @Published var isLoading = false
+    @Published var error: Error?
     
     private let dataManager = DataManager.shared
+    
+    //MARK: - Получение фильмов по slug "films"
+    func fetchFilmsEvents() async throws -> [Event] {
+        // Используем категорию "films" для фильтрации
+        return try await dataManager.getUpcamingEvents(categories: ["films"])
+    }
     
     //MARK: - Фильтр для определенного дня
     func filterTodayEvents(from events: [Event]) -> [Event] {
@@ -31,21 +33,23 @@ final class ProButtonsViewModel: ObservableObject {
         }
     }
     
-    // Фильтрация фильмов
-    func filterFilms(from events: [Event]) -> [Event] {
-        return events.filter { event in
-            event.categories?.contains("films") == true ||
-            event.categories?.contains("cinema") == true ||
-            event.title?.lowercased().contains("film") == true ||
-            event.title?.lowercased().contains("movie") == true ||
-            event.categories?.contains("кино") == true ||
-            event.categories?.contains("фильм") == true
-        }
-    }
-    
     // Получение списков (подборок)
     func fetchLists() async throws -> [ListItem] {
         return try await dataManager.fetchLists()
     }
     
+    // Загрузка фильмов
+    func loadFilms() async {
+        isLoading = true
+        error = nil
+        
+        do {
+            filmsEvents = try await fetchFilmsEvents()
+        } catch {
+            self.error = error
+            print("Error loading films: \(error)")
+        }
+        
+        isLoading = false
+    }
 }
