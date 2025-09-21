@@ -36,8 +36,10 @@ struct ProButtons: View {
 
             
             //MARK: - Films
-            NavigationLink {
-                
+            Button {
+                Task {
+                   try await print(viewModel.fetchLists())
+                }
             } label: {
                 Text("FILMS")
                     .foregroundStyle(.textLightPrimary)
@@ -52,7 +54,7 @@ struct ProButtons: View {
             //MARK: - Lists
             
             NavigationLink {
-                
+                ListsView()
             } label: {
                 Text("LISTS")
                     .foregroundStyle(.textLightPrimary)

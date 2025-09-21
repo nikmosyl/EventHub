@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-
 struct EventsCollectionView: View {
     let title: String
     let events: [Event]
@@ -29,14 +28,29 @@ struct EventsCollectionView: View {
             }
             .padding(.horizontal, 15)
             
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 15) {
-                    ForEach(events, id: \.id) { event in
-                        EventsCard(events: event)
-                            .padding(.vertical, 5)
+            // Контейнер с фиксированной высотой для контента
+            ZStack {
+                if events.isEmpty {
+                    // Сообщение о отсутствии событий
+                    Text("Events not Found")
+                        .font(.system(size: 16))
+                        .foregroundColor(.textDarkSecondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.clear)
+                } else {
+                    // Список событий
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 15) {
+                            ForEach(events, id: \.id) { event in
+                                EventsCard(events: event)
+                                    .padding(.vertical, 5)
+                            }
+                        }
+                        .padding(.horizontal, 15)
                     }
                 }
             }
+            
         }
     }
 }
