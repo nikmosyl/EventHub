@@ -17,7 +17,7 @@ struct ExploreView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 30) {
                     Spacer()
-                        .frame(height: 150)
+                        .frame(height: 200)
                     
                     switch viewModel.state {
                     case .idle, .loading:
@@ -28,21 +28,21 @@ struct ExploreView: View {
                             title: "Upcomming Events",
                             events: viewModel.getUpcommingForExploreView(),
                             tapInSeeAllButton: {
-                                #warning("Получать все ячейки Upcomming Events")
-                                print(viewModel.getAllUpcomingEvents())
+                                // Переход на экран со всеми событиями
                             }
                         )
                         EventsCollectionView(
                             title: "Nearby Events",
                             events: viewModel.getNearbyEventsForExploreView(),
                             tapInSeeAllButton: {
-                                #warning("Получать все ивенты, которые находятся рядом по городам")
-                                print(viewModel.getAllNearbyEvents())
+                                // Переход на экран с nearby событиями
                             }
                         )
                     case .error(let error):
                         ErrorView(error: error) {
-                            
+                            Task {
+                                await viewModel.refreshData()
+                            }
                         }
                     }
                 }
@@ -58,12 +58,24 @@ struct ExploreView: View {
                 currentLocationName: viewModel.getCurrentLocationName(),
                 currentLocationSlug: viewModel.selectedLocation,
                 availableLocations: viewModel.availableLocations,
-                isLoadingLocations: viewModel.isLoadingLocations && viewModel.availableLocations.isEmpty
-            ) { locationSlug in
-                Task {
-                    await viewModel.updateLocation(locationSlug)
-                }
-            }
+                isLoadingLocations: viewModel.isLoadingLocations && viewModel.availableLocations.isEmpty,
+                onLocationSelect: { locationSlug in
+                    Task {
+                        await viewModel.updateLocation(locationSlug)
+                    }
+                },
+                todayEvent: {
+                    viewModel.showTodayEvents()
+                },
+                filmsEvent: {
+                    viewModel.showFilms()
+                },
+                listsEvent: {
+                    // Переход на экран списков
+                },
+                showOnlyToday: $viewModel.showOnlyTodayEvents,
+                showOnlyFilms: $viewModel.showOnlyFilms
+            )
         }
         .task {
             await viewModel.loadInitialData()

@@ -46,7 +46,12 @@ final class EventCardViewModel: ObservableObject {
     
     func checkIfEventIsFavorited() async -> Bool {
         guard let eventId = event.id else { return false }
-        return await dataManager.isEventfavorited(eventId: eventId)
+        do {
+            return try await dataManager.isEventfavorited(eventId: eventId)
+        } catch {
+            print("Error checking if event is favorited: \(error)")
+            return false
+        }
     }
     
     func isEventFavorited(eventId: Int) -> Bool {
@@ -57,13 +62,17 @@ final class EventCardViewModel: ObservableObject {
     
     private func loadInitialFavoriteStatus() {
         Task {
-            guard let eventId = event.id else { return }
-            let isFavorited = await dataManager.isEventfavorited(eventId: eventId)
-            await MainActor.run {
-                isLiked = isFavorited
-                if isFavorited {
-                    favoriteEventIds.insert(eventId)
+            do {
+                guard let eventId = event.id else { return }
+                let isFavorited = try await dataManager.isEventfavorited(eventId: eventId)
+                await MainActor.run {
+                    isLiked = isFavorited
+                    if isFavorited {
+                        favoriteEventIds.insert(eventId)
+                    }
                 }
+            } catch {
+                print("Error loading initial favorite status: \(error)")
             }
         }
     }

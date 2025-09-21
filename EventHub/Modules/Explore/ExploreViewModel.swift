@@ -32,11 +32,14 @@ final class ExploreViewModel: ObservableObject {
     @Published var selectedLocation: String = "msk"
     @Published var isLoadingLocations: Bool = false
     @Published var isLoadingEvents: Bool = false
+    @Published var showOnlyTodayEvents: Bool = false
+    @Published var showOnlyFilms: Bool = false
     
     //MARK: - Private Properties
     private var isInitialLoadComplete: Bool = false
     private let dataManager = DataManager.shared
     private var cachedSelectedCategorySlugs: [String] = []
+    private var allUpcommingEvents: [Event] = [] // Храним все события для фильтрации
     
     //MARK: - Public Methods
     
@@ -52,9 +55,10 @@ final class ExploreViewModel: ObservableObject {
             categoryModels = categories.map { CategoryModel(category: $0) }
 
             // Загружаем события без фильтров (все категории)
-            upcommingEvents = try await dataManager.getUpcamingEvents()
+            allUpcommingEvents = try await dataManager.getUpcamingEvents()
             nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
             
+            upcommingEvents = allUpcommingEvents
             state = .loaded(upcommingEvents)
             isInitialLoadComplete = true
             
@@ -91,13 +95,14 @@ final class ExploreViewModel: ObservableObject {
             // Если нет выбранных категорий - загружаем все события
             let categorySlugs = cachedSelectedCategorySlugs.isEmpty ? nil : cachedSelectedCategorySlugs
             
-            upcommingEvents = try await dataManager.getUpcamingEvents(categories: categorySlugs)
+            allUpcommingEvents = try await dataManager.getUpcamingEvents(categories: categorySlugs)
             nearbyEvents = try await dataManager.getNearByEvents(
-                location: selectedLocation, 
+                location: selectedLocation,
                 categories: categorySlugs
             )
             
-            state = .loaded(upcommingEvents)
+            // Применяем текущие фильтры (сегодня/фильмы)
+            applyCurrentFilters()
             
         } catch {
             state = .error(error)
@@ -105,6 +110,66 @@ final class ExploreViewModel: ObservableObject {
         }
         
         isLoadingEvents = false
+    }
+    
+    // MARK: - Обработчики кнопок
+    
+    func showTodayEvents() {
+        showOnlyTodayEvents = true
+        showOnlyFilms = false
+        applyCurrentFilters()
+    }
+    
+    func showFilms() {
+        showOnlyFilms = true
+        showOnlyTodayEvents = false
+        applyCurrentFilters()
+    }
+    
+    func showAllEvents() {
+        showOnlyTodayEvents = false
+        showOnlyFilms = false
+        applyCurrentFilters()
+    }
+    
+    // Применение текущих фильтров
+    private func applyCurrentFilters() {
+        if showOnlyTodayEvents {
+            filterTodayEvents()
+        } else if showOnlyFilms {
+            filterFilms()
+        } else {
+            upcommingEvents = allUpcommingEvents
+        }
+        state = .loaded(upcommingEvents)
+    }
+    
+    // Фильтрация событий на сегодня
+    private func filterTodayEvents() {
+        let calendar = Calendar.current
+        let today = Date()
+        
+        upcommingEvents = allUpcommingEvents.filter { event in
+            guard let eventDate = event.dates?.first,
+                  let startTimestamp = eventDate.start else {
+                return false
+            }
+            
+            let eventStartDate = Date(timeIntervalSince1970: TimeInterval(startTimestamp))
+            
+            return calendar.isDate(eventStartDate, inSameDayAs: today)
+        }
+    }
+    
+    // Фильтрация фильмов
+    private func filterFilms() {
+
+        upcommingEvents = allUpcommingEvents.filter { event in
+            event.categories?.contains("films") == true ||
+            event.categories?.contains("cinema") == true ||
+            event.title?.lowercased().contains("film") == true ||
+            event.title?.lowercased().contains("movie") == true
+        }
     }
     
     // MARK: - Getter Methods for Views
@@ -134,7 +199,7 @@ final class ExploreViewModel: ObservableObject {
     }
     
     var hasActiveFilters: Bool {
-        !selectedCategoryIds.isEmpty || !searchQuery.isEmpty
+        !selectedCategoryIds.isEmpty || !searchQuery.isEmpty || showOnlyTodayEvents || showOnlyFilms
     }
     
     var hasMoreUpcomingEvents: Bool {
