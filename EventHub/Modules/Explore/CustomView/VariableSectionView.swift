@@ -10,17 +10,17 @@ import SwiftUI
 struct VariableSectionView: View {
     
     let categories: [CategoryModel]
-    @Binding var excludedCategoryIds: Set<Int>
+    @Binding var selectedCategoryIds: Set<Int>
     
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
                 ForEach(categories, id: \.id) { category in
                     Button {
-                        if excludedCategoryIds.contains(category.id) {
-                            excludedCategoryIds.remove(category.id)
+                        if selectedCategoryIds.contains(category.id) {
+                            selectedCategoryIds.remove(category.id)
                         } else {
-                            excludedCategoryIds.insert(category.id)
+                            selectedCategoryIds.insert(category.id)
                         }
                     } label: {
                         HStack(spacing: 6) {
@@ -28,26 +28,26 @@ struct VariableSectionView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 16, height: 16)
-                                .foregroundColor(excludedCategoryIds.contains(category.id) ? category.color : .white)
+                                .foregroundColor(selectedCategoryIds.contains(category.id) ? .white : category.color)
                             
                             Text(category.name)
                                 .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(excludedCategoryIds.contains(category.id) ? category.color : .white)
+                                .foregroundColor(selectedCategoryIds.contains(category.id) ? .white : category.color)
                                 .lineLimit(1)
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)
                         .background(
                             Capsule()
-                                .fill(excludedCategoryIds.contains(category.id) ? .white : category.color)
+                                .fill(selectedCategoryIds.contains(category.id) ? category.color : .white)
                         )
                         .overlay(
                             Capsule()
-                                .stroke(excludedCategoryIds.contains(category.id) ? category.color.opacity(0.3) : Color.clear, lineWidth: 1)
+                                .stroke(selectedCategoryIds.contains(category.id) ? category.color.opacity(0.3) : Color.gray.opacity(0.2), lineWidth: 1)
                         )
                         .shadow(
-                            color: excludedCategoryIds.contains(category.id) ? .black.opacity(0.1) : .clear,
-                            radius: 3,
+                            color: .shadow,
+                            radius: 2,
                             x: 0,
                             y: 2
                         )

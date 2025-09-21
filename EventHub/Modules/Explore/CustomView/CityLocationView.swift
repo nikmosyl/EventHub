@@ -38,12 +38,11 @@ struct CityLocationView: View {
             
             Spacer()
             
-            Button {
-                print("12334")
+            NavigationLink {
+                NotificationsView()
             } label: {
                 CustomBellButton()
             }
-
         }
     }
 }

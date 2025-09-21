@@ -16,7 +16,7 @@ struct BookmarkButton: View {
         Button {
             action()
         } label: {
-            Image(isLiked ? "bookmark.fill" : "bookmark")
+            Image(isLiked ? "bookmark.fill" : "bookmark-1")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 14, height: 14)

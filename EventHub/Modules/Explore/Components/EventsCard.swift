@@ -25,57 +25,54 @@ struct EventsCard: View {
             VStack(alignment: .leading, spacing: 0) {
                 ZStack(alignment: .top) {
                     
+                    // Изображение события
                     if let imageURL = events.imageUrl {
                         NetworkImage(imageUrl: imageURL)
                             .frame(width: 218, height: 131)
-                            .clipShape(RoundedRectangle(cornerRadius: 15))
-                            .padding(.horizontal, 10)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     } else {
                         Image(systemName: "photo")
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 218, height: 131)
-                            .clipShape(RoundedRectangle(cornerRadius: 15))
-                            .padding(.horizontal, 10)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .foregroundColor(.gray.opacity(0.3))
                     }
+                    
                     HStack {
-                        
                         Text(events.formattedEventDate)
-                            .font(.system(size: 16, weight: .semibold))
+                            .font(.system(size: 14, weight: .semibold))
                             .multilineTextAlignment(.center)
                             .foregroundColor(.textCalored)
                             .frame(width: 45, height: 45)
                             .background(
                                 RoundedRectangle(cornerRadius: 15)
                                     .fill(Color.textLightSecondary)
-                                    .blur(radius: 1)
                             )
-                            .padding(.leading, 20)
-                            .padding(.top, 10)
+                            .padding(.leading, 16)
+                            .padding(.top, 12)
                         
                         Spacer()
                         
+                        // Кнопка избранного
                         BookmarkButton(action: {
-                            // Сохранение мероприятия
                             viewModel.eventsToggle()
                         }, isLiked: $viewModel.isLiked)
-                        .padding(.trailing, 15)
-                        .padding(.top, 2)
+                        .padding(.trailing, 16)
+                        .padding(.top, 12)
                     }
                 }
                 .frame(height: 131)
-                .padding(.top, 20)
-                
+                .padding(.top, 12)
                 
                 VStack(alignment: .leading, spacing: 8) {
                     
                     Text(events.title ?? "Unknown")
-                        .font(.system(size: 18, weight: .semibold))
-                        .lineLimit(1)
-                        .foregroundStyle(.black)
+                        .font(.system(size: 16, weight: .semibold))
+                        .lineLimit(2)
+                        .foregroundColor(.black)
                         .multilineTextAlignment(.leading)
-                        .padding(.horizontal, 16)
-                        .padding(.top, 12)
+                        .fixedSize(horizontal: false, vertical: true)
                     
                     HStack(spacing: 4) {
                         Image(systemName: "person.2.fill")
@@ -84,38 +81,31 @@ struct EventsCard: View {
                             .font(.system(size: 12))
                     }
                     .foregroundColor(Color.tabBarTextPrimary)
-                    .padding(.horizontal, 16)
                     
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack(spacing: 3) {
-                            Image("Map")
-                                .renderingMode(.template)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .foregroundStyle(Color.textDarkSecondary)
-                                .frame(width: 16, height: 16)
-                            
-                            Text(events.locationName)
-                                .font(.system(size: 14))
-                        }
-                        .foregroundStyle(Color.textDarkSecondary)
+                    HStack(spacing: 6) {
+                        Image(systemName: "mappin.and.ellipse")
+                            .font(.system(size: 12))
+                            .foregroundColor(Color.textDarkSecondary)
+                        
+                        Text(events.locationName)
+                            .font(.system(size: 12))
+                            .lineLimit(1)
+                            .foregroundColor(Color.textDarkSecondary)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 16)
                 }
-                .frame(height: 115)
-                .background(Color.white)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(width: 237, height: 255)
             .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 15))
-            .overlay(
-                RoundedRectangle(cornerRadius: 15)
-                    .stroke(Color.black.opacity(0.1), lineWidth: 1)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .shadow(
+                color: .shadow,
+                radius: 15,
+                x: 0,
+                y: 8
             )
         }
-        
-        
     }
 }

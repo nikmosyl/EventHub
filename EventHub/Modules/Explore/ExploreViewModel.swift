@@ -16,31 +16,32 @@ final class ExploreViewModel: ObservableObject {
     @Published var categoryModels: [CategoryModel] = []
     @Published var upcommingEvents: [Event] = []
     @Published var nearbyEvents: [Event] = []
-    @Published var excludedCategoryIds: Set<Int> = [] {
+    @Published var selectedCategoryIds: Set<Int> = [] {
         didSet {
-            updateCachedExcludedCategorySlugs()
+            updateCachedSelectedCategorySlugs()
             if isInitialLoadComplete {
-                filterEventsByExcludedCategories()
+                Task {
+                    await reloadEventsWithSelectedCategories()
+                }
             }
         }
     }
-    @Published var filteredUpcommingEvents: [Event] = []
-    @Published var filteredNearbyEvents: [Event] = []
     @Published var favoriteEventIds: Set<Int> = []
     @Published var searchQuery: String = ""
     @Published var availableLocations: [Location] = []
     @Published var selectedLocation: String = "msk"
     @Published var isLoadingLocations: Bool = false
+    @Published var isLoadingEvents: Bool = false
     
     //MARK: - Private Properties
     private var isInitialLoadComplete: Bool = false
     private let dataManager = DataManager.shared
-    private var cachedExcludedCategorySlugs: Set<String> = []
+    private var cachedSelectedCategorySlugs: [String] = []
     
     //MARK: - Public Methods
     
     func loadInitialData() async {
-        guard !isInitialLoadComplete else {return}
+        guard !isInitialLoadComplete else { return }
         state = .loading
         
         do {
@@ -50,12 +51,11 @@ final class ExploreViewModel: ObservableObject {
             categories = try await categoriesTask
             categoryModels = categories.map { CategoryModel(category: $0) }
 
+            // Загружаем события без фильтров (все категории)
             upcommingEvents = try await dataManager.getUpcamingEvents()
             nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
             
-            filterEventsByExcludedCategories()
-            
-            state = .loaded(filteredUpcommingEvents)
+            state = .loaded(upcommingEvents)
             isInitialLoadComplete = true
             
         } catch {
@@ -73,16 +73,38 @@ final class ExploreViewModel: ObservableObject {
             categories = try await categoriesTask
             categoryModels = categories.map { CategoryModel(category: $0) }
 
-            upcommingEvents = try await dataManager.getUpcamingEvents()
-            nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
+            // Перезагружаем события с текущими выбранными категориями
+            await reloadEventsWithSelectedCategories()
             
-            filterEventsByExcludedCategories()
-            
-            state = .loaded(filteredUpcommingEvents)
         } catch {
             state = .error(error)
             print("Error Refresh Data: \(error)")
         }
+    }
+    
+    // Загрузка событий с выбранными категориями
+    private func reloadEventsWithSelectedCategories() async {
+        isLoadingEvents = true
+        state = .loading
+        
+        do {
+            // Если нет выбранных категорий - загружаем все события
+            let categorySlugs = cachedSelectedCategorySlugs.isEmpty ? nil : cachedSelectedCategorySlugs
+            
+            upcommingEvents = try await dataManager.getUpcamingEvents(categories: categorySlugs)
+            nearbyEvents = try await dataManager.getNearByEvents(
+                location: selectedLocation, 
+                categories: categorySlugs
+            )
+            
+            state = .loaded(upcommingEvents)
+            
+        } catch {
+            state = .error(error)
+            print("Error loading events with categories: \(error)")
+        }
+        
+        isLoadingEvents = false
     }
     
     // MARK: - Getter Methods for Views
@@ -96,36 +118,36 @@ final class ExploreViewModel: ObservableObject {
     }
     
     func getUpcommingForExploreView() -> [Event] {
-        Array(filteredUpcommingEvents.prefix(6))
+        Array(upcommingEvents.prefix(6))
     }
     
     func getNearbyEventsForExploreView() -> [Event] {
-        Array(filteredNearbyEvents.prefix(6))
+        Array(nearbyEvents.prefix(6))
     }
     
     func getAllUpcomingEvents() -> [Event] {
-        filteredUpcommingEvents
+        upcommingEvents
     }
     
     func getAllNearbyEvents() -> [Event] {
-        filteredNearbyEvents
+        nearbyEvents
     }
     
     var hasActiveFilters: Bool {
-        !excludedCategoryIds.isEmpty || !searchQuery.isEmpty
+        !selectedCategoryIds.isEmpty || !searchQuery.isEmpty
     }
     
     var hasMoreUpcomingEvents: Bool {
-        filteredUpcommingEvents.count > 6
+        upcommingEvents.count > 6
     }
     
     var hasMoreNearbyEvents: Bool {
-        filteredNearbyEvents.count > 6
+        nearbyEvents.count > 6
     }
     
     func updateLocation(_ location: String) async {
         selectedLocation = location
-        await reloadEventsForCurrentLocation()
+        await reloadEventsWithSelectedCategories()
     }
     
     //MARK: - Private Methods
@@ -144,53 +166,13 @@ final class ExploreViewModel: ObservableObject {
         isLoadingLocations = false
     }
     
-    private func reloadEventsForCurrentLocation() async {
-        state = .loading
-        
-        do {
-            upcommingEvents = try await dataManager.getUpcamingEvents()
-            nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
-            
-            filterEventsByExcludedCategories()
-            state = .loaded(filteredUpcommingEvents)
-            
-        } catch {
-            let formattedError = formatError(error)
-            state = .error(formattedError)
-            print("Error loading events for location: \(formattedError)")
-        }
-    }
-    
-    private func filterEventsByExcludedCategories() {
-        if cachedExcludedCategorySlugs.isEmpty {
-            filteredUpcommingEvents = upcommingEvents
-            filteredNearbyEvents = nearbyEvents
-        } else {
-            filteredUpcommingEvents = upcommingEvents.filter { event in
-                !eventContainsExcludedCategories(event)
+    private func updateCachedSelectedCategorySlugs() {
+        cachedSelectedCategorySlugs = categories
+            .filter { category in
+                guard let categoryId = category.id else { return false }
+                return selectedCategoryIds.contains(categoryId)
             }
-            
-            filteredNearbyEvents = nearbyEvents.filter { event in
-                !eventContainsExcludedCategories(event)
-            }
-        }
-    }
-    
-    private func eventContainsExcludedCategories(_ event: Event) -> Bool {
-        guard let eventCategorySlugs = event.categories, !eventCategorySlugs.isEmpty else { return false }
-
-        return eventCategorySlugs.contains { cachedExcludedCategorySlugs.contains($0) }
-    }
-    
-    private func updateCachedExcludedCategorySlugs() {
-        cachedExcludedCategorySlugs = Set(
-            categories
-                .filter { category in
-                    guard let categoryId = category.id else { return false }
-                    return excludedCategoryIds.contains(categoryId)
-                }
-                .compactMap { $0.slug }
-        )
+            .compactMap { $0.slug }
     }
     
     private func formatError(_ error: Error) -> Error {

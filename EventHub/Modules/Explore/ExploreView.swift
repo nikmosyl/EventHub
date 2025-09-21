@@ -54,7 +54,7 @@ struct ExploreView: View {
             
             ExploreNavBar(
                 categories: viewModel.getCategoryForExploreView(),
-                excludedCategoryIds: $viewModel.excludedCategoryIds,
+                selectedCategoryIds: $viewModel.selectedCategoryIds,
                 currentLocationName: viewModel.getCurrentLocationName(),
                 currentLocationSlug: viewModel.selectedLocation,
                 availableLocations: viewModel.availableLocations,
