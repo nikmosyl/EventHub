@@ -9,27 +9,27 @@ import Foundation
 
 struct CategoryIconCarousel {
     static let icons: [String: String] = [
-        "События для бизнеса": "briefcase",
-        "Кинопоказы": "film",
-        "Концерты": "music.note",
-        "Обучение": "book",
-        "Развлечения": "party.popper",
-        "Выставки": "rectangle.grid.2x2",
-        "Мода и стиль": "hanger",
-        "Фестивали": "flag",
-        "Праздники": "gift",
-        "Детям": "teddybear",
-        "Разное": "ellipsis",
-        "Вечеринки": "music.mic",
-        "Фотография": "camera",
-        "Квесты": "puzzlepiece",
-        "Активный отдых": "figure.run",
-        "Шопинг (Магазины)": "cart",
-        "Благотворительность": "heart",
-        "Акции и скидки": "tag",
-        "Спектакли": "theatermasks",
-        "Экскурсии": "map",
-        "Ярмарки (Развлечения, Ярмарки)": "tent"
+        "business-events": "briefcase",
+        "cinema": "film",
+        "concert": "music.note",
+        "education": "book",
+        "entertainment": "party.popper",
+        "exhibition": "rectangle.grid.2x2",
+        "fashion": "hanger",
+        "festival": "flag",
+        "holiday": "gift",
+        "kids": "teddybear",
+        "other": "ellipsis",
+        "party": "music.mic",
+        "photo": "camera",
+        "quest": "puzzlepiece",
+        "recreation": "figure.run",
+        "shopping": "cart",
+        "social-activity": "heart",
+        "stock": "tag",
+        "theater": "theatermasks",
+        "tour": "map",
+        "yarmarki-razvlecheniya-yarmarki": "tent"
     ]
     
     static func icon(for categoryName: String) -> String {

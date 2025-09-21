@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct ExploreNavBar: View {
-    
     let categories: [CategoryModel]
     @Binding var selectedCategoryIds: Set<Int>
     @State private var showCurrentLocation: Bool = false
