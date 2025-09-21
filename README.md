@@ -2,7 +2,7 @@
 
 iOS приложение для поиска событий с Firebase аутентификацией и избранным.
 
-[![iOS](https://img.shields.io/badge/iOS-15.0+-blue?logo=apple&logoColor=white&style=for-the-badge)](https://developer.apple.com/ios/)
+[![iOS](https://img.shields.io/badge/iOS-16.0+-blue?logo=apple&logoColor=white&style=for-the-badge)](https://developer.apple.com/ios/)
 [![Swift](https://img.shields.io/badge/Swift-5.7+-orange?logo=swift&logoColor=white&style=for-the-badge)](https://swift.org/)
 [![SwiftUI](https://img.shields.io/badge/SwiftUI-4.0+-blue?logo=swift&logoColor=white&style=for-the-badge)](https://developer.apple.com/xcode/swiftui/)
 [![Firebase](https://img.shields.io/badge/Firebase-Authentication-green?logo=firebase&logoColor=white&style=for-the-badge)](https://firebase.google.com/)
@@ -26,24 +26,7 @@ iOS приложение для поиска событий с Firebase ауте
 - **Firebase** (Auth, Firestore, Storage)
 - **Google Sign-In** OAuth
 - **URLSession** + **Async/Await**
-- **PhotosUI** + **WebKit**
-
-## 📁 Структура
-
-```
-EventHub/
-├── App/                    # Точка входа
-├── Models/                 # Модели данных
-├── Services/               # API и аутентификация
-├── Modules/
-│   ├── Auth/              # Вход/регистрация
-│   ├── EventDetails/      # Детали события
-│   ├── Favorites/         # Избранное
-│   ├── Notifications/     # Уведомления
-│   ├── Profile/           # Профиль
-│   └── TabBar/            # Навигация
-└── Resources/             # Ресурсы
-```
+- **PhotosUI**
 
 ## 🚀 Быстрый старт
 
@@ -63,4 +46,4 @@ EventHub/
 
 ---
 
-**EventHub** - создано для Dervish Swift Marathon 13, Team 5.
+**EventHub** - создано для Dervish Swift Marathon 15, Team 8.
