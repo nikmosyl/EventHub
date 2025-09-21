@@ -148,6 +148,7 @@ final class DataManager {
                 "location",
                 "images",
                 "favorites_count",
+                "categories"
             ],
             expand: [
                 "place",

@@ -23,8 +23,15 @@ struct MapView: View {
         ZStack {
             Map(
                 coordinateRegion: $region,
-                showsUserLocation: true
-            )
+                showsUserLocation: true,
+                annotationItems: viewModel.pins
+            ) { pin in
+                MapAnnotation(
+                    coordinate: CLLocationCoordinate2D(latitude: pin.lat, longitude: pin.lon)
+                ) {
+                    MapPin(icon: pin.icon, color: pin.color)
+                }
+            }
             .ignoresSafeArea()
             .onChange(of: EquatableRegion(region: region)) { newWrapped in
                 let newRegion = newWrapped.region

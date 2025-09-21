@@ -12,7 +12,7 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
     @Published var lastLocation: CLLocation?
     @Published var searchText = ""
     
-    @Published var events: [Event] = []
+    @Published var pins: [PinModel] = []
     
     private let manager = CLLocationManager()
     private var debounceTask: Task<Void, Never>?
@@ -25,7 +25,10 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
         manager.startUpdatingLocation()
     }
     
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(
+        _ manager: CLLocationManager,
+        didUpdateLocations locations: [CLLocation]
+    ) {
         guard let location = locations.last else { return }
         DispatchQueue.main.async {
             self.lastLocation = location
@@ -33,27 +36,29 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
     }
     
     func updateRegion(lat: Double, lon: Double, radius: Int) {
-        debounceTask?.cancel()
-        
-        debounceTask = Task {
-            try? await Task.sleep(nanoseconds: 3_000_000_000) // ждём 3 сек
-            guard !Task.isCancelled else { return }
+            debounceTask?.cancel()
             
-            print("‼️ обновляем данные")
-            await loadPins(lat: lat, lon: lon, radius: radius)
+            debounceTask = Task {
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+                guard !Task.isCancelled else { return }
+                
+                await loadPins(lat: lat, lon: lon, radius: radius)
+                
+            }
         }
-    }
     
+    @MainActor
     func loadPins(lat: Double, lon: Double, radius: Int) async {
-        do {
-            events = try await DataManager.shared.getEventsByCoords(
-                lat: lat,
-                lon: lon,
-                radius: radius
-            )
-            print("Загружено \(events.count) событий")
-        } catch {
-            print("Ошибка загрузки событий: \(error)")
+            do {
+                let events = try await DataManager.shared.getEventsByCoords(
+                    lat: lat,
+                    lon: lon,
+                    radius: radius
+                )
+                pins = events.compactMap { PinModel(event: $0) }
+            } catch {
+                print("Ошибка загрузки событий: \(error)")
+            }
         }
-    }
+
 }
