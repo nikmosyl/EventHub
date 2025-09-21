@@ -69,27 +69,13 @@ final class ExploreViewModel: ObservableObject {
     }
     
     func refreshData() async {
-        state = .loading
-        do {
-            async let categoriesTask = dataManager.getCategories()
-            await loadLocations()
-            
-            categories = try await categoriesTask
-            categoryModels = categories.map { CategoryModel(category: $0) }
-
-            // Перезагружаем события с текущими выбранными категориями
-            await reloadEventsWithSelectedCategories()
-            
-        } catch {
-            state = .error(error)
-            print("Error Refresh Data: \(error)")
-        }
+        await reloadEventsWithSelectedCategories()
     }
     
     // Загрузка событий с выбранными категориями
     private func reloadEventsWithSelectedCategories() async {
-        isLoadingEvents = true
-        state = .loading
+        //isLoadingEvents = true
+        //state = .loading
         
         do {
             // Если нет выбранных категорий - загружаем все события
@@ -105,7 +91,7 @@ final class ExploreViewModel: ObservableObject {
             applyCurrentFilters()
             
         } catch {
-            state = .error(error)
+            //state = .error(error)
             print("Error loading events with categories: \(error)")
         }
         

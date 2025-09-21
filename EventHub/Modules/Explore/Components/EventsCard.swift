@@ -83,8 +83,11 @@ struct EventsCard: View {
                     .foregroundColor(Color.tabBarTextPrimary)
                     
                     HStack(spacing: 6) {
-                        Image(systemName: "mappin.and.ellipse")
-                            .font(.system(size: 12))
+                        Image("Map")
+                            .renderingMode(.template)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 14, height: 14)
                             .foregroundColor(Color.textDarkSecondary)
                         
                         Text(events.locationName)
@@ -98,7 +101,7 @@ struct EventsCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(width: 237, height: 255)
-            .background(Color.white)
+            .background(Color.background)
             .clipShape(RoundedRectangle(cornerRadius: 16))
             .shadow(
                 color: .shadow,
