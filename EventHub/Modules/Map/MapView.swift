@@ -10,31 +10,28 @@ import MapKit
 
 struct MapView: View {
     @StateObject private var viewModel = MapViewModel()
+    @State private var region: MKCoordinateRegion
+    
+    init() {
+        _region = State(initialValue: MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 55.7558, longitude: 37.6173),
+            span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+        ))
+    }
     
     var body: some View {
         ZStack {
-            Map(coordinateRegion: $viewModel.region, showsUserLocation: true)
-                .ignoresSafeArea()
+            Map(
+                coordinateRegion: $region,
+                showsUserLocation: true
+            )
+            .ignoresSafeArea()
             
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        if let location = viewModel.lastLocation {
-                            withAnimation {
-                                viewModel.region.center = location.coordinate
-                            }
-                        }
-                    }) {
-                        Image(systemName: "location.fill")
-                            .font(.title2)
-                            .padding()
-                            .background(Color.white)
-                            .clipShape(Circle())
-                            .shadow(radius: 4)
+            MapToolbar(searchText: $viewModel.searchText) {
+                if let location = viewModel.lastLocation {
+                    withAnimation {
+                        region.center = location.coordinate
                     }
-                    .padding()
                 }
             }
         }

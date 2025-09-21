@@ -369,9 +369,6 @@ extension DataManager {
         case add, remove
     }
     
-    private var favoritesKey: String { "favoriteEvents" }
-    
-    // обновляем избранное
     private func updateFavorites(eventId: Int, action: FavoritesAction) async throws {
         var favorites = try await getFavoritesIds()
         
@@ -387,28 +384,23 @@ extension DataManager {
         try await saveFavorites(favorites)
     }
     
-    // сохранить в избранное
     private func saveFavorites(_ favoritesIds: [Int]) async throws {
         try await updateUserData(favoritesIds: favoritesIds)
     }
     
-    // получить  избранные
     func getFavoritesIds() async throws -> [Int] {
         let userModel = try await getUserData()
         return userModel.favoritesIds
     }
     
-    // Добавление в избранное
     func addToFavorites(eventId: Int) async throws {
         try await updateFavorites(eventId: eventId, action: .add)
     }
     
-    // Удаление из избранного
     func removeFromFavorites(eventId: Int) async throws {
         try await updateFavorites(eventId: eventId, action: .remove)
     }
     
-    // Проверка статуса избранного
     func isEventfavorited(eventId: Int) async throws -> Bool {
         let favorites = try await getFavoritesIds()
         return favorites.contains(eventId)
