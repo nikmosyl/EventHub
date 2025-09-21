@@ -32,72 +32,92 @@ final class ExploreViewModel: ObservableObject {
     @Published var selectedLocation: String = "msk"
     @Published var isLoadingLocations: Bool = false
     @Published var isLoadingEvents: Bool = false
-    @Published var showOnlyTodayEvents: Bool = false
-    @Published var showOnlyFilms: Bool = false
     
     //MARK: - Private Properties
     private var isInitialLoadComplete: Bool = false
     private let dataManager = DataManager.shared
     private var cachedSelectedCategorySlugs: [String] = []
-    private var allUpcommingEvents: [Event] = [] // Храним все события для фильтрации
+    private var allUpcommingEvents: [Event] = []
+    private var currentTask: Task<Void, Never>?
     
     //MARK: - Public Methods
     
     func loadInitialData() async {
         guard !isInitialLoadComplete else { return }
-        state = .loading
         
-        do {
-            async let categoriesTask = dataManager.getCategories()
-            await loadLocations()
+        currentTask?.cancel()
+        
+        currentTask = Task {
+            state = .loading
             
-            categories = try await categoriesTask
-            categoryModels = categories.map { CategoryModel(category: $0) }
+            do {
+                async let categoriesTask = dataManager.getCategories()
+                await loadLocations()
+                
+                categories = try await categoriesTask
+                categoryModels = categories.map { CategoryModel(category: $0) }
 
-            // Загружаем события без фильтров (все категории)
-            allUpcommingEvents = try await dataManager.getUpcamingEvents()
-            nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
-            
-            upcommingEvents = allUpcommingEvents
-            state = .loaded(upcommingEvents)
-            isInitialLoadComplete = true
-            
-        } catch {
-            state = .error(error)
-            print("Error loading data: \(error)")
+                allUpcommingEvents = try await dataManager.getUpcamingEvents()
+                nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
+                
+                upcommingEvents = allUpcommingEvents
+                state = .loaded(upcommingEvents)
+                isInitialLoadComplete = true
+                
+            } catch {
+                if !Task.isCancelled {
+                    state = .error(error)
+                    print("Error loading data: \(error)")
+                }
+            }
         }
+        
+        await currentTask?.value
     }
     
     func refreshData() async {
-        state = .loading
+        currentTask?.cancel()
         
-        // Сбрасываем все фильтры
-        selectedCategoryIds.removeAll()
-        showOnlyTodayEvents = false
-        showOnlyFilms = false
-        selectedLocation = "msk" // Устанавливаем локацию msk
-        
-        do {
-            // Загружаем все события без фильтров категорий
-            allUpcommingEvents = try await dataManager.getUpcamingEvents(categories: nil)
-            nearbyEvents = try await dataManager.getNearByEvents(location: "msk", categories: nil)
-            
-            // Применяем текущие фильтры (в данном случае будут сброшены, так что покажем все события)
-            applyCurrentFilters()
-            
-        } catch {
-            state = .error(error)
-            print("Error Refresh Data: \(error)")
+        currentTask = Task {
+            selectedCategoryIds = []
+
+            await reloadEventsWithoutFilters()
         }
+        
+        await currentTask?.value
     }
     
-    // Загрузка событий с выбранными категориями
-    private func reloadEventsWithSelectedCategories() async {
+    private func reloadEventsWithoutFilters() async {
+        guard !Task.isCancelled else { return }
+        
         isLoadingEvents = true
         state = .loading
         
         do {
-            // Если нет выбранных категорий - загружаем все события
+            allUpcommingEvents = try await dataManager.getUpcamingEvents()
+            nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
+            
+            guard !Task.isCancelled else { return }
+            
+            upcommingEvents = allUpcommingEvents
+            state = .loaded(upcommingEvents)
+            
+        } catch {
+            if !Task.isCancelled {
+                state = .error(error)
+                print("Error loading events without filters: \(error)")
+            }
+        }
+        
+        isLoadingEvents = false
+    }
+    
+    private func reloadEventsWithSelectedCategories() async {
+        guard !Task.isCancelled else { return }
+        
+        isLoadingEvents = true
+        
+        do {
             let categorySlugs = cachedSelectedCategorySlugs.isEmpty ? nil : cachedSelectedCategorySlugs
             
             allUpcommingEvents = try await dataManager.getUpcamingEvents(categories: categorySlugs)
@@ -106,75 +126,19 @@ final class ExploreViewModel: ObservableObject {
                 categories: categorySlugs
             )
             
-            // Применяем текущие фильтры (сегодня/фильмы)
-            applyCurrentFilters()
+            guard !Task.isCancelled else { return }
+            
+            upcommingEvents = allUpcommingEvents
+            state = .loaded(upcommingEvents)
             
         } catch {
-            state = .error(error)
-            print("Error loading events with categories: \(error)")
+            if !Task.isCancelled {
+                state = .error(error)
+                print("Error loading events with categories: \(error)")
+            }
         }
         
         isLoadingEvents = false
-    }
-    
-    // MARK: - Обработчики кнопок
-    
-    func showTodayEvents() {
-        showOnlyTodayEvents = true
-        showOnlyFilms = false
-        applyCurrentFilters()
-    }
-    
-    func showFilms() {
-        showOnlyFilms = true
-        showOnlyTodayEvents = false
-        applyCurrentFilters()
-    }
-    
-    func showAllEvents() {
-        showOnlyTodayEvents = false
-        showOnlyFilms = false
-        applyCurrentFilters()
-    }
-    
-    // Применение текущих фильтров
-    private func applyCurrentFilters() {
-        if showOnlyTodayEvents {
-            filterTodayEvents()
-        } else if showOnlyFilms {
-            filterFilms()
-        } else {
-            upcommingEvents = allUpcommingEvents
-        }
-        state = .loaded(upcommingEvents)
-    }
-    
-    // Фильтрация событий на сегодня
-    private func filterTodayEvents() {
-        let calendar = Calendar.current
-        let today = Date()
-        
-        upcommingEvents = allUpcommingEvents.filter { event in
-            guard let eventDate = event.dates?.first,
-                  let startTimestamp = eventDate.start else {
-                return false
-            }
-            
-            let eventStartDate = Date(timeIntervalSince1970: TimeInterval(startTimestamp))
-            
-            return calendar.isDate(eventStartDate, inSameDayAs: today)
-        }
-    }
-    
-    // Фильтрация фильмов
-    private func filterFilms() {
-
-        upcommingEvents = allUpcommingEvents.filter { event in
-            event.categories?.contains("films") == true ||
-            event.categories?.contains("cinema") == true ||
-            event.title?.lowercased().contains("film") == true ||
-            event.title?.lowercased().contains("movie") == true
-        }
     }
     
     // MARK: - Getter Methods for Views
@@ -201,10 +165,6 @@ final class ExploreViewModel: ObservableObject {
     
     func getAllNearbyEvents() -> [Event] {
         nearbyEvents
-    }
-    
-    var hasActiveFilters: Bool {
-        !selectedCategoryIds.isEmpty || !searchQuery.isEmpty || showOnlyTodayEvents || showOnlyFilms
     }
     
     var hasMoreUpcomingEvents: Bool {

@@ -43,13 +43,7 @@ struct VariableSectionView: View {
                         )
                         .overlay(
                             Capsule()
-                                .stroke(selectedCategoryIds.contains(category.id) ? category.color.opacity(0.3) : Color.gray.opacity(0.2), lineWidth: 1)
-                        )
-                        .shadow(
-                            color: .shadow,
-                            radius: 2,
-                            x: 0,
-                            y: 2
+                                .stroke(selectedCategoryIds.contains(category.id) ? category.color.opacity(0.3) : Color.shadow, lineWidth: 1)
                         )
                         .fixedSize()
                     }

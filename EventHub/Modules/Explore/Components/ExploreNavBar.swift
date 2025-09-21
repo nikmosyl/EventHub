@@ -17,13 +17,6 @@ struct ExploreNavBar: View {
     let isLoadingLocations: Bool
     let onLocationSelect: (String) -> Void
     
-    //MARK: - for Pro Buttons
-    let todayEvent: () -> Void
-    let filmsEvent: () -> Void
-    let listsEvent: () -> Void
-    @Binding var showOnlyToday: Bool
-    @Binding var showOnlyFilms: Bool
-    
     var body: some View {
         VStack(spacing: 0){
             ZStack(alignment: .top) {
@@ -71,14 +64,6 @@ struct ExploreNavBar: View {
                 VariableSectionView(
                     categories: categories,
                     selectedCategoryIds: $selectedCategoryIds
-                )
-                
-                ProButtons(
-                    todayEvent: todayEvent,
-                    filmsEvent: filmsEvent,
-                    listsEvent: listsEvent,
-                    showOnlyToday: $showOnlyToday,
-                    showOnlyFilms: $showOnlyFilms
                 )
             }
             .offset(y: -80)

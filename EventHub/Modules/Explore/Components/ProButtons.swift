@@ -9,70 +9,61 @@ import SwiftUI
 
 struct ProButtons: View {
     
-    let todayEvent: () -> Void
-    let filmsEvent: () -> Void
-    let listsEvent: () -> Void
-    @Binding var showOnlyToday: Bool
-    @Binding var showOnlyFilms: Bool
+    @StateObject var viewModel = ProButtonsViewModel()
+    
+    init() {
+        self._viewModel = StateObject(wrappedValue: ProButtonsViewModel())
+    }
     
     var body: some View {
         HStack(spacing: 16) {
             
-            // Today Button
+            //MARK: - Today Button
             Button {
-                if showOnlyToday {
-                    // Если уже активна, деактивируем
-                    showOnlyToday = false
-                } else {
-                    todayEvent()
-                    showOnlyToday = true
-                    showOnlyFilms = false
+                Task {
+                   try await print(viewModel.fetchLists())
                 }
             } label: {
                 Text("TODAY")
-                    .foregroundStyle(showOnlyToday ? .white : .textLightPrimary)
+                    .foregroundStyle(.textLightPrimary)
                     .font(.system(size: 15, weight: .medium))
                     .frame(width: 107, height: 40)
                     .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(showOnlyToday ? Color.blue : Color.buttonSecondary)
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.buttonSecondary)
                     )
             }
+
             
-            // Films Button
-            Button {
-                if showOnlyFilms {
-                    // Если уже активна, деактивируем
-                    showOnlyFilms = false
-                } else {
-                    filmsEvent()
-                    showOnlyFilms = true
-                    showOnlyToday = false
-                }
+            //MARK: - Films
+            NavigationLink {
+                
             } label: {
                 Text("FILMS")
-                    .foregroundStyle(showOnlyFilms ? .white : .textLightPrimary)
+                    .foregroundStyle(.textLightPrimary)
                     .font(.system(size: 15, weight: .medium))
                     .frame(width: 107, height: 40)
                     .background(
-                        RoundedRectangle(cornerRadius: 20)
-                            .fill(showOnlyFilms ? Color.blue : Color.buttonSecondary)
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.buttonSecondary)
                     )
             }
             
-            // Lists Button
-            Button {
-                listsEvent()
+            //MARK: - Lists
+            
+            NavigationLink {
+                
             } label: {
                 Text("LISTS")
                     .foregroundStyle(.textLightPrimary)
                     .font(.system(size: 15, weight: .medium))
                     .frame(width: 107, height: 40)
                     .background(
-                        RoundedRectangle(cornerRadius: 20)
+                        RoundedRectangle(cornerRadius: 16)
                             .fill(Color.buttonSecondary)
                     )
             }
+
         }
         .padding(.horizontal, 16)
     }

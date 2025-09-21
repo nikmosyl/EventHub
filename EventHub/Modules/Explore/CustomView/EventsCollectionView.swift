@@ -19,7 +19,6 @@ struct EventsCollectionView: View {
                 Text(title)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(Color.textDarkPrimary)
-                
                 Spacer()
                 
                 Button("See All") {
@@ -34,6 +33,7 @@ struct EventsCollectionView: View {
                 HStack(spacing: 15) {
                     ForEach(events, id: \.id) { event in
                         EventsCard(events: event)
+                            .padding(.vertical, 5)
                     }
                 }
             }

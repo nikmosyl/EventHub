@@ -17,7 +17,9 @@ struct ExploreView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 30) {
                     Spacer()
-                        .frame(height: 200)
+                        .frame(height: 160)
+                    
+                    ProButtons()
                     
                     switch viewModel.state {
                     case .idle, .loading:
@@ -63,19 +65,7 @@ struct ExploreView: View {
                     Task {
                         await viewModel.updateLocation(locationSlug)
                     }
-                },
-                todayEvent: {
-                    viewModel.showTodayEvents()
-                },
-                filmsEvent: {
-                    viewModel.showFilms()
-                },
-                listsEvent: {
-                    // Переход на экран списков
-                },
-                showOnlyToday: $viewModel.showOnlyTodayEvents,
-                showOnlyFilms: $viewModel.showOnlyFilms
-            )
+                })
         }
         .task {
             await viewModel.loadInitialData()
