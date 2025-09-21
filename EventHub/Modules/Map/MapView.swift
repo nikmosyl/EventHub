@@ -49,6 +49,17 @@ struct MapView: View {
                     }
                 }
             }
+            
+            if viewModel.isLoading {
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        CustomProgressView()
+                            .padding(.horizontal, 24)
+                    }
+                }
+            }
         }
     }
 }

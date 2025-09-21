@@ -11,8 +11,8 @@ import MapKit
 final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var lastLocation: CLLocation?
     @Published var searchText = ""
-    
     @Published var pins: [PinModel] = []
+    @Published var isLoading = false
     
     private let manager = CLLocationManager()
     private var debounceTask: Task<Void, Never>?
@@ -36,29 +36,33 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
     }
     
     func updateRegion(lat: Double, lon: Double, radius: Int) {
-            debounceTask?.cancel()
+        isLoading = true
+        debounceTask?.cancel()
+        
+        debounceTask = Task {
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            guard !Task.isCancelled else { return }
             
-            debounceTask = Task {
-                try? await Task.sleep(nanoseconds: 3_000_000_000)
-                guard !Task.isCancelled else { return }
-                
-                await loadPins(lat: lat, lon: lon, radius: radius)
-                
-            }
+            await loadPins(lat: lat, lon: lon, radius: radius)
+            
         }
+    }
     
     @MainActor
     func loadPins(lat: Double, lon: Double, radius: Int) async {
-            do {
-                let events = try await DataManager.shared.getEventsByCoords(
-                    lat: lat,
-                    lon: lon,
-                    radius: radius
-                )
-                pins = events.compactMap { PinModel(event: $0) }
-            } catch {
-                print("Ошибка загрузки событий: \(error)")
-            }
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            let events = try await DataManager.shared.getEventsByCoords(
+                lat: lat,
+                lon: lon,
+                radius: radius
+            )
+            pins = events.compactMap { PinModel(event: $0) }
+        } catch {
+            print("Ошибка загрузки событий: \(error)")
         }
-
+    }
+    
 }
