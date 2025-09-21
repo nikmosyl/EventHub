@@ -24,7 +24,7 @@ struct HeaderSection: View {
                         .aspectRatio(contentMode: .fill)
                 } placeholder: {
                     LinearGradient(
-                        colors: [Color.buttonPrimary, Color.buttonCalored],
+                        colors: [Color.buttonPrimary, Color.buttonColored],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )

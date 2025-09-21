@@ -12,7 +12,7 @@ struct TabBarView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $viewModel.selectedTab) {
-                ExploreView()
+                TestView()
                     .tabSafeAreaPadding()
                     .tag(TabItem.explore)
                 EventsView()
@@ -20,7 +20,7 @@ struct TabBarView: View {
                     .tag(TabItem.events)
                 FavoritesView()
                     .tag(TabItem.bookmark)
-                TestView()
+                MapView()
                     .tabSafeAreaPadding()
                     .tag(TabItem.map)
                 ProfileView()

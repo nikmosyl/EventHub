@@ -26,17 +26,6 @@ enum TabItem: CaseIterable {
 }
 
 // MARK: - Примеры экранов
-struct ExploreView: View {
-    var body: some View {
-        ZStack {
-            Color
-                .red
-                .ignoresSafeArea()
-            Text("ExploreView")
-        }
-    }
-}
-
 struct EventsView: View {
     var body: some View {
         ZStack {
@@ -47,18 +36,6 @@ struct EventsView: View {
         }
     }
 }
-
-struct MapView: View {
-    var body: some View {
-        ZStack {
-            Color
-                .cyan
-                .ignoresSafeArea()
-            Text("MapView")
-        }
-    }
-}
-
 
 //MARK: пример использования DataManager
 struct TestView: View {
@@ -74,12 +51,12 @@ struct TestView: View {
                 NotificationsView()
             }
             
-            VStack {
-                ForEach(viewModel.events, id: \.id) { event in
-                    EventCellView(event: event)
-                        .padding(.horizontal, 8)
-                }
-            }
+//            VStack {
+//                ForEach(viewModel.events, id: \.id) { event in
+//                    EventCellView(event: event)
+//                        .padding(.horizontal, 8)
+//                }
+//            }
         }
     }
 }
@@ -89,7 +66,7 @@ final class TestViewModel: ObservableObject {
     @Published var events: [Event] = []
     
     init() {
-        loadEvents()
+        //loadEvents()
     }
     
     func loadEvents() {

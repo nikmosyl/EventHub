@@ -17,7 +17,7 @@ struct ListsView: View {
         ScrollView {
             LazyVStack {
                 if let error = viewModel.errorText {
-                    Text(error).foregroundStyle(.buttonCalored)
+                    Text(error).foregroundStyle(.buttonColored)
                 }
                 ForEach(viewModel.items) { item in
                     ListCellView(title: viewModel.processedTitle(for: item)) {

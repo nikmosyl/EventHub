@@ -66,7 +66,7 @@ struct EventCellView: View {
                         .resizable()
                         .frame(width: 12, height: 14)
                         .font(.title3.weight(.semibold))
-                        .foregroundStyle(.buttonCalored)
+                        .foregroundStyle(.buttonColored)
                         .scaleEffect(viewModel.isLoading ? 0.8 : 1)
                         .animation(.easeInOut(duration: 0.2), value:  viewModel.isLoading)
                 }
