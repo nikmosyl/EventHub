@@ -70,15 +70,20 @@ final class ExploreViewModel: ObservableObject {
     
     func refreshData() async {
         state = .loading
+        
+        // Сбрасываем все фильтры
+        selectedCategoryIds.removeAll()
+        showOnlyTodayEvents = false
+        showOnlyFilms = false
+        selectedLocation = "msk" // Устанавливаем локацию msk
+        
         do {
-            async let categoriesTask = dataManager.getCategories()
-            await loadLocations()
+            // Загружаем все события без фильтров категорий
+            allUpcommingEvents = try await dataManager.getUpcamingEvents(categories: nil)
+            nearbyEvents = try await dataManager.getNearByEvents(location: "msk", categories: nil)
             
-            categories = try await categoriesTask
-            categoryModels = categories.map { CategoryModel(category: $0) }
-
-            // Перезагружаем события с текущими выбранными категориями
-            await reloadEventsWithSelectedCategories()
+            // Применяем текущие фильтры (в данном случае будут сброшены, так что покажем все события)
+            applyCurrentFilters()
             
         } catch {
             state = .error(error)
