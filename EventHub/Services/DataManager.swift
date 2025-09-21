@@ -241,6 +241,7 @@ final class DataManager {
         let displayName = user.displayName ?? "User"
         let photoURL = user.photoURL?.absoluteString ?? ""
         let bio = "empty"
+        let favoritesIds: [Int] = []
         
         do {
             _ = try await AuthService.shared.getUser(uid: uid)
@@ -250,7 +251,8 @@ final class DataManager {
                 displayName: displayName,
                 email: email,
                 photoURL: photoURL,
-                bio: bio
+                bio: bio,
+                favoritesIds: favoritesIds
             )
             try await AuthService.shared.saveUser(newUser)
         }
@@ -282,7 +284,8 @@ final class DataManager {
             displayName: fullName,
             email: email,
             photoURL: "",
-            bio: "empty"
+            bio: "empty",
+            favoritesIds: []
         )
         try await AuthService.shared.saveUser(user)
         
@@ -330,6 +333,7 @@ final class DataManager {
     func updateUserData(
         displayName: String? = nil,
         bio: String? = nil,
+        favoritesIds: [Int]? = nil,
         userModel: UserModel? = nil
     ) async throws {
         guard let uid = await AuthService.shared.currentUser?.uid else {
@@ -341,6 +345,9 @@ final class DataManager {
         }
         if let bio {
             try await AuthService.shared.updateUser(uid: uid, bio: bio)
+        }
+        if let favoritesIds {
+            try await AuthService.shared.updateUser(uid: uid, favoritesIds: favoritesIds)
         }
         if let userModel {
             try await AuthService.shared.updateUser(uid: uid, displayName: userModel.displayName)
@@ -378,7 +385,7 @@ extension DataManager {
     
     // обновляем избранное
     private func updateFavorites(eventId: Int, action: FavoritesAction) async throws {
-        var favorites = getFavoritesIds()
+        var favorites = try await getFavoritesIds()
         
         switch action {
         case .add:
@@ -389,17 +396,18 @@ extension DataManager {
             favorites.removeAll { $0 == eventId }
         }
         
-        saveFavorites(favorites)
+        try await saveFavorites(favorites)
     }
     
     // сохранить в избранное
-    private func saveFavorites(_ bookmarks: [Int]) {
-        UserDefaults.standard.set(bookmarks, forKey: favoritesKey)
+    private func saveFavorites(_ favoritesIds: [Int]) async throws {
+        try await updateUserData(favoritesIds: favoritesIds)
     }
     
     // получить  избранные
-    func getFavoritesIds() -> [Int] {
-        UserDefaults.standard.array(forKey: favoritesKey) as? [Int] ?? []
+    func getFavoritesIds() async throws -> [Int] {
+        let userModel = try await getUserData()
+        return userModel.favoritesIds
     }
     
     // Добавление в избранное
@@ -413,8 +421,8 @@ extension DataManager {
     }
     
     // Проверка статуса избранного
-    func isEventfavorited(eventId: Int) async -> Bool {
-        let favorites = getFavoritesIds()
+    func isEventfavorited(eventId: Int) async throws -> Bool {
+        let favorites = try await getFavoritesIds()
         return favorites.contains(eventId)
     }
 }

@@ -51,7 +51,6 @@ struct FavoritesView: View {
                 FavoritesErrorView(message: message, refresh: viewModel.loadFavorites)
             }
         }
-        .padding()
         .onAppear {
             viewModel.loadFavorites()
         }

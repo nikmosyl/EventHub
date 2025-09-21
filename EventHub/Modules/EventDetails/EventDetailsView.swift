@@ -41,6 +41,7 @@ struct EventDetailsView: View {
                     onBackTapped: { dismiss() },
                     onBookmarkTapped: viewModel.onBookmarkTapped,
                     isBookmarked: viewModel.isBookmarked,
+                    isBookmarking: viewModel.isBookmarking,
                     shareURL: viewModel.shareURL
                 )
             }
