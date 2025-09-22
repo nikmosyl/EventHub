@@ -47,7 +47,7 @@ struct CustomTF: View {
                         }
                     }) {
                         Image(systemName: showPassword ? "eye.slash" : "eye")
-                            .foregroundStyle(.textLightSecondary)
+                            .foregroundStyle(.textDarkSecondary)
                             .padding(10)
                             .frame(width: 30)
                             .contentShape(.rect)

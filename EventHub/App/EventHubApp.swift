@@ -32,7 +32,7 @@ struct EventHubApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                TabBarView()
+                RootView()
             }
         }
     }
