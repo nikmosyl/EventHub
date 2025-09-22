@@ -28,7 +28,7 @@ final class ProButtonsViewModel: ObservableObject {
     func loadFilms(location: String) async {
         do {
             filmsEvents = try await DataManager.shared.getUpcamingEvents(location: location, categories: ["cinema"])
-            print("Количество пришедших данных: \(filmsEvents)")
+            print("Количество пришедших данных: \(filmsEvents.count)")
         } catch {
             print("Не удалось получить фильмы")
             print(error.localizedDescription)
