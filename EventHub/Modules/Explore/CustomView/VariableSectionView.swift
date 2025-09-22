@@ -39,7 +39,7 @@ struct VariableSectionView: View {
                         .padding(.vertical, 10)
                         .background(
                             Capsule()
-                                .fill(selectedCategoryIds.contains(category.id) ? category.color : .white)
+                                .fill(selectedCategoryIds.contains(category.id) ? category.color : .backgroundCard)
                         )
                         .overlay(
                             Capsule()

@@ -47,7 +47,7 @@ struct CustomTF: View {
                         }
                     }) {
                         Image(systemName: showPassword ? "eye.slash" : "eye")
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(.textLightSecondary)
                             .padding(10)
                             .frame(width: 30)
                             .contentShape(.rect)
@@ -59,7 +59,7 @@ struct CustomTF: View {
         .padding(.horizontal, 10)
         .overlay {
             RoundedRectangle(cornerRadius: 16)
-                .stroke(Color(.systemGray5), lineWidth: 1)
+                .stroke(Color.borderPrimary, lineWidth: 1)
                 .frame(height: 60)
         }
     }

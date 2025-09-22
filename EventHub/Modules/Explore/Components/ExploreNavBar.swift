@@ -46,13 +46,14 @@ struct ExploreNavBar: View {
                                     } label: {
                                         Text(name)
                                     }
+                                    .background(Color.backgroundCard)
                                 }
                             }
                         }
                     }
                     
                     NavigationLink {
-                        // Экран поиска
+                        SearchView()
                     } label: {
                         SearchButton()
                             .padding(.horizontal, 20)

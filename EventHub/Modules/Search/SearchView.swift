@@ -18,7 +18,7 @@ struct SearchView: View {
                     HStack {
                         Button(action: { dismiss() }) {
                             Image(systemName: "arrow.left")
-                                .foregroundColor(.primary)
+                                .foregroundColor(Color.textDarkPrimary)
                         }
                         .frame(width: 25, height: 25)
                         
@@ -27,7 +27,7 @@ struct SearchView: View {
                     
                     Text("Search")
                         .font(.system(size: 24, weight: .regular))
-                        .foregroundColor(.primary)
+                        .foregroundColor(Color.textDarkPrimary)
                 }
                 
                 HStack(spacing: 12) {
@@ -43,7 +43,7 @@ struct SearchView: View {
             }
             .padding(.top, 16)
             .padding(.horizontal, 24)
-            .background(Color.white)
+            .background(Color.background)
             
             Spacer()
             
@@ -68,7 +68,7 @@ struct SearchView: View {
                         .foregroundColor(.red)
                     Text("Error: \(message)")
                         .font(.body)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.textDarkSecondary)
                         .multilineTextAlignment(.center)
                         .padding()
                 }
@@ -78,7 +78,7 @@ struct SearchView: View {
             Spacer()
         }
         .navigationBarBackButtonHidden()
-        .background(Color.white.ignoresSafeArea())
+        .background(Color.background.ignoresSafeArea())
         .sheet(isPresented: $viewModel.showFilters) {
             EmptyView()
         }

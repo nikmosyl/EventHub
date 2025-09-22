@@ -24,10 +24,11 @@ struct CustomSearchBar: View {
             
             TextField(placeholder, text: $text)
                 .font(.system(size: 16))
-                .foregroundColor(.primary)
+                .foregroundColor(Color.textDarkSecondary)
                 .focused($isFocused)
                 .submitLabel(.search)
         }
+        .background(Color.background)
     }
 }
 

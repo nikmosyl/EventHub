@@ -52,6 +52,7 @@ struct FavoritesView: View {
                 FavoritesErrorView(message: message, refresh: viewModel.loadFavorites)
             }
         }
+        .background(Color.background.ignoresSafeArea())
         .onAppear {
             viewModel.loadFavorites()
         }

@@ -21,6 +21,8 @@ struct EventDetailsView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else if let eventDetails = viewModel.eventDetails {
             ZStack(alignment: .top) {
+                Color.background.ignoresSafeArea()
+                
                 ScrollView {
                     VStack(spacing: 0) {
                         Spacer()

@@ -19,7 +19,7 @@ struct FilterButton: View {
                 Text("Filters")
                     .font(.system(size: 12, weight: .medium))
             }
-            .foregroundColor(.white)
+            .foregroundColor(.textLightSecondary)
             .padding(.leading, 8)
             .padding(.trailing, 11)
             .padding(.vertical, 8)

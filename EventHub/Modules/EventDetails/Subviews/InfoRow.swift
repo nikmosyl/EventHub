@@ -19,11 +19,11 @@ struct InfoRow: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(title)
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(.black)
+                    .foregroundColor(.textDarkPrimary)
                 
                 Text(subtitle)
                     .font(.system(size: 14))
-                    .foregroundColor(.gray)
+                    .foregroundColor(.textDarkSecondary)
             }
         }
     }

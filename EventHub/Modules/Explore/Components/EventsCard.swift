@@ -70,7 +70,7 @@ struct EventsCard: View {
                     Text(events.title ?? "Unknown")
                         .font(.system(size: 16, weight: .semibold))
                         .lineLimit(2)
-                        .foregroundColor(.black)
+                        .foregroundColor(.textDarkPrimary)
                         .multilineTextAlignment(.leading)
                         .fixedSize(horizontal: false, vertical: true)
                     
@@ -101,7 +101,7 @@ struct EventsCard: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
            .frame(width: 237, height: 255)
-           .background(Color.background)
+           .background(Color.backgroundCard)
            .clipShape(RoundedRectangle(cornerRadius: 16))
            .overlay(
                RoundedRectangle(cornerRadius: 16)

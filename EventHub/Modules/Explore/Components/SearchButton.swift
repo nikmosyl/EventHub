@@ -27,11 +27,11 @@ struct SearchButton: View {
                 Image(systemName: "line.3.horizontal.decrease.circle.fill")
                     .resizable()
                     .frame(width: 20, height: 20)
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.textLightSecondary)
                 
                 Text("Filters")
-                    .foregroundStyle(Color.background)
-                    .font(.system(size: 20))
+                    .foregroundStyle(Color.textLightSecondary)
+                    .font(.system(size: 14))
             }
             .background{
                 Capsule()
