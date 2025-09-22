@@ -46,8 +46,7 @@ struct HeaderSection: View {
                         Spacer()
                         Button(action: onBookmarkTapped) {
                             if isBookmarking {
-                                ProgressView()
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                CustomProgressView()
                                     .frame(width: 36, height: 36)
                             } else {
                                 Image(isBookmarked ? .bookmarkFill : .bookmark)

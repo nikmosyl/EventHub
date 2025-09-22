@@ -44,8 +44,6 @@ final class DataManager {
     
     // MARK: - Универсальный запрос
     private func fetch<T: Decodable>(_ request: APIRequest) async throws -> T {
-        
-#warning("убрать Debug")
         print("request.urlRequest():", try request.urlRequest())
         
         let (data, response) = try await URLSession.shared.data(for: try request.urlRequest())
@@ -222,16 +220,19 @@ final class DataManager {
     }
     
     func getTodayEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
-        let actualSince = Int(Date().timeIntervalSince1970) + (6 * 60 * 60)
-        let actualUntil = actualSince + (2 * 24 * 60 * 60)
+        let actualSince = Int(Date().timeIntervalSince1970)
+        let actualUntil = actualSince + (24 * 60 * 60)
         
         let filters = EventFilters(
             location: location,
             actualSince: actualSince,
             actualUntil: actualUntil,
-            categories: categories
+            categories: categories,
+            pageSize: "100"
         )
-        return try await fetchEvents(filters: filters)
+        return try await fetchEvents(filters: filters).filter { event in
+            (event.nextDate?.start ?? 0) > actualSince && (event.nextDate?.start ?? 0) < actualUntil
+        }
     }
     
     func getUpcamingEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
@@ -242,9 +243,12 @@ final class DataManager {
             location: location,
             actualSince: actualSince,
             actualUntil: actualUntil,
-            categories: categories
+            categories: categories,
+            pageSize: "100"
         )
-        return try await fetchEvents(filters: filters)
+        return try await fetchEvents(filters: filters).filter { event in
+            (event.nextDate?.start ?? 0) > actualSince && (event.nextDate?.start ?? 0) < actualUntil
+        }
     }
     
     func getPastEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
@@ -255,9 +259,12 @@ final class DataManager {
             location: location,
             actualSince: actualSince,
             actualUntil: actualUntil,
-            categories: categories
+            categories: categories,
+            pageSize: "100"
         )
-        return try await fetchEvents(filters: filters)
+        return try await fetchEvents(filters: filters).filter { event in
+            (event.previousDate?.start ?? 0) > actualSince && (event.previousDate?.start ?? 0) < actualUntil
+        }
     }
     
     func getNearByEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
@@ -351,6 +358,13 @@ final class DataManager {
         )
         try await AuthService.shared.saveUser(user)
         
+        try await loginUser(email: email, password: password, rememberUser: true)
+        
+        if rootViewModel == nil {
+            print("rootViewModel НЕ найдена")
+        } else {
+            print("rootViewModel найдена")
+        }
         await rootViewModel?.login()
     }
     
@@ -421,7 +435,6 @@ final class DataManager {
     @MainActor
     func logoutUser() throws {
         try AuthService.shared.logout()
-        UserDefaults.standard.set(false, forKey: UserSettingsLink.onboarding.rawValue)
         rootViewModel?.logout()
     }
     

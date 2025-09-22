@@ -15,15 +15,33 @@ struct ProfileView: View {
     
     var body: some View {
         ZStack {
+            Color.background.ignoresSafeArea()
+            
             if viewModel.isLoading {
                 ProgressView("Loading...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let profile = viewModel.profile {
                 VStack(spacing: 32) {
-                    Text("Profile")
-                        .font(.system(size: 24))
-                        .fontWeight(.medium)
-                    
+                    ZStack {
+                        Text("Profile")
+                            .font(.system(size: 24))
+                            .fontWeight(.medium)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        
+                        HStack {
+                            Spacer()
+                            
+                            NavigationLink {
+                                ChangePasswordView()
+                            } label: {
+                                Image("lock")
+                                    .foregroundColor(Color.textDarkPrimary)
+                            }
+                            .padding(.horizontal)
+                        }
+                    }
+                    .frame(height: 44)
+
                     ScrollView(showsIndicators: false) {
                         ProfileHeader(
                             avatarImage: selectedImage ?? viewModel.profileImage,

@@ -20,6 +20,9 @@ struct SeeAllView: View {
                     .padding(.horizontal, 16)
                 }
             }
+            .safeAreaInset(edge: .top) {
+                Color.clear.frame(height: 20)
+            }
         }
         .navigationBarBackButtonHidden()
         .background(Color.background.ignoresSafeArea())

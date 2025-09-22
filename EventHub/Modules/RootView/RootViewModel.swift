@@ -10,7 +10,7 @@ import Foundation
 @MainActor
 final class RootViewModel: ObservableObject {
     @Published var isOnboardingComplete = DataManager.shared.isOnboardingComplete()
-    @Published private(set) var isLoggedIn: Bool = false
+    @Published var isLoggedIn: Bool = false
     
     init() {
         checkAuthState()
@@ -21,6 +21,7 @@ final class RootViewModel: ObservableObject {
     }
     
     func login() {
+        print("Залогинились на RootViewModel")
         isLoggedIn = true
     }
     
@@ -34,6 +35,7 @@ final class RootViewModel: ObservableObject {
         } else {
             isLoggedIn = false
         }
+        print("isLoggedIn:", isLoggedIn)
     }
     
     func logout() {

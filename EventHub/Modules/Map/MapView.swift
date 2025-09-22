@@ -61,6 +61,7 @@ struct MapView: View {
                     HStack {
                         Spacer()
                         CustomProgressView()
+                            .scaleEffect(1.5)
                             .padding(.horizontal, 24)
                     }
                 }
