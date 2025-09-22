@@ -54,6 +54,11 @@ struct MapView: View {
                     }
                 }
             }
+            .onChange(of: viewModel.searchText) { _ in
+                Task {
+                    await viewModel.searchEvents()
+                }
+            }
             
             if viewModel.isLoading {
                 VStack {

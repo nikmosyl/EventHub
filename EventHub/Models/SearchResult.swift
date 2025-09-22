@@ -21,3 +21,18 @@ struct SearchResult: Decodable, Sendable, Identifiable {
 struct SearchResultImage: Decodable {
     let image: String?
 }
+
+extension SearchResult {
+    init(from event: Event) {
+        self.id = event.id
+        self.slug = nil
+        self.title = event.title
+        self.description = event.description
+        self.itemUrl = event.siteUrl
+        self.coords = event.location?.coords
+        self.daterange = event.dates?.first
+        self.firstImage = event.images?.first.map { img in
+            SearchResultImage(image: img.image)
+        }
+    }
+}
