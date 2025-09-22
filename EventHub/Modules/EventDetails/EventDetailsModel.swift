@@ -49,7 +49,7 @@ struct EventDetailsModel {
     init(from event: Event) {
         self.title = event.title ?? "Event"
 
-        if let firstDate = event.dates?.first, let start = firstDate.start, start > 0 {
+        if let firstDate = event.nextDate, let start = firstDate.start, start > 0 {
             self.date = firstDate.formatter(date: start, format: "dd MMMM, yyyy")
 
             if let end = firstDate.end, end > 0 {

@@ -12,7 +12,7 @@ struct TabBarView: View {
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $viewModel.selectedTab) {
-                TestView()
+                ExploreView()
                     .tabSafeAreaPadding()
                     .tag(TabItem.explore)
                 EventsView()

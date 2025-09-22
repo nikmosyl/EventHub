@@ -221,11 +221,38 @@ final class DataManager {
         return try await fetchPaged(.search(filters: filters, query: query, lat: lat, lon: lon, radius: radius, page: page))
     }
     
-    func getUpcamingEvents(categories: [String]? = nil) async throws -> [Event] {
+    func getTodayEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
+        let actualSince = Int(Date().timeIntervalSince1970) + (6 * 60 * 60)
+        let actualUntil = actualSince + (2 * 24 * 60 * 60)
+        
+        let filters = EventFilters(
+            location: location,
+            actualSince: actualSince,
+            actualUntil: actualUntil,
+            categories: categories
+        )
+        return try await fetchEvents(filters: filters)
+    }
+    
+    func getUpcamingEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
         let actualSince = Int(Date().timeIntervalSince1970)
         let actualUntil = actualSince + (7 * 24 * 60 * 60)
         
         let filters = EventFilters(
+            location: location,
+            actualSince: actualSince,
+            actualUntil: actualUntil,
+            categories: categories
+        )
+        return try await fetchEvents(filters: filters)
+    }
+    
+    func getPastEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
+        let actualUntil = Int(Date().timeIntervalSince1970)
+        let actualSince = actualUntil - (7 * 24 * 60 * 60)
+
+        let filters = EventFilters(
+            location: location,
             actualSince: actualSince,
             actualUntil: actualUntil,
             categories: categories
