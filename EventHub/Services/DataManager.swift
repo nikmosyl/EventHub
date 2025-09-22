@@ -222,8 +222,8 @@ final class DataManager {
     }
     
     func getTodayEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
-        let actualSince = Int(Date().timeIntervalSince1970) + (6 * 60 * 60)
-        let actualUntil = actualSince + (2 * 24 * 60 * 60)
+        let actualSince = Int(Date().timeIntervalSince1970)
+        let actualUntil = actualSince + (24 * 60 * 60)
         
         let filters = EventFilters(
             location: location,
