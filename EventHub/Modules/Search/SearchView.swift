@@ -60,6 +60,9 @@ struct SearchView: View {
                                 .padding(.horizontal, 24)
                         }
                     }
+                    .safeAreaInset(edge: .top) {
+                        Color.clear.frame(height: 20)
+                    }
                 }
             case .error(let message):
                 VStack {
