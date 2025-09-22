@@ -68,7 +68,7 @@ struct SignInView: View {
                         Spacer()
                         
                         NavigationLink {
-                            Text("screen Forgot password")
+                            ResetPasswordView()
                         } label: {
                             Text("Forgot Password?")
                                 .font(.system(size: 14))
@@ -137,9 +137,9 @@ struct SignInView: View {
                         HStack {
                             Text("Don't have an account?")
                             
-                            Button(action: {
-                                showSignUp = true
-                            }) {
+                            NavigationLink {
+                                SignUpView()
+                            } label: {
                                 Text("Sign Up")
                                     .foregroundColor(Color.buttonPrimary)
                             }
@@ -151,16 +151,12 @@ struct SignInView: View {
                 Spacer()
             }
         }
-        .navigationDestination(
-            isPresented: $showSignUp) {
-                SignUpView(isPresented: $showSignUp)
-            }
-            .alert("Error:", isPresented: $showError) {
-                Button("Okay", role: .cancel) {}
-            } message: {
-                Text(errorMessage)
-            }
-            .focused($keyboardIsActive)
+        .alert("Error:", isPresented: $showError) {
+            Button("Okay", role: .cancel) {}
+        } message: {
+            Text(errorMessage)
+        }
+        .focused($keyboardIsActive)
     }
     
     

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SignUpView: View {
+    @Environment(\.dismiss) var dismiss
     @FocusState private var keyboardIsActive: Bool
     
     @State private var fullName: String = ""
@@ -19,7 +20,7 @@ struct SignUpView: View {
     @State private var isSigningByGoogle: Bool = false
     @State private var alertMessage: String?
     
-    @Binding var isPresented: Bool
+    //@Binding var isPresented: Bool
     
     var body: some View {
         ZStack {
@@ -73,7 +74,6 @@ struct SignUpView: View {
                             title: isSigningByGoogle ? "Signing in…" : "Login with Google",
                             image: "googleIcon",
                             action: {
-                                //Login with Google Auth Service
                                 handleGoogleSignIn()
                             }
                         )
@@ -93,7 +93,7 @@ struct SignUpView: View {
                         
                         Button(action: {
                             //handle sign in action
-                            isPresented = false
+                            dismiss()
                         }) {
                             Text("Sign in")
                                 .foregroundColor(Color.buttonPrimary)
@@ -107,7 +107,7 @@ struct SignUpView: View {
         .navigationTitle("Sign up")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
-        .alert("Oops", isPresented: Binding(
+        .alert("Message:", isPresented: Binding(
             get: { alertMessage != nil },
             set: { _ in alertMessage = nil }
         )) {
@@ -147,6 +147,9 @@ struct SignUpView: View {
                     password: password,
                     fullName: fullName
                 )
+                alertMessage = "Complete"
+                
+                dismiss()
             } catch {
                 isSigningByEmail = false
                 alertMessage = error.localizedDescription
@@ -155,7 +158,6 @@ struct SignUpView: View {
     }
     
     private func handleGoogleSignIn() {
-#warning("TO DO: поднять какой-то флаг, чтобы отслеживать пока процесс идёт и крутить ромашку")
         Task {
             do {
                 try await DataManager.shared.loginUserWithGoogle(
@@ -165,7 +167,6 @@ struct SignUpView: View {
                 print("Ошибка в SignIn.handleGoogleSignInButton: ", error)
             }
         }
-#warning("TO DO: снять флаг")
     }
     
     // MARK: - Utils
@@ -176,5 +177,5 @@ struct SignUpView: View {
 }
 
 #Preview {
-    SignUpView(isPresented: .constant(true))
+    SignUpView()
 }
