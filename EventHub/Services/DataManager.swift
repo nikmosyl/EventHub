@@ -189,7 +189,7 @@ final class DataManager {
     }
     
     // MARK: - Получение фильмов
-    private func fetchMovies(page: Int? = nil) async throws -> [Movie] {
+    func fetchMovies(page: Int? = nil) async throws -> [Movie] {
         try await fetchPaged(.movies(page: page))
     }
     
