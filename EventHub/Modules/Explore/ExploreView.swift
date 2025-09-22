@@ -8,9 +8,10 @@
 import SwiftUI
 
 struct ExploreView: View {
-    
     @StateObject var viewModel = ExploreViewModel()
+    
     @State private var isRefreshing = false
+    
     var body: some View {
         ZStack(alignment: .top) {
             
@@ -19,7 +20,7 @@ struct ExploreView: View {
                     Spacer()
                         .frame(height: 160)
                     
-                    ProButtons()
+                    ProButtons(location: viewModel.selectedLocation)
                     
                     switch viewModel.state {
                     case .idle, .loading:
@@ -29,16 +30,12 @@ struct ExploreView: View {
                         EventsCollectionView(
                             title: "Upcomming Events",
                             events: viewModel.getUpcommingForExploreView(),
-                            tapInSeeAllButton: {
-                                // Переход на экран со всеми событиями
-                            }
+                            allEvents: viewModel.upcommingEvents
                         )
                         EventsCollectionView(
                             title: "Nearby Events",
                             events: viewModel.getNearbyEventsForExploreView(),
-                            tapInSeeAllButton: {
-                                // Переход на экран с nearby событиями
-                            }
+                            allEvents: viewModel.nearbyEvents
                         )
                     case .error(let error):
                         ErrorView(error: error) {

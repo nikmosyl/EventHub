@@ -2,54 +2,25 @@ import Foundation
 
 @MainActor
 final class ProButtonsViewModel: ObservableObject {
-    
-    @Published var todayEvents = [Event]()
     @Published var filmsEvents = [Event]()
     @Published var listsEvents = [Event]()
     @Published var isLoading = false
     @Published var error: Error?
+    @Published var todayEvents: [Event] = []
     
-    private let dataManager = DataManager.shared
-    
-    //MARK: - Получение фильмов по slug "films"
-    func fetchFilmsEvents() async throws -> [Event] {
-        // Используем категорию "films" для фильтрации
-        return try await dataManager.getUpcamingEvents(categories: ["films"])
-    }
-    
-    //MARK: - Фильтр для определенного дня
-    func filterTodayEvents(from events: [Event]) -> [Event] {
-        let calendar = Calendar.current
-        let today = Date()
-        
-        return events.filter { event in
-            guard let eventDate = event.dates?.first,
-                  let startTimestamp = eventDate.start else {
-                return false
-            }
-            
-            let eventStartDate = Date(timeIntervalSince1970: TimeInterval(startTimestamp))
-            return calendar.isDate(eventStartDate, inSameDayAs: today)
+    init(location: String) {
+        Task {
+            await loadTodays(location: location)
         }
     }
     
-    // Получение списков (подборок)
-    func fetchLists() async throws -> [ListItem] {
-        return try await dataManager.fetchLists()
-    }
-    
-    // Загрузка фильмов
-    func loadFilms() async {
-        isLoading = true
-        error = nil
-        
+    func loadTodays(location: String) async {
+        print("запрос сегодняшних")
         do {
-            filmsEvents = try await fetchFilmsEvents()
+            todayEvents = try await DataManager.shared.getTodayEvents(location: location)
+            print("сегодня будет \(todayEvents.count) events")
         } catch {
-            self.error = error
-            print("Error loading films: \(error)")
+            print("не удалось загрузить сегодняшние события")
         }
-        
-        isLoading = false
     }
 }

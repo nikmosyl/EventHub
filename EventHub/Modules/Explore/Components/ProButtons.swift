@@ -8,21 +8,19 @@
 import SwiftUI
 
 struct ProButtons: View {
+    @StateObject var viewModel: ProButtonsViewModel
     
-    @StateObject var viewModel = ProButtonsViewModel()
     
-    init() {
-        self._viewModel = StateObject(wrappedValue: ProButtonsViewModel())
+    init(location: String) {
+        _viewModel = StateObject(wrappedValue: ProButtonsViewModel(location: location))
     }
     
     var body: some View {
         HStack(spacing: 16) {
             
             //MARK: - Today Button
-            Button {
-                Task {
-                   try await print(viewModel.fetchLists())
-                }
+            NavigationLink {
+                SeeAllView(events: viewModel.todayEvents)
             } label: {
                 Text("TODAY")
                     .foregroundStyle(.textLightPrimary)
@@ -33,13 +31,11 @@ struct ProButtons: View {
                             .fill(Color.buttonSecondary)
                     )
             }
-
+            
             
             //MARK: - Films
-            Button {
-                Task {
-                    await viewModel.loadFilms()
-                }
+            NavigationLink {
+                Text("Screen with films in development")
             } label: {
                 Text("FILMS")
                     .foregroundStyle(.textLightPrimary)
@@ -65,7 +61,7 @@ struct ProButtons: View {
                             .fill(Color.buttonSecondary)
                     )
             }
-
+            
         }
         .padding(.horizontal, 16)
     }

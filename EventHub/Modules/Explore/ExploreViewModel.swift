@@ -57,7 +57,7 @@ final class ExploreViewModel: ObservableObject {
                 categories = try await categoriesTask
                 categoryModels = categories.map { CategoryModel(category: $0) }
 
-                allUpcommingEvents = try await dataManager.getUpcamingEvents()
+                allUpcommingEvents = try await dataManager.getUpcamingEvents(location: selectedLocation)
                 nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
                 
                 upcommingEvents = allUpcommingEvents
@@ -94,7 +94,7 @@ final class ExploreViewModel: ObservableObject {
         state = .loading
         
         do {
-            allUpcommingEvents = try await dataManager.getUpcamingEvents()
+            allUpcommingEvents = try await dataManager.getUpcamingEvents(location: selectedLocation)
             nearbyEvents = try await dataManager.getNearByEvents(location: selectedLocation)
             
             guard !Task.isCancelled else { return }
@@ -120,7 +120,7 @@ final class ExploreViewModel: ObservableObject {
         do {
             let categorySlugs = cachedSelectedCategorySlugs.isEmpty ? nil : cachedSelectedCategorySlugs
             
-            allUpcommingEvents = try await dataManager.getUpcamingEvents(categories: categorySlugs)
+            allUpcommingEvents = try await dataManager.getUpcamingEvents(location: selectedLocation, categories: categorySlugs)
             nearbyEvents = try await dataManager.getNearByEvents(
                 location: selectedLocation,
                 categories: categorySlugs
