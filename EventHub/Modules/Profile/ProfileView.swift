@@ -107,9 +107,6 @@ struct ProfileView: View {
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
-        .onAppear {
-            viewModel.loadUserData()
-        }
     }
 }
 
