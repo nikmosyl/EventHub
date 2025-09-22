@@ -14,6 +14,8 @@ final class SearchViewModel: ObservableObject {
     @Published var viewState: SearchViewState = .empty
     @Published var showFilters: Bool = false
     
+    @Published var filter = EventFilters()
+    
     private var cancellables = Set<AnyCancellable>()
     
     init() {
