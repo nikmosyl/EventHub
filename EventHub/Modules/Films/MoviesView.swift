@@ -14,26 +14,29 @@ struct MoviesView: View {
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
-        ScrollView {
-            LazyVStack {
-                if let error = viewModel.errorText {
-                    Text(error).foregroundStyle(.buttonColored)
-                }
-                ForEach(viewModel.items) { item in
-                    MovieCellView(
-                        poster: viewModel.processedPoster(for: item),
-                        title: viewModel.processedTitle(for: item)
-                    ) {
-                        if let url = item.poster?.source?.link {
-                            selectedWebURL = WebURL(url)
-                        }
+        ZStack {
+            Color.background.ignoresSafeArea()
+            
+            ScrollView {
+                LazyVStack {
+                    if let error = viewModel.errorText {
+                        Text(error).foregroundStyle(.buttonColored)
                     }
+                    ForEach(viewModel.items) { item in
+                        MovieCellView(
+                            poster: viewModel.processedPoster(for: item),
+                            title: viewModel.processedTitle(for: item)
+                        ) {
+                            selectedWebURL = WebURL("https://kudago.com/spb/kino/")
+                        }
+                        .shadow(color: Color.shadow, radius: 5, x: 0, y: 6)
+                    }
+                    .padding(.top, 16)
                 }
-                .padding(.top, 16)
-            }
-            if viewModel.isLoading {
-                ProgressView("Uploading films...")
-                    .padding(.top, 12)
+                if viewModel.isLoading {
+                    ProgressView("Uploading films...")
+                        .padding(.top, 12)
+                }
             }
         }
         .navigationBarBackButtonHidden()
@@ -52,15 +55,6 @@ struct MoviesView: View {
                     .fontWeight(.regular)
                     .foregroundStyle(.textDarkPrimary)
                     .minimumScaleFactor(0.5)
-            }
-            
-            ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink(destination: {
-                    Text("The search screen will be implemented later...")
-                }, label: {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.textDarkPrimary)
-                })
             }
         }
         .task { await viewModel.load() }

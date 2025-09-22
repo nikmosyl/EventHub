@@ -37,7 +37,7 @@ struct ProButtons: View {
             //MARK: - Films
             NavigationLink {
                 //Text("Screen with films in development")
-                SeeAllView(events: viewModel.filmsEvents)
+                MoviesView()
             } label: {
                 Text("FILMS")
                     .foregroundStyle(.textLightPrimary)

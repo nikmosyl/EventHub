@@ -38,7 +38,6 @@ struct MovieCellView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color.background)
         )
-        .shadow(color: Color.shadow, radius: 16, x: 0, y: 10)
     }
 }
 
