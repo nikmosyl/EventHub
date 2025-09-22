@@ -12,7 +12,7 @@ struct FavoritesLoadingView: View {
         VStack(spacing: 20) {
             Spacer()
 
-            ProgressView()
+            CustomProgressView()
                 .scaleEffect(1.2)
                 .progressViewStyle(CircularProgressViewStyle(tint: .buttonPrimary))
 

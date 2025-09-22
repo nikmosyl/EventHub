@@ -26,7 +26,7 @@ struct ExploreView: View {
                     
                     switch viewModel.state {
                     case .idle, .loading:
-                        ProgressView()
+                        CustomProgressView()
                             .frame(height: 200)
                     case .loaded(_):
                         EventsCollectionView(

@@ -60,6 +60,17 @@ struct EventDetailsModel {
             } else {
                 self.timeRange = firstDate.formatter(date: start, format: "EEEE, HH:mm")
             }
+        } else if let firstDate = event.previousDate, let start = firstDate.start {
+            self.date = firstDate.formatter(date: start, format: "dd MMMM, yyyy")
+
+            if let end = firstDate.end, end > 0 {
+                let startTime = firstDate.formatter(date: start, format: "HH:mm")
+                let endTime = firstDate.formatter(date: end, format: "HH:mm")
+                let dayName = firstDate.formatter(date: start, format: "EEEE")
+                self.timeRange = "\(dayName), \(startTime) - \(endTime)"
+            } else {
+                self.timeRange = firstDate.formatter(date: start, format: "EEEE, HH:mm")
+            }
         } else {
             self.date = "Date TBD"
             self.timeRange = "Time TBD"
