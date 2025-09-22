@@ -229,9 +229,12 @@ final class DataManager {
             location: location,
             actualSince: actualSince,
             actualUntil: actualUntil,
-            categories: categories
+            categories: categories,
+            pageSize: "100"
         )
-        return try await fetchEvents(filters: filters)
+        return try await fetchEvents(filters: filters).filter { event in
+            (event.nextDate?.start ?? 0) > actualSince && (event.nextDate?.start ?? 0) < actualUntil
+        }
     }
     
     func getUpcamingEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
@@ -242,9 +245,12 @@ final class DataManager {
             location: location,
             actualSince: actualSince,
             actualUntil: actualUntil,
-            categories: categories
+            categories: categories,
+            pageSize: "100"
         )
-        return try await fetchEvents(filters: filters)
+        return try await fetchEvents(filters: filters).filter { event in
+            (event.nextDate?.start ?? 0) > actualSince && (event.nextDate?.start ?? 0) < actualUntil
+        }
     }
     
     func getPastEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
@@ -255,9 +261,12 @@ final class DataManager {
             location: location,
             actualSince: actualSince,
             actualUntil: actualUntil,
-            categories: categories
+            categories: categories,
+            pageSize: "100"
         )
-        return try await fetchEvents(filters: filters)
+        return try await fetchEvents(filters: filters).filter { event in
+            (event.previousDate?.start ?? 0) > actualSince && (event.previousDate?.start ?? 0) < actualUntil
+        }
     }
     
     func getNearByEvents(location: String, categories: [String]? = nil) async throws -> [Event] {

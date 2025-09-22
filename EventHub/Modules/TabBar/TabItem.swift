@@ -25,18 +25,6 @@ enum TabItem: CaseIterable {
     }
 }
 
-// MARK: - Примеры экранов
-struct EventsView: View {
-    var body: some View {
-        ZStack {
-            Color
-                .green
-                .ignoresSafeArea()
-            Text("EventsView")
-        }
-    }
-}
-
 #Preview {
     TabBarView()
 }

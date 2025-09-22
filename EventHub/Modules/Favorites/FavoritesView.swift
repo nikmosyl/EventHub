@@ -46,7 +46,10 @@ struct FavoritesView: View {
                     events: viewModel.favoriteEvents,
                     refresh: viewModel.loadFavorites
                 )
-                .tabSafeAreaPadding(40)
+                .safeAreaInset(edge: .top) {
+                    Color.clear.frame(height: 20)
+                }
+                .tabSafeAreaPadding(50)
                 
             case .error(let message):
                 FavoritesErrorView(message: message, refresh: viewModel.loadFavorites)
