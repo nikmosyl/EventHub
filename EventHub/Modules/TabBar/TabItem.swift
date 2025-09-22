@@ -37,63 +37,6 @@ struct EventsView: View {
     }
 }
 
-//MARK: пример использования DataManager
-struct TestView: View {
-    @StateObject private var viewModel = TestViewModel()
-    
-    var body: some View {
-        ScrollView {
-            NavigationLink("Lists") {
-                ListsView()
-            }
-            
-            NavigationLink("Notifications") {
-                NotificationsView()
-            }
-            
-//            VStack {
-//                ForEach(viewModel.events, id: \.id) { event in
-//                    EventCellView(event: event)
-//                        .padding(.horizontal, 8)
-//                }
-//            }
-        }
-    }
-}
-
-@MainActor
-final class TestViewModel: ObservableObject {
-    @Published var events: [Event] = []
-    
-    init() {
-        //loadEvents()
-    }
-    
-    func loadEvents() {
-        Task {
-            do {
-                let events = try await DataManager.shared.getUpcamingEvents()
-                self.events = events
-            } catch {
-                print("ProfileViewModel Ошибка при загрузке событий, ошибка: \(error)")
-                if let netError = error as? NetworkError {
-                    switch netError {
-                    case .invalidResponse:
-                        print("⚠️ Некорректный ответ сервера")
-                    case .badStatus(let code):
-                        print("⚠️ Сервер вернул статус: \(code)")
-                    case .decoding(let decodeError):
-                        print("⚠️ Ошибка декодирования:", decodeError)
-                    case .invalidURL:
-                        print("⚠️ Ошибка url:")
-                    }
-                }
-                self.events = []
-            }
-        }
-    }
-}
-
 #Preview {
     TabBarView()
 }

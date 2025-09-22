@@ -31,7 +31,7 @@ final class EventCellViewModel: ObservableObject {
             return nextDate.formatter(date: start, format: "E, dd MMM • HH:mm")
         }
         if let previousDate = event.previousDate, let start = previousDate.start {
-            return previousDate.formatter(date: start, format: "E, dd MMM • HH:mm")
+            return "was " + previousDate.formatter(date: start, format: "E, dd MMM • HH:mm")
         }
         
         return "Date not specified"
