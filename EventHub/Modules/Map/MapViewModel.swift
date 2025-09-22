@@ -27,6 +27,21 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
         manager.startUpdatingLocation()
     }
     
+    @MainActor
+    func searchEvents() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            let searchResults = try await DataManager.shared.searchEvents(query: searchText)
+            let ids: [Int] = searchResults.compactMap { $0.id }
+            let events: [Event] = try await DataManager.shared.getEventsByIds(ids: ids)
+            pins = events.compactMap { PinModel(event: $0) }
+        } catch {
+            print("Поиск по карте не удался", error)
+        }
+    }
+    
     func locationManager(
         _ manager: CLLocationManager,
         didUpdateLocations locations: [CLLocation]
@@ -46,7 +61,6 @@ final class MapViewModel: NSObject, ObservableObject, CLLocationManagerDelegate 
             guard !Task.isCancelled else { return }
             
             await loadPins(lat: lat, lon: lon, radius: radius)
-            
         }
     }
     

@@ -83,16 +83,6 @@ struct EventCellView: View {
             }
         }
     }
-    
-    private var placeholder: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(.textDarkSecondary)
-            Image(systemName: "photo")
-                .font(.title2)
-                .foregroundStyle(.tertiary)
-        }
-    }
 }
 
 #Preview {

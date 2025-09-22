@@ -24,3 +24,11 @@ struct NetworkImage: View {
         }
     }
 }
+
+#Preview {
+    NetworkImage(imageUrl: "https://image.tmdb.org/t/p/w500/edv5CZvWj09upOsy2Y6IwDhK8bt.jpg")
+        .frame(width: 120, height: 120)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .shadow(radius: 3)
+        .padding()
+}

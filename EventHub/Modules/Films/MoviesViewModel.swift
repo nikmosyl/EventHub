@@ -1,15 +1,15 @@
 //
-//  ListsViewModel.swift
+//  MoviesViewModel.swift
 //  EventHub
 //
-//  Created by Наташа Спиридонова on 19.09.2025.
+//  Created by Наташа Спиридонова on 22.09.2025.
 //
 
 import Foundation
 
 @MainActor
-final class ListsViewModel: ObservableObject {
-    @Published private(set) var items: [ListItem] = []
+final class MoviesViewModel: ObservableObject {
+    @Published private(set) var items: [Movie] = []
     @Published private(set) var isLoading = false
     @Published private(set) var errorText: String?
     
@@ -19,14 +19,18 @@ final class ListsViewModel: ObservableObject {
         defer { isLoading = false }
         
         do {
-            let newItems = try await DataManager.shared.fetchLists()
+            let newItems = try await DataManager.shared.fetchMovies()
             self.items = newItems
         } catch {
             self.errorText = error.localizedDescription
         }
     }
     
-    func processedTitle(for item: ListItem) -> String {
+    func processedTitle(for item: Movie) -> String {
         item.title ?? "Unknown title"
+    }
+    
+    func processedPoster(for item: Movie) -> String {
+        item.poster?.image ?? ""
     }
 }

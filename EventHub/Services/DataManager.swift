@@ -187,7 +187,7 @@ final class DataManager {
     }
     
     // MARK: - Получение фильмов
-    private func fetchMovies(page: Int? = nil) async throws -> [Movie] {
+    func fetchMovies(page: Int? = nil) async throws -> [Movie] {
         try await fetchPaged(.movies(page: page))
     }
     
@@ -254,7 +254,7 @@ final class DataManager {
     func getPastEvents(location: String, categories: [String]? = nil) async throws -> [Event] {
         let actualUntil = Int(Date().timeIntervalSince1970)
         let actualSince = actualUntil - (7 * 24 * 60 * 60)
-
+        
         let filters = EventFilters(
             location: location,
             actualSince: actualSince,
@@ -482,6 +482,7 @@ extension DataManager {
     
     func addToFavorites(eventId: Int) async throws {
         try await updateFavorites(eventId: eventId, action: .add)
+        await addNotification(eventId: eventId)
     }
     
     func removeFromFavorites(eventId: Int) async throws {
@@ -491,6 +492,16 @@ extension DataManager {
     func isEventfavorited(eventId: Int) async throws -> Bool {
         let favorites = try await getFavoritesIds()
         return favorites.contains(eventId)
+    }
+    
+    func addNotification(eventId: Int) async {
+        do {
+            let event = try await getEvent(id: eventId)
+            NotificationService.shared.scheduleNotifications(for: event)
+            print("уведомление для id:", eventId, "добавлено")
+        } catch {
+            print("не получилось добавить уведомление для id:", eventId, "ошибка:", error)
+        }
     }
 }
 

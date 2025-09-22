@@ -9,7 +9,7 @@
 import Foundation
 
 // MARK: - Фильм
-struct Movie: Decodable, Sendable {
+struct Movie: Decodable, Sendable, Identifiable {
     let id: Int?
     let title: String?
     let poster: MoviePoster?
