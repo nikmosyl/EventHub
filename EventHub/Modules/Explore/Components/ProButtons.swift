@@ -9,9 +9,10 @@ import SwiftUI
 
 struct ProButtons: View {
     @StateObject var viewModel: ProButtonsViewModel
-    
+    let location: String
     
     init(location: String) {
+        self.location = location
         _viewModel = StateObject(wrappedValue: ProButtonsViewModel(location: location))
     }
     
@@ -35,7 +36,8 @@ struct ProButtons: View {
             
             //MARK: - Films
             NavigationLink {
-                Text("Screen with films in development")
+                //Text("Screen with films in development")
+                SeeAllView(events: viewModel.filmsEvents)
             } label: {
                 Text("FILMS")
                     .foregroundStyle(.textLightPrimary)
@@ -64,5 +66,11 @@ struct ProButtons: View {
             
         }
         .padding(.horizontal, 16)
+        .onChange(of: location) { newLocation in
+            Task {
+                await viewModel.loadTodays(location: newLocation)
+                await viewModel.loadFilms(location: newLocation)
+            }
+        }
     }
 }

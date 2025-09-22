@@ -11,6 +11,7 @@ final class ProButtonsViewModel: ObservableObject {
     init(location: String) {
         Task {
             await loadTodays(location: location)
+            await loadFilms(location: location)
         }
     }
     
@@ -21,6 +22,16 @@ final class ProButtonsViewModel: ObservableObject {
             print("сегодня будет \(todayEvents.count) events")
         } catch {
             print("не удалось загрузить сегодняшние события")
+        }
+    }
+    
+    func loadFilms(location: String) async {
+        do {
+            filmsEvents = try await DataManager.shared.getUpcamingEvents(location: location, categories: ["cinema"])
+            print("Количество пришедших данных: \(filmsEvents)")
+        } catch {
+            print("Не удалось получить фильмы")
+            print(error.localizedDescription)
         }
     }
 }

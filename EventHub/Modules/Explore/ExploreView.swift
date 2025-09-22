@@ -10,8 +10,6 @@ import SwiftUI
 struct ExploreView: View {
     @StateObject var viewModel = ExploreViewModel()
     
-    @State private var isRefreshing = false
-    
     var body: some View {
         ZStack(alignment: .top) {
             Color.background
@@ -47,11 +45,10 @@ struct ExploreView: View {
                         }
                     }
                 }
-            }
-            .refreshable {
-                isRefreshing = true
-                await viewModel.refreshData()
-                isRefreshing = false
+                .refreshable {
+                    await viewModel.refreshData()
+                }
+                .tint(.gray)
             }
 
             ExploreNavBar(
