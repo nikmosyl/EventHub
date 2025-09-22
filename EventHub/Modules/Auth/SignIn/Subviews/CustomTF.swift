@@ -8,38 +8,35 @@
 import SwiftUI
 
 struct CustomTF: View {
+    @State private var showPassword: Bool = false
+    @Binding var value: String
     var sfIcon: String
     var iconTint: Color = .gray
     var hint: String
-    /// Hides Textfield
     var isPassword: Bool = false
-    @Binding var value: String
-    /// View Properties
-    @State private var showPassword: Bool = false
     
     var body: some View {
-        HStack(alignment: .top, spacing: 8, content: {
+        HStack(alignment: .top, spacing: 8) {
             Image(sfIcon)
                 .foregroundStyle(iconTint)
                 .frame(width: 30)
                 .offset(y: 2)
+            ZStack {
+                SecureField(
+                    "",
+                    text: $value,
+                    prompt: Text(hint).foregroundColor(Color.textDarkSecondary)
+                )
+                .opacity(isPassword && !showPassword ? 1 : 0)
                 
-            VStack(alignment: .leading, spacing: 8) {
-                if isPassword {
-                    Group {
-                        /// Revealing Password when users wants to show Password
-                        if showPassword {
-                            TextField(hint, text: $value)
-                        } else {
-                            SecureField(hint, text: $value)
-                        }
-                    }
-                } else {
-                    TextField(hint, text: $value)
-                }
+                TextField(
+                    "",
+                    text: $value,
+                    prompt: Text(hint).foregroundColor(Color.textDarkSecondary)
+                )
+                .opacity(!isPassword || showPassword ? 1 : 0)
             }
-            .overlay(alignment: .trailing, content: {
-                /// Password Reveal Button
+            .overlay(alignment: .trailing) {
                 if isPassword {
                     Button(action: {
                         withAnimation {
@@ -53,9 +50,9 @@ struct CustomTF: View {
                             .contentShape(.rect)
                     }
                 }
-            })
-            
-        })
+            }
+                     
+        }
         .padding(.horizontal, 10)
         .overlay {
             RoundedRectangle(cornerRadius: 16)

@@ -360,6 +360,13 @@ final class DataManager {
         )
         try await AuthService.shared.saveUser(user)
         
+        try await loginUser(email: email, password: password, rememberUser: true)
+        
+        if rootViewModel == nil {
+            print("rootViewModel НЕ найдена")
+        } else {
+            print("rootViewModel найдена")
+        }
         await rootViewModel?.login()
     }
     
