@@ -15,6 +15,8 @@ struct ProfileView: View {
     
     var body: some View {
         ZStack {
+            Color.background.ignoresSafeArea()
+            
             if viewModel.isLoading {
                 ProgressView("Loading...")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

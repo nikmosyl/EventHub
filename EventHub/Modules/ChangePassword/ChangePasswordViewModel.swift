@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 final class ChangePasswordViewModel: ObservableObject {
     @Published var oldPassword = ""
     @Published var newPassword = ""
