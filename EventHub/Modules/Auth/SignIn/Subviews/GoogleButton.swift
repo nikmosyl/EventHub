@@ -21,6 +21,7 @@ struct GoogleButton: View {
                     .frame(width: 26, height: 26)
                 Text(title)
                     .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(.textDarkPrimary)
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal)

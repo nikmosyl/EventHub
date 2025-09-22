@@ -75,7 +75,7 @@ struct EventCellView: View {
             .padding(12)
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color.background)
+                    .fill(Color.backgroundCard)
                     .shadow(color: Color.shadow, radius: 8, x: 0, y: 2)
             )
             .onAppear {

@@ -14,12 +14,11 @@ struct ContentSection: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            
             VStack(alignment: .leading) {
                 Text(eventDetails.title)
                     .font(.title)
                     .fontWeight(.regular)
-                    .foregroundColor(.black)
+                    .foregroundColor(.textDarkPrimary)
                 
                 Spacer()
                     .frame(height: 38)
@@ -52,12 +51,12 @@ struct ContentSection: View {
                 VStack(alignment: .leading, spacing: 16) {
                     Text("About Event")
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(.black)
+                        .foregroundColor(.textDarkPrimary)
                     
                     VStack(alignment: .leading, spacing: 4) {
                         Text(eventDetails.description)
                             .font(.system(size: 16, weight: .regular))
-                            .foregroundColor(.black)
+                            .foregroundColor(.textDarkPrimary)
                             .lineSpacing(10)
                             .lineLimit(3)
                         
@@ -65,7 +64,7 @@ struct ContentSection: View {
                             Button(action: onReadMoreTapped) {
                                 Text("Read More..")
                                     .font(.system(size: 16, weight: .regular))
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.buttonPrimary)
                                     .lineSpacing(10)
                             }
                         }
@@ -73,7 +72,7 @@ struct ContentSection: View {
                 }
             }
         }
-        .background(Color.white)
+        .background(Color.background)
     }
 }
 

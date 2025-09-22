@@ -12,7 +12,6 @@ import Foundation
 struct Event: Decodable, Sendable, Identifiable {
     let id: Int?
     let title: String?
-    //let slug: String?
     let description: String?
     let shortTitle: String?
     let dates: [EventDate]?
@@ -72,5 +71,28 @@ struct Event: Decodable, Sendable, Identifiable {
             let siteUrl: String?
             let isStub: Bool?
         }
+    }
+}
+
+extension Event {
+    init(from searchResult: SearchResult) {
+        self.id = searchResult.id
+        self.title = searchResult.title
+        self.description = searchResult.description
+        self.shortTitle = searchResult.title
+        self.dates = searchResult.daterange.map { [$0] }
+        self.location = searchResult.coords.map { coords in
+            Location(slug: nil, name: nil, coords: coords)
+        }
+        self.images = searchResult.firstImage.map { image in
+            [EventImage(image: image.image, source: nil)]
+        }
+        self.siteUrl = searchResult.itemUrl
+        self.categories = nil
+        self.participants = nil
+        
+        self.place = nil
+        self.price = nil
+        self.favoritesCount = nil
     }
 }

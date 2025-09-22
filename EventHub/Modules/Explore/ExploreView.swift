@@ -14,6 +14,8 @@ struct ExploreView: View {
     
     var body: some View {
         ZStack(alignment: .top) {
+            Color.background
+                .ignoresSafeArea()
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 30) {

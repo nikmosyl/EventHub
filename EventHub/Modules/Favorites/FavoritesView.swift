@@ -21,13 +21,14 @@ struct FavoritesView: View {
                     Spacer()
                     
                     NavigationLink {
-                        Text("Тут должен быть search")
+                        SearchView()
                     } label: {
                         Image(systemName: "magnifyingglass")
                             .resizable()
                             .frame(width: 18, height: 18)
                             .foregroundStyle(.textDarkPrimary)
                     }
+                    .padding(.horizontal, 16)
                     
                 }
             }
@@ -51,6 +52,7 @@ struct FavoritesView: View {
                 FavoritesErrorView(message: message, refresh: viewModel.loadFavorites)
             }
         }
+        .background(Color.background.ignoresSafeArea())
         .onAppear {
             viewModel.loadFavorites()
         }
