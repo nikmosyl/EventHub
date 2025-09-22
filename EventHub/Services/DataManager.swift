@@ -44,8 +44,6 @@ final class DataManager {
     
     // MARK: - Универсальный запрос
     private func fetch<T: Decodable>(_ request: APIRequest) async throws -> T {
-        
-#warning("убрать Debug")
         print("request.urlRequest():", try request.urlRequest())
         
         let (data, response) = try await URLSession.shared.data(for: try request.urlRequest())
@@ -437,7 +435,6 @@ final class DataManager {
     @MainActor
     func logoutUser() throws {
         try AuthService.shared.logout()
-        UserDefaults.standard.set(false, forKey: UserSettingsLink.onboarding.rawValue)
         rootViewModel?.logout()
     }
     
