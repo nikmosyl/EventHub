@@ -16,9 +16,9 @@ struct ExploreView: View {
                 .ignoresSafeArea()
             
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 30) {
+                VStack(spacing: 15) {
                     Spacer()
-                        .frame(height: 160)
+                        .frame(height: 175)
                     
                     ProButtons(location: viewModel.selectedLocation)
                     
@@ -45,11 +45,11 @@ struct ExploreView: View {
                         }
                     }
                 }
-                .refreshable {
-                    await viewModel.refreshData()
-                }
-                .tint(.gray)
             }
+            .refreshable {
+                await viewModel.refreshData()
+            }
+            .tint(.gray)
 
             ExploreNavBar(
                 categories: viewModel.getCategoryForExploreView(),

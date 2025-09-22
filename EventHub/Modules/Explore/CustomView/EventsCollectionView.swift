@@ -13,11 +13,12 @@ struct EventsCollectionView: View {
     let allEvents: [Event]
     
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 1) {
             HStack {
                 Text(title)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(Color.textDarkPrimary)
+                    .frame(height: 34)
                 Spacer()
                 
                 NavigationLink {
