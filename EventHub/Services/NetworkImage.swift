@@ -19,7 +19,7 @@ struct NetworkImage: View {
         } placeholder: {
             ZStack {
                 Color.clear
-                ProgressView()
+                CustomProgressView()
             }
         }
     }
