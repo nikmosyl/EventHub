@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SignUpView: View {
+    @FocusState private var keyboardIsActive: Bool
+    
     @State private var fullName: String = ""
     @State private var emailID: String = ""
     @State private var password: String = ""
@@ -21,31 +23,40 @@ struct SignUpView: View {
     
     var body: some View {
         ZStack {
-            Color("background")
-                .ignoresSafeArea()
+            Color.background.ignoresSafeArea()
             
             VStack(alignment: .center, spacing: 50) {
-                /// Custom Text Fields
-                CustomTF(sfIcon: "person", hint: "Full name", value: $fullName)
+                CustomTF(
+                    value: $fullName,
+                    sfIcon: "person",
+                    hint: "Full name"
+                )
                 
-                CustomTF(sfIcon: "envelope", hint: "abc@email.com", value: $emailID)
+                CustomTF(
+                    value: $emailID,
+                    sfIcon: "envelope",
+                    hint: "abc@email.com"
+                )
                 
-                CustomTF(sfIcon: "lock", hint: "Your password", isPassword: true, value: $password)
-                    .textContentType(.none)
-                    .autocorrectionDisabled(true)
-                    .textInputAutocapitalization(.never)
+                CustomTF(
+                    value: $password,
+                    sfIcon: "lock",
+                    hint: "Your password",
+                    isPassword: true
+                )
                 
-                CustomTF(sfIcon: "lock", hint: "Confirm password", isPassword: true, value: $confirmPassword)
-                    .textContentType(.none)
-                    .autocorrectionDisabled(true)
-                    .textInputAutocapitalization(.never)
+                CustomTF(
+                    value: $confirmPassword,
+                    sfIcon: "lock",
+                    hint: "Confirm password",
+                    isPassword: true
+                )
                 
                 VStack(alignment: .center, spacing: 40) {
                     SignInButton(
                         backgroundColor: .buttonPrimary,
                         circleColor: .buttonSecondary,
                         title: isSigningByEmail ? "PLEASE WAIT…" : "SIGN UP") {
-                            //handle sign up action
                             handleEmailSignUp()
                         }
                         .disabled(isSigningByEmail)
@@ -54,37 +65,39 @@ struct SignUpView: View {
                         .background(.buttonPrimary, in: RoundedRectangle(cornerRadius: 16))
                         .foregroundStyle(.white)
                     
-                    Text("OR")
-                        .foregroundStyle(.secondary)
+                    if !keyboardIsActive {
+                        Text("OR")
+                            .foregroundStyle(.secondary)
+                        
+                        GoogleButton(
+                            title: isSigningByGoogle ? "Signing in…" : "Login with Google",
+                            image: "googleIcon",
+                            action: {
+                                //Login with Google Auth Service
+                                handleGoogleSignIn()
+                            }
+                        )
+                        .disabled(isSigningByGoogle)
+                        .frame(width: 300)
+                        .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
+                        .background(Color.background, in: RoundedRectangle(cornerRadius: 16))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                        )
+                        .foregroundStyle(.black)
+                    }
                     
-                    GoogleButton(
-                        title: isSigningByGoogle ? "Signing in…" : "Login with Google",
-                        image: "googleIcon",
-                        action: {
-                            //Login with Google Auth Service
-                            handleGoogleSignIn()
+                    HStack {
+                        Text("Already have an account?")
+                        
+                        Button(action: {
+                            //handle sign in action
+                            isPresented = false
+                        }) {
+                            Text("Sign in")
+                                .foregroundColor(Color.buttonPrimary)
                         }
-                    )
-                    .disabled(isSigningByGoogle)
-                    .frame(width: 300)
-                    .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
-                    .background(Color.background, in: RoundedRectangle(cornerRadius: 16))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                    )
-                    .foregroundStyle(.black)
-                }
-                
-                HStack {
-                    Text("Already have an account?")
-                    
-                    Button(action: {
-                        //handle sign in action
-                        isPresented = false
-                    }) {
-                        Text("Sign in")
-                            .foregroundColor(Color.buttonPrimary)
                     }
                 }
             }
@@ -102,6 +115,7 @@ struct SignUpView: View {
         } message: {
             Text(alertMessage ?? "")
         }
+        .focused($keyboardIsActive)
     }
     
     // MARK: - Actions

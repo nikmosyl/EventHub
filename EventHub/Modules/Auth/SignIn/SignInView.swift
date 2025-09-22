@@ -8,11 +8,18 @@
 import SwiftUI
 
 struct SignInView: View {
+    @FocusState private var keyboardIsActive: Bool
+    
     @State private var emailID: String = ""
     @State private var password: String = ""
     @State private var rememberUser = true
     
     @State private var showSignUp: Bool = false
+    
+    @State var isLoading = false
+    
+    @State private var showError = false
+    @State private var errorMessage = ""
     
     var body: some View {
         ZStack {
@@ -20,11 +27,13 @@ struct SignInView: View {
                 .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 40) {
-                HStack {
-                    EventHubLogoView()
-                    Spacer()
+                if !keyboardIsActive {
+                    HStack {
+                        EventHubLogoView()
+                        Spacer()
+                    }
+                    .padding(.horizontal, 40)
                 }
-                .padding(.horizontal, 40)
                 
                 VStack(alignment: .center, spacing: 50) {
                     HStack {
@@ -33,67 +42,107 @@ struct SignInView: View {
                         Spacer()
                     }
                     
-                    /// Custom Text Fields
-                    CustomTF(sfIcon: "envelope", hint: "abc@email.com", value: $emailID)
+                    CustomTF(
+                        value: $emailID,
+                        sfIcon: "envelope",
+                        hint: "abc@email.com"
+                    )
                     
-                    CustomTF(sfIcon: "lock", hint: "Your password", isPassword: true, value: $password)
+                    CustomTF(
+                        value: $password,
+                        sfIcon: "lock",
+                        hint: "Your password",
+                        isPassword: true
+                    )
                     
                     HStack {
                         Toggle(isOn: $rememberUser) { }
                             .tint(.buttonPrimary)
                             .labelsHidden()
-                        Spacer()
+                        
                         Text("Remember Me")
+                            .font(.system(size: 14))
+                            .fontWeight(.regular)
+                            .foregroundStyle(.textDarkPrimary)
+                        
                         Spacer()
-                        Button("Forgot Password?") {
-                            //TO DO navigation to reset password
+                        
+                        NavigationLink {
+                            Text("screen Forgot password")
+                        } label: {
+                            Text("Forgot Password?")
+                                .font(.system(size: 14))
+                                .fontWeight(.regular)
+                                .foregroundStyle(.textDarkPrimary)
                         }
-                        .tint(.primary)
+                        
                     }
                     
                     VStack(alignment: .center, spacing: 40) {
                         
-                        SignInButton(
-                            backgroundColor: .buttonPrimary,
-                            circleColor: .buttonSecondary,
-                            title: "SIGN IN") {
-                                //sign in action
-                                handleAuthButton()
+                        ZStack {
+                            SignInButton(
+                                backgroundColor: .buttonPrimary,
+                                circleColor: .buttonSecondary,
+                                title: "SIGN IN") {
+                                    //sign in action
+                                    handleAuthButton()
+                                }
+                                .frame(width: 300)
+                                .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
+                                .background(.buttonPrimary, in: RoundedRectangle(cornerRadius: 16))
+                                .foregroundStyle(.white)
+                            
+                            if isLoading {
+                                HStack {
+                                    CustomProgressView()
+                                    
+                                    Spacer()
+                                }
                             }
-                            .frame(width: 300)
-                            .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
-                            .background(.buttonPrimary, in: RoundedRectangle(cornerRadius: 16))
-                            .foregroundStyle(.white)
-                        
-                        Text("OR")
-                            .foregroundStyle(.secondary)
-                        
-                        GoogleButton(
-                            title: "Login with Google",
-                            image: "googleIcon",
-                            action: {
-                                //Login with Google Auth Service
-                                handleGoogleSignInButton()
+                        }
+                        if !keyboardIsActive {
+                            Text("OR")
+                                .foregroundStyle(.secondary)
+                            
+                            ZStack {
+                                GoogleButton(
+                                    title: "Login with Google",
+                                    image: "googleIcon",
+                                    action: {
+                                        Task {
+                                            await handleGoogleSignInButton()
+                                        }
+                                    }
+                                )
+                                .frame(width: 300)
+                                .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
+                                .background(Color.background, in: RoundedRectangle(cornerRadius: 16))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
+                                )
+                                .foregroundStyle(.black)
+                                
+                                if isLoading {
+                                    HStack {
+                                        CustomProgressView()
+                                        
+                                        Spacer()
+                                    }
+                                }
                             }
-                        )
-                        .frame(width: 300)
-                        .buttonStyle(PrimaryButtonStyle(height: 58, cornerRadius: 16))
-                        .background(Color.background, in: RoundedRectangle(cornerRadius: 16))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
-                        )
-                        .foregroundStyle(.black)
-                    }
-                    
-                    HStack {
-                        Text("Don't have an account?")
+                        }
                         
-                        Button(action: {
-                            showSignUp = true
-                        }) {
-                            Text("Sign Up")
-                                .foregroundColor(Color.buttonPrimary)
+                        HStack {
+                            Text("Don't have an account?")
+                            
+                            Button(action: {
+                                showSignUp = true
+                            }) {
+                                Text("Sign Up")
+                                    .foregroundColor(Color.buttonPrimary)
+                            }
                         }
                     }
                 }
@@ -106,25 +155,33 @@ struct SignInView: View {
             isPresented: $showSignUp) {
                 SignUpView(isPresented: $showSignUp)
             }
+            .alert("Error:", isPresented: $showError) {
+                Button("Okay", role: .cancel) {}
+            } message: {
+                Text(errorMessage)
+            }
+            .focused($keyboardIsActive)
     }
     
     
-    private func handleGoogleSignInButton() {
-#warning("TO DO: поднять какой-то флаг, чтобы отслеживать пока процесс идёт и крутить ромашку")
-        Task {
-            do {
-                try await DataManager.shared.loginUserWithGoogle(
-                    rememberUser: rememberUser
-                )
-            } catch {
-                print("Ошибка в SignIn.handleGoogleSignInButton: ", error)
-            }
+    private func handleGoogleSignInButton() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            try await DataManager.shared.loginUserWithGoogle(
+                rememberUser: rememberUser
+            )
+        } catch {
+            errorMessage = error.localizedDescription
+            showError = true
         }
-#warning("TO DO: снять флаг")
     }
     
     private func handleAuthButton() {
-#warning("TO DO: поднять какой-то флаг, чтобы отслеживать пока процесс идёт и крутить ромашку")
+        isLoading = true
+        defer { isLoading = false }
+        
         Task {
             do {
                 try await DataManager.shared.loginUser(
@@ -133,10 +190,10 @@ struct SignInView: View {
                     rememberUser: rememberUser
                 )
             } catch {
-                print("Ошибка в SignIn.handleGoogleSignInButton: ", error)
+                errorMessage = error.localizedDescription
+                showError = true
             }
         }
-#warning("TO DO: снять флаг")
     }
 }
 
